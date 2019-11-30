@@ -14,6 +14,22 @@
 
     }
 
+    // Get changelog contents
+    public function changelog() {
+
+      if(file_exists(DIR_ROOT . 'CHANGELOG.md')) {
+      $data['contents'] = str_replace('`', '\`', addslashes(file_get_contents(DIR_ROOT . 'CHANGELOG.md')));
+
+      $this->loadView('pages/changelog', $data);
+
+      } else { // File doesn't exist. Redirect to error page.
+
+        $this->error();
+
+      }
+
+    }
+
     // Testing page
     public function cstest() {
 
