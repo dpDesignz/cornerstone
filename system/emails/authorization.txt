@@ -1,0 +1,20 @@
+Your authorization code for {{site_name}}.\r\n\r\n
+
+{{site_name}} ( {{site_url}} )\r\n\r\n
+
+******************\r\n
+AUTHORIZATION CODE\r\n
+******************\r\n\r\n
+
+Here is your authorization code for the {{site_name}} website.\r\n\r\n
+
+Authorize your login ( {{action_url}} )\r\n\r\n
+
+This code will expire at {{expire_dtm}}, and is only valid when entered in the same browser as your login.\r\n\r\n
+
+{{browser_security}}If you did not try to log in, please ignore this email, or contact support ( {{support_url}} ) if you have questions.\r\n\r\n
+
+Thanks,\r\n
+The {{site_url}} Team\r\n\r\n
+
+© {{current_year}} {{site_name}}. All rights reserved.

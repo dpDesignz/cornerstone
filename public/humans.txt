@@ -1,0 +1,23 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+#   IT Developer: John Smith
+#	Site: www.example.com
+#	Email: john.smith@example.com
+#	Twitter: john.smith
+#	Location: Hiddensville
+
+# THANKS
+
+    Name: dpDesignz (Cornerstone PHP Framework) - https://github.com/dpDesignz/cornerstone
+
+# TECHNOLOGY COLOPHON
+
+    Last update: 2019/09/03
+
+    CSS3, HTML5, CSS Grid, Flexbox
+    Apache Server Configs, jQuery, Modernizr, Normalize.css, Fontawesome, PHPMailer, WhichBrowser, Swiftmailer
+
+    Software: VS Code, Hyper, NPM, Composer

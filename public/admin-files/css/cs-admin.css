@@ -1,0 +1,380 @@
+/*########################################
+
+Project:	Cornerstone Framework
+Extends:	Cornerstone Framework Core CSS
+Script:		Cornerstone Framework
+Section:	Cornerstone Admin
+Version:	0.0.2
+Last Change:	05/09/2019
+Developed:	dpDesignz - www.dpdesignz.co.nz
+
+#########################################*/
+.Fear {
+  display: none;
+}
+
+/* CSS Naming based on CSS Guidelines ~ https://cssguidelin.es/#naming-conventions */
+@keyframes fadeInUp {
+  from {
+    transform: translate3d(0, 40px, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+.animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.animatedFadeInUp {
+  opacity: 0;
+}
+
+.fadeInUp {
+  opacity: 0;
+  animation-name: fadeInUp;
+}
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+/* ==========================================================================
+   Cornerstone Admin Styling
+   ========================================================================== */
+/* Body Layouts */
+body.cs-admin {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: minmax(0, 230px) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "cs--body__sidebar cs--body__header" "cs--body__sidebar cs--body__main";
+  transition: all 1s;
+}
+
+/*------------------------------------*\
+  #HEADER
+\*------------------------------------*/
+body.cs-admin > header {
+  grid-area: cs--body__header;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  height: 64px;
+  background-color: #263238;
+  color: white;
+}
+body.cs-admin > header #csa-header__nav {
+  display: flex;
+  justify-content: flex-end;
+}
+body.cs-admin > header #csa-header__nav nav {
+  display: flex;
+  height: 100%;
+  margin-left: 8px;
+}
+body.cs-admin > header #csa-header__nav nav ol,
+body.cs-admin > header #csa-header__nav nav li {
+  padding: 0;
+  margin: 0;
+}
+body.cs-admin > header #csa-header__nav nav ol {
+  display: grid;
+  grid-auto-flow: column;
+  margin: 0;
+}
+body.cs-admin > header #csa-header__nav nav ol li {
+  list-style: none;
+}
+body.cs-admin > header #csa-header__nav nav ol li a {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 25px;
+  color: white;
+  border-left: 2px solid #455a64;
+  border-bottom: 3px solid #263238;
+}
+body.cs-admin > header #csa-header__nav nav ol li a:hover {
+  color: #1de9b6;
+  font-weight: 700;
+  border-bottom-color: #1de9b6;
+}
+body.cs-admin > header #csa-header__nav nav ol li a.logout:hover {
+  color: #ff5722;
+  font-weight: 700;
+}
+body.cs-admin > header section#csa-header__welcome {
+  display: flex;
+  align-items: center;
+  padding: 0px 25px;
+  text-align: right;
+  border-left: 2px solid #455a64;
+}
+body.cs-admin > header section#csa-header__welcome p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+body.cs-admin > header section#csa-header__welcome p span {
+  display: block;
+  font-size: 0.75rem;
+}
+
+/*------------------------------------*\
+  #MAIN CONTENT
+\*------------------------------------*/
+body.cs-admin > main {
+  grid-area: cs--body__main;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 25px;
+  grid-template-rows: 1fr auto;
+  grid-template-areas: "cs--main__main" "cs--main__footer";
+  padding: 0 25px;
+  background-color: #eee;
+  box-shadow: inset 7px 0 9px -7px rgba(0, 0, 0, 0.56);
+}
+body.cs-admin > main > main {
+  grid-area: cs--main__main;
+}
+
+/*------------------------------------*\
+  #SIDEBAR CONTENT
+\*------------------------------------*/
+body.cs-admin > aside#sidebar__main {
+  grid-area: cs--body__sidebar;
+  position: relative;
+  width: 100%;
+  background: transparent url("/admin-files/img/menu_bg.jpg") center center no-repeat;
+  background-size: cover;
+  box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.8);
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar_identity {
+  text-align: center;
+  height: 64px;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar_identity h3 a {
+  color: white;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar_identity img {
+  width: 230px;
+  height: 100%;
+  transition: width 0.7s;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav {
+  position: relative;
+  overflow: auto;
+  height: calc(100vh - 64px);
+  width: 100%;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links {
+  padding: 0px;
+  margin: 0px;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li {
+  list-style: none;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a {
+  display: flex;
+  position: relative;
+  vertical-align: middle;
+  align-items: center;
+  padding: 8px 10px;
+  margin: 15px;
+  color: white;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 3px;
+  transition: all 0.15s ease-in;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a i.material-icons {
+  margin-right: 8px;
+  font-size: 1.3em;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a i.fas,
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a i.far {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a span {
+  transition: all 0.3s linear;
+  white-space: nowrap;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a.open b.caret {
+  transform: rotate(180deg);
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a.open + ol.sidebar__sub-nav {
+  display: block;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a:hover, body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a:focus {
+  background-color: rgba(199, 199, 199, 0.2);
+  box-shadow: inset -5px 0 5px -5px rgba(0, 0, 0, 0.3);
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.has-subnav a b.caret {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-top: 4px dashed;
+  border-top: 4px solid\9 ;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  transition: all 0.15s ease-in;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.active > a {
+  background-color: #bf360c;
+  box-shadow: inset -5px 0 5px -5px rgba(0, 0, 0, 0.3);
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.active > a b.caret {
+  transform: rotate(180deg);
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.active > ol.sidebar__sub-nav {
+  display: block;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.active > [data-toggle=collapse] {
+  background-color: rgba(199, 199, 199, 0.2);
+  box-shadow: none;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.sidebar__nav-separator {
+  padding: 2px 15px;
+  margin: 0 0 6px 0;
+  cursor: inherit;
+  border-bottom: 1px solid rgba(181, 181, 181, 0.3);
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.sidebar__nav-separator span {
+  display: inline-block;
+  color: #9e9e9e;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.sidebar__nav-separator.no-border {
+  border: none;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.sidebar__nav-separator:hover, body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li.sidebar__nav-separator:focus {
+  background-color: transparent;
+  box-shadow: unset;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li ol.sidebar__sub-nav {
+  display: none;
+  padding: 0;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li ol.sidebar__sub-nav li a {
+  width: auto;
+  padding: 8px 25px 8px 30px;
+  justify-content: left;
+  font-size: 0.9rem;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li ol.sidebar__sub-nav li:hover > a, body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li ol.sidebar__sub-nav li:focus > a {
+  box-shadow: none;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li ol.sidebar__sub-nav li:hover > a::after, body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li ol.sidebar__sub-nav li:focus > a::after {
+  width: 0px;
+  height: 0px;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li ol.sidebar__sub-nav li.active {
+  font-weight: 700;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse {
+  margin-top: 5px;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse button {
+  display: flex;
+  vertical-align: middle;
+  align-items: center;
+  padding: 10px 20px;
+  width: 100%;
+  color: white;
+  font-size: 0.9rem;
+  line-height: 1;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse button i.fas,
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse button i.far {
+  margin-right: 5px;
+  font-size: 1rem;
+  transform: rotate(180deg);
+}
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse button span {
+  transition: all 0.3s linear;
+}
+
+body.cs-admin.sidebar__collapsed {
+  grid-template-columns: minmax(0, 100px) minmax(0, 1fr);
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main section#csa-sidebar_identity img {
+  width: 100px;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button {
+  justify-content: center;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a span,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button span {
+  display: none;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.material-icons,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.fas,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.far,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.material-icons,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.fas,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.far {
+  margin-right: 0;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.material-icons,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.material-icons {
+  font-size: 1.7rem;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.fas,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.far,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.fas,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.far {
+  font-size: 1.3rem;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a b.caret,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button b.caret {
+  display: none;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li.sidebar__nav-separator {
+  padding: 2px 0;
+  text-align: center;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li ol.sidebar__sub-nav li a {
+  justify-content: center;
+  padding: 5px;
+  text-align: center;
+  font-size: 0.75em;
+}
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li#sidebar__collapse button i {
+  transform: rotate(0deg);
+}
+
+/*------------------------------------*\
+  #FOOTER
+\*------------------------------------*/
+body.cs-admin > main > footer {
+  grid-area: cs--main__footer;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-size: 0.65rem;
+  text-align: center;
+  border-top: 1px solid #e7e7e7;
+}
+body.cs-admin > main > footer p#footer__copyright {
+  text-align: left;
+}
+body.cs-admin > main > footer p#footer__thankyou {
+  text-align: right;
+}
+
+/* ==========================================================================
+   Media Queries for Responsive Design.
+   These templates override the primary ('mobile first') styles.
+   ========================================================================== */
+
+/*# sourceMappingURL=cs-admin.css.map */

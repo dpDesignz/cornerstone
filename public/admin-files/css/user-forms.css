@@ -1,0 +1,67 @@
+@charset "UTF-8";
+/*########################################
+
+Project:	Cornerstone Framework
+Extends:	Cornerstone Framework Core CSS
+Script:		Cornerstone Framework
+Section:	User Forms
+Version:	1.0.0
+Last Change:	29/08/2019
+Developed:	dpDesignz - www.dpdesignz.co.nz
+
+#########################################*/
+
+body.cs-admin {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "cs--body__header"
+    "cs--body__main"
+    "cs--body__footer";
+  background-image: linear-gradient(to bottom right, #d13f2d, #da4230, #8e44ad);
+}
+body.cs-admin > header {
+  grid-template-columns: 1fr;
+  background-color: transparent;
+  padding: 0;
+}
+body > header > section#cs--header__logo {
+  width: 100%; min-width: 100vw;
+}
+body > header > section#cs--header__logo img {
+  width: 100%; height: auto; max-width: 250px;
+  text-align: center;
+}
+body.cs-admin > main {
+  grid-template-columns: 1fr;
+  justify-items: center; align-items: center;
+  background-color: transparent;
+  box-shadow: unset;
+}
+body > main > section#cs--user-form {
+  padding: 10px;
+  box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 16px 24px 2px rgba(0,0,0,.14), 0 6px 30px 5px rgba(0,0,0,.12);
+}
+body > main > section#cs--user-form h3 {
+  margin: 0;
+}
+body > main > section#cs--user-form .csc-input-field .csc-prefix {
+  font-size: 1.5rem;
+  top: 0.7rem;
+}
+body > footer {
+  padding: 0 20px;
+  text-align: left;
+}
+body > footer > p {
+  font-size: 0.7em;
+  color: #eeeeee;
+}
+body > footer > p > span {
+  margin-right: 10px;
+}
+body > footer > p a {
+  color: #eeeeee !important;
+  text-decoration: none !important;
+  font-weight: bold;
+}

@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    Options -Multiviews
+    RewriteEngine On
+    RewriteBase /public
+    # Don't Redirect Existing Directory
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # Don't Redirect Existing File
+    RewriteCond %{REQUEST_FILENAME} !-f
+    # Redirect everything else
+    RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+</IfModule>
