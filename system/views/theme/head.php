@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html class="no-js" lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
@@ -26,7 +27,7 @@
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#eeeeee">
   <!-- Remove Tap Highlight on Windows Phone IE -->
-  <meta name="msapplication-tap-highlight" content="no"/>
+  <meta name="msapplication-tap-highlight" content="no" />
   <!--[if IE]>
     <script type="text/javascript" src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
@@ -35,9 +36,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <!-- Fontawesome ~ https://fontawesome.com/icons -->
   <?php
-    $fontAwesomeURL = get_option('font_awesome_kit_url');
-    if (!empty($fontAwesomeURL)) { ?>
-  <script src="<?php echo $fontAwesomeURL; ?>"></script>
+  $fontAwesomeURL = $option->get('font_awesome_kit_url');
+  if (!empty($fontAwesomeURL)) { ?>
+    <script src="<?php echo $fontAwesomeURL; ?>" crossorigin="anonymous"></script>
   <?php } ?>
   <!-- Tooltipster ~ http://iamceege.github.io/tooltipster/ -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css">
@@ -46,22 +47,27 @@
   <!-- Site Styling -->
   <link href="<?php echo get_site_url('css/cornerstone.css?v=1.0.0'); ?>" rel="stylesheet" type="text/css">
   <?php
-    // Output custom main.css file if it exists
-    if(file_exists(get_site_url('css/main.css?v=1.0.0'))) : ?>
-  <link href="<?php echo get_site_url('css/main.css?v=1.0.0'); ?>" rel="stylesheet" type="text/css">
-    <?php endif; ?>
+  // Output custom main.css file if it exists
+  if (file_exists(get_site_url('css/main.css?v=1.0.0'))) : ?>
+    <link href="<?php echo get_site_url('css/main.css?v=1.0.0'); ?>" rel="stylesheet" type="text/css">
+  <?php endif; ?>
   <!-- SCRIPTS -->
   <!-- jQuery library -->
   <script src="<?php echo get_site_url('js/vendor/modernizr-3.6.0.min.js'); ?>" async></script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous" async></script>
-  <script>window.jQuery || document.write('<script src="<?php echo get_site_url('js/vendor/jquery-3.3.1.min.js'); ?>"><\/script>')</script>
+  <script>
+    window.jQuery || document.write('<script src="<?php echo get_site_url('js/vendor/jquery-3.3.1.min.js'); ?>"><\/script>')
+  </script>
   <?php
-    // Output any page specific extras if it exists
-    if(!empty($pageHeadExtras)) {
-      echo $pageHeadExtras;
-    } ?>
+  // Output any page specific extras if it exists
+  if (!empty($pageHeadExtras)) {
+    echo $pageHeadExtras;
+  } ?>
 </head>
-<body <?php if(!empty($pageBodyClassID)) { echo $pageBodyClassID;} ?>>
+
+<body <?php if (!empty($pageBodyClassID)) {
+        echo $pageBodyClassID;
+      } ?>>
   <!--[if lte IE 9]>
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->

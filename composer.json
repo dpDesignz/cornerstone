@@ -18,6 +18,7 @@
     "paragonie/random_compat": ">=2",
     "swiftmailer/swiftmailer": "^6.0",
     "gumlet/php-image-resize": "1.9.*",
-    "nielse63/phpimagecache": "dev-master"
+    "nielse63/phpimagecache": "dev-master",
+    "icanboogie/inflector": "^2.0"
   }
 }

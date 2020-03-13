@@ -14,66 +14,20 @@
 
 // $csdb->dbh->varDump($result);
 
-class Test {
+$subject = "New order created";
+$text = "A new order has been placed";
 
-  /**
-   * Class Constructor
-  */
-  public function __construct() {
+$array = array(
+  'subject' => $subject,
+  'text' => $text
+);
 
-    $params = array('sort', 'rate');
+$res = json_encode($array);
+echo "Convert from array to json : " . $res . "<br>";
 
-    // Set parameters
-    $this->params = array();
-    $this->data['showFilter'] = FALSE;
+echo "<br>From json to array:<br>";
+echo '<pre>';
+print_r(json_decode($res));
+echo '</pre>';
 
-    // Allowed sort fields
-    $canSortBy = array('name' => 'tax_name', 'rate' => 'tax_rate_type, tax_rate');
-
-    $sortData = $this->testMethod($canSortBy, array('sort' => 'tax_name', 'order' => 'ASC'), ...$params);
-
-    echo '<pre>';
-    print_r($sortData);
-    echo '</pre>';
-    exit;
-
-  }
-
-  public function testMethod ($canSortBy, $defaultSort, ...$params) {
-
-    // Set data
-    $return = array();
-
-    // Check for sort
-    if(array_search('sort', $params) !== FALSE && !empty($params[array_search('sort', $params) + 1])) {
-      // Get key of 'sort'
-      $arrayKey = array_search('sort', $params);
-      // Set what column to order by
-      $sort = htmlspecialchars(stripslashes(urldecode(trim($params[$arrayKey + 1]))));
-      // Check if is a valid column to sort by
-      if(array_key_exists($sort, $canSortBy)) {
-        // Set column to sort by
-        $return['sort'] = $canSortBy[$sort];
-        // Check what direction to sort by
-        $order = (!empty($params[$arrayKey + 2])) ? strtoupper(htmlspecialchars(stripslashes(urldecode(trim($params[$arrayKey + 2]))))) : '';
-        // Set what direction to sort by
-        $return['order'] = (in_array($order, array("DESC", "ASC"))) ? $order : 'ASC' ;
-        $return['showFilter'] = TRUE;
-
-        return $return;
-        exit;
-      } // Reuqested sort was not a valid column. Define defaults
-    } // No sort by set. Define defaults
-    $return['sort'] = $defaultSort['sort'];
-    $return['order'] = $defaultSort['order'];
-
-    return $return;
-    exit;
-
-  }
-
-}
-
-new Test();
-
-exit; ?>
+exit;

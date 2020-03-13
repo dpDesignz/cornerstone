@@ -131,7 +131,7 @@ body.cs-admin > main {
   grid-template-rows: 1fr auto;
   grid-template-areas: "cs--main__main" "cs--main__footer";
   padding: 0 25px;
-  background-color: #eee;
+  background-color: #f2f2f2;
   box-shadow: inset 7px 0 9px -7px rgba(0, 0, 0, 0.56);
 }
 body.cs-admin > main > main {
@@ -191,8 +191,7 @@ body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a 
   margin-right: 8px;
   font-size: 1.3em;
 }
-body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a i.fas,
-body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a i.far {
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a i[class^=fa] {
   margin-right: 8px;
   font-size: 1rem;
 }
@@ -294,8 +293,7 @@ body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#si
   border: none;
   cursor: pointer;
 }
-body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse button i.fas,
-body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse button i.far {
+body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse button i[class^=fa] {
   margin-right: 5px;
   font-size: 1rem;
   transform: rotate(180deg);
@@ -319,21 +317,17 @@ body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sid
   display: none;
 }
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.material-icons,
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.fas,
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.far,
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i[class^=fa],
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.material-icons,
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.fas,
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.far {
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i[class^=fa] {
   margin-right: 0;
 }
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.material-icons,
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.material-icons {
   font-size: 1.7rem;
 }
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.fas,
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.far,
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.fas,
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.far {
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i[class^=fa],
+body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i[class^=fa] {
   font-size: 1.3rem;
 }
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a b.caret,

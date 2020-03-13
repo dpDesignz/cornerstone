@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The "Output/Page" related functions file
  *
@@ -17,36 +18,36 @@
  * @return string Will return the requested output.
  *
  * Thanks to {@link https://stackoverflow.com/a/57552804/1248664 Nick} for his help on this
-*/
-function friendlyDtmDiff($date1, $date2, $length = '', $format = '') {
+ */
+function friendlyDtmDiff($date1, $date2, $length = '', $format = '')
+{
   // Create DateTime for diff()
   $dt1 = new \DateTime($date1);
   $dt2 = new \DateTime($date2);
 
   // Create intervals
   if ($dt1 < $dt2) {
-      $ago = '';
-      $interval = $dt1->diff($dt2);
-  }
-  else { // If $dt2 is older than $dt1, reverse the roles
-      $ago = '-';
-      $interval = $dt2->diff($dt1);
+    $ago = '';
+    $interval = $dt1->diff($dt2);
+  } else { // If $dt2 is older than $dt1, reverse the roles
+    $ago = '-';
+    $interval = $dt2->diff($dt1);
   }
 
   // Assume best output options
-  if(empty($format) || $format == '') {
-    $formatCheck = $interval->days*86400 + $interval->h*3600 + $interval->i*60 + $interval->s;
-    if($formatCheck > YEAR_IN_SECONDS) { // Assume Years
+  if (empty($format) || $format == '') {
+    $formatCheck = $interval->days * 86400 + $interval->h * 3600 + $interval->i * 60 + $interval->s;
+    if ($formatCheck > YEAR_IN_SECONDS) { // Assume Years
       $format = 'y';
-    } else if($formatCheck > MONTH_IN_SECONDS) { // Assume Months
+    } else if ($formatCheck > MONTH_IN_SECONDS) { // Assume Months
       $format = 'm';
-    } else if($formatCheck > DAY_IN_SECONDS) { // Assume Days
+    } else if ($formatCheck > DAY_IN_SECONDS) { // Assume Days
       $format = 'd';
-    } else if($formatCheck > HOUR_IN_SECONDS) { // Assume Hours
+    } else if ($formatCheck > HOUR_IN_SECONDS) { // Assume Hours
       $format = 'h';
-    } else if($formatCheck > MINUTE_IN_SECONDS) { // Assume Minutes
+    } else if ($formatCheck > MINUTE_IN_SECONDS) { // Assume Minutes
       $format = 'i';
-    } else {// Assume seconds
+    } else { // Assume seconds
       $format = 's';
     }
   }
@@ -58,50 +59,50 @@ function friendlyDtmDiff($date1, $date2, $length = '', $format = '') {
   $output = array();
   // create time components
   switch ($format) {
-      case 'Y':
-      case 'y':
-          $years = $interval->y;
-          $plural = ($years == 1) ? '' : 's';
-          if ($years) $output[] = sprintf("$of year" . $plural, $years);
-          if ($length != 'l') break;
-          $interval->y = 0;
-      case 'M':
-      case 'm':
-          $months = $interval->y * 12 + $interval->m;
-          $plural = ($months == 1) ? '' : 's';
-          if ($months) $output[] = sprintf("$of month" . $plural, $months);
-          if ($length != 'l') break;
-          $interval->m = $interval->y = 0;
-      case 'D':
-      case 'd':
-          $days = ($interval->y * 12 + $interval->m) * 30 + $interval->d;
-          $plural = ($days == 1) ? '' : 's';
-          if ($days) $output[] = sprintf("$of day" . $plural, $days);
-          if ($length != 'l') break;
-          $interval->d = $interval->m = $interval->y = 0;
-      case 'H':
-      case 'h':
-          $hours = (($interval->y * 12 + $interval->m) * 30 + $interval->d) * 24 + $interval->h;
-          $plural = ($hours == 1) ? '' : 's';
-          if ($hours) $output[] = sprintf("$of hour" . $plural, $hours);
-          if ($length != 'l') break;
-          $interval->h = $interval->d = $interval->m = $interval->y = 0;
-      case 'I':
-      case 'i':
-          $minutes = ((($interval->y * 12 + $interval->m) * 30 + $interval->d) * 24 + $interval->h) * 60 + $interval->i;
-          $plural = ($minutes == 1) ? '' : 's';
-          if ($minutes) $output[] = sprintf("$of minute" . $plural, $minutes);
-          if ($length != 'l') break;
-          $interval->i = $interval->h = $interval->d = $interval->m = $interval->y = 0;
-      case 'S':
-      case 's':
-          $seconds = (((($interval->y * 12 + $interval->m) * 30 + $interval->d) * 24 + $interval->h) * 60 + $interval->i) * 60 + $interval->s;
-          $plural = ($seconds == 1) ? '' : 's';
-          if ($seconds) $output[] = sprintf("$of second" . $plural, $seconds);
-          break;
-      default:
-          return 'Invalid format';
-          break;
+    case 'Y':
+    case 'y':
+      $years = $interval->y;
+      $plural = ($years == 1) ? '' : 's';
+      if ($years) $output[] = sprintf("$of year" . $plural, $years);
+      if ($length != 'l') break;
+      $interval->y = 0;
+    case 'M':
+    case 'm':
+      $months = $interval->y * 12 + $interval->m;
+      $plural = ($months == 1) ? '' : 's';
+      if ($months) $output[] = sprintf("$of month" . $plural, $months);
+      if ($length != 'l') break;
+      $interval->m = $interval->y = 0;
+    case 'D':
+    case 'd':
+      $days = ($interval->y * 12 + $interval->m) * 30 + $interval->d;
+      $plural = ($days == 1) ? '' : 's';
+      if ($days) $output[] = sprintf("$of day" . $plural, $days);
+      if ($length != 'l') break;
+      $interval->d = $interval->m = $interval->y = 0;
+    case 'H':
+    case 'h':
+      $hours = (($interval->y * 12 + $interval->m) * 30 + $interval->d) * 24 + $interval->h;
+      $plural = ($hours == 1) ? '' : 's';
+      if ($hours) $output[] = sprintf("$of hour" . $plural, $hours);
+      if ($length != 'l') break;
+      $interval->h = $interval->d = $interval->m = $interval->y = 0;
+    case 'I':
+    case 'i':
+      $minutes = ((($interval->y * 12 + $interval->m) * 30 + $interval->d) * 24 + $interval->h) * 60 + $interval->i;
+      $plural = ($minutes == 1) ? '' : 's';
+      if ($minutes) $output[] = sprintf("$of minute" . $plural, $minutes);
+      if ($length != 'l') break;
+      $interval->i = $interval->h = $interval->d = $interval->m = $interval->y = 0;
+    case 'S':
+    case 's':
+      $seconds = (((($interval->y * 12 + $interval->m) * 30 + $interval->d) * 24 + $interval->h) * 60 + $interval->i) * 60 + $interval->s;
+      $plural = ($seconds == 1) ? '' : 's';
+      if ($seconds) $output[] = sprintf("$of second" . $plural, $seconds);
+      break;
+    default:
+      return 'Invalid format';
+      break;
   }
   // Output Oxford Comma
   (count($output) > 2) ? $oxford = ',' : $oxford = '';
@@ -118,26 +119,71 @@ function friendlyDtmDiff($date1, $date2, $length = '', $format = '') {
  *
  * @return string Will return the errors as a string for appending to the javascript.
  *
-*/
-function showValidationErrors($errors) {
+ */
+function showValidationErrors($errors)
+{
 
-    // Start the show errors output
-    $output = '.showErrors({ ';
+  // Start the show errors output
+  $output = '.showErrors({ ';
 
-        // Loop through all the errors
-    foreach($errors as $field => $error) {
+  // Loop through all the errors
+  foreach ($errors as $field => $error) {
 
-        // Add the error to the string
-        $output .= '"' . $field . '" : "' . $error . '", ';
+    // Add the error to the string
+    $output .= '"' . $field . '" : "' . $error . '", ';
+  }
 
+  // Remove the last comma
+  $output = rtrim(trim($output), ',');
+
+  // Close the errors output
+  $output .= ' });';
+
+  // Return the string to be output
+  return $output;
+}
+
+/**
+ * Get closest in array
+ * Based on https://stackoverflow.com/a/5464961/1248664
+ *
+ * @param int $search Item to search for
+ * @param array $arr Array to search in
+ *
+ * @return string Will return the value of the closest match
+ */
+function getClosest(int $search, array $arr)
+{
+  $closest = null;
+  foreach ($arr as $item) {
+    if ($closest === null || abs($search - $closest) > abs($item - $search)) {
+      $closest = $item;
     }
+  }
+  return $closest;
+}
 
-    // Remove the last comma
-    $output = rtrim(trim($output), ',');
+/**
+ * Output breadcrumbs
+ *
+ * @param object $breadcrumbs
+ *
+ * @return string Will return the breadcrumbs as a string
+ */
+function outputBreadcrumbs(object $breadcrumbs)
+{
+  // Init output
+  $returnOutput = '';
 
-    // Close the errors output
-    $output .= ' });';
+  // Output breadcrumbs
+  foreach ($breadcrumbs as $breadcrumb) {
+    // Check for href
+    $href = (!empty($breadcrumb->href)) ? ' href="' . $breadcrumb->href . '"' : '';
+    // Check for title
+    $title = (!empty($breadcrumb->title)) ? $breadcrumb->title : $breadcrumb->text;
+    $returnOutput .= '<a' . $href . ' class="csc-breadcrumb" title="' . $title . '">' . $breadcrumb->text . '</a>';
+  }
 
-    // Return the string to be output
-    return $output;
+  // Return output
+  return (!empty($returnOutput)) ? $returnOutput : '<a class="csc-breadcrumb" title="No breadcrumb available">n/a</a>';
 }
