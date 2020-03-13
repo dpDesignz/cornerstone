@@ -16,7 +16,7 @@ Download a copy of the repo and unzip it. Copy the `/system/cs-config-sample.php
 
 You will need [Composer](https://getcomposer.org/) to install all the dependencies required to run your site.
 
-Run the SQL file in your database and fill out the `site_url`, `site_https`, `site_name`, and `smtp_*` details.
+Run the SQL file in your database and fill out the `site_url`, `site_https`, `site_name`, and `smtp_*` details in the `cs_options` table.
 
 Upload ready files to your server.
 
