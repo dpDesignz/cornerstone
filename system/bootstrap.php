@@ -6,13 +6,13 @@
  * Allows for some configuration in the cs-config.php
  *
  * @package Cornerstone
- * @version 0.1.2
+ * @version 0.2.18
  * @author Damien Peden <support@dpdesignz.co>
- * @copyright 2019 dpDesignz. All Rights Reserved
+ * @copyright 2019-2020 dpDesignz. All Rights Reserved
  * @license This script can be used FREE of charge for any commercial or personal projects. Enjoy!
  * - LIMITATIONS
  * --- This script cannot be sold.
- * --- This script should have the copyright notice intact. Please dont remove it.
+ * --- This script should have the copyright notice intact. Please don't remove it.
  * --- This script may not be provided for download except from its original site.
  * --- For further usage, please feel free to contact me.
  */

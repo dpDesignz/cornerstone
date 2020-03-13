@@ -6,6 +6,7 @@
 - ➕ Added the setting to set option data in the load view data
 - 🧹 Fixed session and bootstrap EOF bugs
 - 🧹 Fixed an error where `request->set_params()` fell over if a data item was an array or object
+- ➕ Added files and documentation for personal usage
 
 ## 0.2.17 - Composer Updates (2020-02-03)
 
