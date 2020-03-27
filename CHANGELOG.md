@@ -1,6 +1,14 @@
 # Cornerstone Change Log
 
-## 0.2.18 - Options
+## 0.2.19 - Content (2020-03-27)
+
+- ➕ Added the vanilla JS ready state function
+- ➕ Added the `cs_content`, `cs_content_meta`, `cs_content_section`, and `cs_seo_url` tables
+- ➕ Added the `cornerstonecore.model.php` file to the system models for loading seo and content data
+- 🖊️ Changed the `core.class.php` default `$currentMethod` from `error` to `loadpage`
+- ➕ Added the [Html2Text](https://github.com/mtibben/html2text) library
+
+## 0.2.18 - Options (2020-03-14)
 
 - ➕ Added the options class
 - ➕ Added the setting to set option data in the load view data

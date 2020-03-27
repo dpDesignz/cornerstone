@@ -2,6 +2,12 @@
 // The core JS file for running Cornerstone Framework scripts
 */
 
+// Vanilla JS ready function
+const ready = callback => {
+  if (document.readyState !== 'loading') callback();
+  else document.addEventListener('DOMContentLoaded', callback);
+};
+
 // Hide Banner Notification
 function hideBanner() {
   $('#csc-banner').removeClass('visible');

@@ -16,7 +16,7 @@ foreach ($csOptions->dbh->selecting(DB_PREFIX . 'options', array('option_name', 
 /**#@+
  * Cornerstone constants
  */
-\defined('CS_VERSION') or \define('CS_VERSION', '0.2.18'); // Last updated ~ 2020-03-14
+\defined('CS_VERSION') or \define('CS_VERSION', '0.2.19'); // Last updated ~ 2020-03-27
 \defined('_DS') or \define('_DS', \DIRECTORY_SEPARATOR);
 /**#@-*/
 

@@ -4,7 +4,7 @@ This is the Cornerstone PHP Framework created and maintained by [dpdesignz](http
 
 ***A PHP MVC framework created to make starting your PHP projects just that little bit easier, allowing you to focus on keeping control of your main code, while trying to keep up with best practices in security.***
 
-The current Version is **0.2.18-alpha**
+The current Version is **0.2.19-alpha**
 
 This is still in alpha stages while it is being developed. Use at your own risk. There are no guarantees offered with this framework.
 

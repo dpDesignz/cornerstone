@@ -14,7 +14,7 @@ class Core
   // Set default properties
   protected $url = array();
   protected $currentController = 'Page';
-  protected $currentMethod = 'error';
+  protected $currentMethod = 'loadpage';
   protected $params = [];
   protected $subFolders = ALLOWED_SUBFOLDERS;
 

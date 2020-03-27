@@ -16,6 +16,75 @@ class Page extends Controller
     $this->load->view('pages/index', $params);
   }
 
+  // Load Page
+  public function loadpage(...$params)
+  {
+
+    // Get the friendly URL if exists
+    if (!empty($params[0])) {
+
+      // Load the core model
+      $this->coreModel = $this->load->model('common/cornerstonecore');
+
+      // Check for the friendly URL type
+      if ($seoData = $this->coreModel->getSEOData(trim($params[0]))) {
+        // Keyword exists
+
+        // Set seo data to the params array
+        array_unshift($params, $seoData);
+
+        // Set SEO Keyword to data
+        $this->data['seo_keyword'] = $seoData->seo_keyword;
+
+        // Check if the page exists
+        if ($pageData = $this->coreModel->getContentData((int) $seoData->seo_type_id)) {
+          // Page exists
+
+          // Set page data
+          foreach ($pageData as $key => $data) {
+            $this->data[$key] = htmlspecialchars_decode($data);
+          }
+
+          // Check for any meta data
+          if ($metaData = $this->coreModel->getContentMetaData((int) $pageData->content_id)) {
+            // Meta data exists
+
+            // Add meta data to data
+            foreach ($metaData as $metaDataOutput) {
+              $this->data['content_' . $metaDataOutput->cmeta_key] = htmlspecialchars_decode($metaDataOutput->cmeta_value);
+            }
+          }
+
+          // Set page meta title
+          $this->data['page_meta_title'] = (empty($this->data['content_meta_title'])) ? $this->data['content_title'] : $this->data['content_meta_title'];
+
+          // Set page meta description
+          $this->data['page_meta_description'] = (empty($this->data['content_meta_description'])) ? trim(preg_replace('/\s+/', ' ', (new \Html2Text\Html2Text($this->data['content_content']))->getText())) : $this->data['content_meta_description'];
+          $this->data['page_meta_description'] = (strlen($this->data['page_meta_description']) > 166) ? substr($this->data['page_meta_description'], 0, 165) . '...' : $this->data['page_meta_description']; // Trim if more than 166 characters
+          $this->data['page_meta_description'] = filter_var($this->data['page_meta_description'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH); // Fix any unicode characters that slip in
+
+          // Set page head extras
+          $this->data['page_head_extras'] = (!empty($this->data['content_head_extras'])) ? $this->data['content_head_extras'] : '';
+
+          // Set page footer extras
+          $this->data['page_footer_extras'] = (!empty($this->data['content_footer_extras'])) ? $this->data['content_footer_extras'] : '';
+
+          // Load page
+          $this->load->view('pages/page', $this->data);
+          exit;
+        } // Page doesn't exist. Redirect to 404
+      } else { // Page doesn't exist. Redirect to 404
+        // Load error page
+        $this->error();
+        exit;
+      }
+    } else { // Friendly URL doesn't exist. Load index page
+      // Load index page
+      $this->index;
+      exit;
+    }
+  }
+
   // Get changelog contents
   public function changelog()
   {

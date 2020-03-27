@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code decides what to do when an error occurs on the site
  * based on the `errorLogType` option in the `cs_options` table
@@ -7,27 +8,29 @@
  */
 
 /**
-* Split `errorLogType` option
-*/
+ * Split `errorLogType` option
+ */
 $errorLogType = explode(',', ERROR_LOG_TYPE);
 
 /**
-* Error handler, passes flow over the exception logger with new ErrorException.
-*/
-function log_error( $num, $str, $file, $line, $context = null ) {
-	log_exception( new ErrorException( $str, 0, $num, $file, $line ) );
+ * Error handler, passes flow over the exception logger with new ErrorException.
+ */
+function log_error($num, $str, $file, $line, $context = null)
+{
+	log_exception(new ErrorException($str, 0, $num, $file, $line));
 }
 
 /**
-* Uncaught exception handler.
-*/
-function log_exception( $e ) {
+ * Uncaught exception handler.
+ */
+function log_exception($e)
+{
 	global $errorLogType; // Allow function to access $errorLogType
 	switch ($errorLogType[1]) {
 		case 1: // Email error to `errorsToEmail` and redirect the user
-			$errorEmailData = '<p>An error (' . get_class( $e ) . ') occurred on line <strong>' . $e->getLine() . '</strong> in the <strong>file: ' . $e->getFile() . '.</strong></p><p> ' . $e->getMessage() . ' </p>';
+			$errorEmailData = '<p>An error (' . get_class($e) . ') occurred on line <strong>' . $e->getLine() . '</strong> in the <strong>file: ' . $e->getFile() . '.</strong></p><p> ' . $e->getMessage() . ' </p>';
 			$errorEmailHeaders = 'From: ' . SITE_FROM_EMAIL . '\r\n';
-			$errorEmailHeaders .= 'Subject: Errortype ' . get_class( $e ) . ' from ' . SITE_NAME . '\r\n';
+			$errorEmailHeaders .= 'Subject: Errortype ' . get_class($e) . ' from ' . SITE_NAME . '\r\n';
 			$errorEmailHeaders .= 'MIME-Version: 1.0\r\n';
 			$errorEmailHeaders .= 'Content-type: text/html; charset=iso-8859-1\r\n';
 			error_log($errorEmailData, 1, ERRORS_TO_EMAIL, $errorEmailHeaders);
@@ -42,7 +45,7 @@ function log_exception( $e ) {
 			print '<title>Exception Occured on ' . SITE_NAME . '</title>' . PHP_EOL;
 			print '</head><body style="margin: 0; padding: 0; font-family: Verdana, Geneva, sans-serif;">' . PHP_EOL;
 			print '<div style="padding: 15px; background-color:#d3dcde; border-left: 5px solid #E81123;">' . PHP_EOL;
-			print '<p style="color: #e67e22;">' . get_class( $e ) . ': ' . $e->getCode() . '</p>' . PHP_EOL;
+			print '<p style="color: #e67e22;">' . get_class($e) . ': ' . $e->getCode() . '</p>' . PHP_EOL;
 			print '<p style="color: #4A5459; font-size: 1.8em; margin: 15px 0;">' . $e->getMessage() . '</p>' . PHP_EOL;
 			print '</div>' . PHP_EOL;
 			print '<div style="padding: 20px; border-left: 5px solid #e67e22; background-color: #ecf0f1;">' . PHP_EOL;
@@ -54,8 +57,8 @@ function log_exception( $e ) {
 			print '<table style="width: 100%;border: none; border-collapse: collapse;">' . PHP_EOL;
 			$f = fopen($e->getFile(), 'r');
 			$lineNo = 0;
-			$startLine = $e->getLine()-5;
-			$endLine = $e->getLine()+5;
+			$startLine = $e->getLine() - 5;
+			$endLine = $e->getLine() + 5;
 			while ($line = fgets($f)) {
 				$lineNo++;
 				if ($lineNo >= $startLine) {
@@ -70,10 +73,10 @@ function log_exception( $e ) {
 			print '</table>' . PHP_EOL;
 			print '</div>' . PHP_EOL;
 			print '<div style="padding: 8px; background-color: #34495e;">' . PHP_EOL;
-			print '<p style="margin: 0; font-size: 0.9em; color: #bdccdb;">Error on line '. $e->getLine() .'</p>' . PHP_EOL;
+			print '<p style="margin: 0; font-size: 0.9em; color: #bdccdb;">Error on line ' . $e->getLine() . '</p>' . PHP_EOL;
 			print '</div>' . PHP_EOL;
 			print '</div>' . PHP_EOL;
-			print '<p style="margin-bottom: 0; font-size: 0.8em;"><em>If you are not a developer for this website, please notify the webmaster you saw this error at <a href="mailto:' . ERRORS_TO_EMAIL . '?Subject=' . urlencode('I saw an error on the ' . SITE_NAME . ' website') . '&body=File: ' . urlencode($e->getFile()) .'">' . ERRORS_TO_EMAIL . '</a></em></p>' . PHP_EOL;
+			print '<p style="margin-bottom: 0; font-size: 0.8em;"><em>If you are not a developer for this website, please notify the webmaster you saw this error at <a href="mailto:' . ERRORS_TO_EMAIL . '?Subject=' . urlencode('I saw an error on the ' . SITE_NAME . ' website') . '&body=File: ' . urlencode($e->getFile()) . '">' . ERRORS_TO_EMAIL . '</a></em></p>' . PHP_EOL;
 			print '</div>' . PHP_EOL;
 			print '<div style="padding: 20px; border-left: 5px solid #7f8c8d;">' . PHP_EOL;
 			print '<h2 style="padding-bottom: 5px; color: #d35400; border-bottom: 1px solid #95a5a6;">Server/Request Data</h2>' . PHP_EOL;
@@ -90,59 +93,60 @@ function log_exception( $e ) {
 			print '</body></html>';
 			break;
 		default: // Log error in file and redirect the user
-			$message = "Type: " . get_class( $e ) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};";
-			file_put_contents( ABSPATH . "/tmp/logs/exceptions.log", $message . PHP_EOL, FILE_APPEND );
+			$message = "Type: " . get_class($e) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};";
+			file_put_contents(ABSPATH . "/tmp/logs/exceptions.log", $message . PHP_EOL, FILE_APPEND);
 			header('Refresh:0; url=/', true, 303);
 			break;
 	}
-  exit();
+	exit();
 }
 
 /**
-* Checks for a fatal error, work around for set_error_handler not working on fatal errors.
-*/
-function check_for_fatal() {
+ * Checks for a fatal error, work around for set_error_handler not working on fatal errors.
+ */
+function check_for_fatal()
+{
 	$error = error_get_last();
-	if ( $error["type"] == E_ERROR )
-		log_error( $error["type"], $error["message"], $error["file"], $error["line"] );
+	if (!empty($error) && $error["type"] == E_ERROR)
+		log_error($error["type"], $error["message"], $error["file"], $error["line"]);
 }
 
 // Register a function for execution on shutdown
 // http://php.net/manual/en/function.register-shutdown-function.php
-register_shutdown_function( "check_for_fatal" );
+register_shutdown_function("check_for_fatal");
 
 // Sets a user-defined error handler function
 // http://php.net/manual/en/function.set-error-handler.php
-set_error_handler( "log_error" );
+set_error_handler("log_error");
 
 // Sets a user-defined exception handler function
 // http://php.net/manual/en/function.set-exception-handler.php
-set_exception_handler( "log_exception" );
+set_exception_handler("log_exception");
 
 // This determines whether errors should be printed to the screen
 // as part of the output or if they should be hidden from the user.
 // http://php.net/manual/en/errorfunc.configuration.php#ini.display-errors
-ini_set( "display_errors", "off" );
+ini_set("display_errors", "off");
 
 // Set which PHP errors are reported
 // http://php.net/manual/en/function.error-reporting.php
 switch ($errorLogType[0]) {
 	case 0: // Turn off all error reporting
-		error_reporting( 0 );
+		error_reporting(0);
 		break;
 	case 1: // Report all PHP errors
-		error_reporting( E_ALL );
+		error_reporting(E_ALL);
 		break;
 	case 2: // Report all errors except E_NOTICE
-		error_reporting( E_ALL & ~E_NOTICE );
+		error_reporting(E_ALL & ~E_NOTICE);
 		break;
 	case 3: // Report simple running errors
-		error_reporting( E_ERROR | E_WARNING | E_PARSE );
+		error_reporting(E_ERROR | E_WARNING | E_PARSE);
 		break;
 	case 4: // Reporting E_NOTICE can be good too (to report uninitialized variables or catch variable name misspellings ...)
-		error_reporting( E_ERROR | E_WARNING | E_PARSE | E_NOTICE );
+		error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 		break;
 	default: // Report all PHP errors
-		error_reporting( E_ALL );
+		error_reporting(E_ALL);
 		break;
-} ?>
+}
