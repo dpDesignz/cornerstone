@@ -643,6 +643,12 @@ class Pages extends Controller
             $this->data[str_replace(array('content_'), '', $key)] = $data;
           }
 
+          // Set fallback for section directory
+          $sectionDirectory = (empty($this->data['section_directory_name'])) ? '' : $this->data['section_directory_name'] . '/';
+
+          // Set fallback for view link
+          $this->data['viewLink'] = (!empty($this->data['slug'])) ? get_site_url($sectionDirectory . $this->data['slug']) : '';
+
           // Set Edit Data
           $this->setEditData((int) $this->data['status'], (int) $this->data['section_id']);
 

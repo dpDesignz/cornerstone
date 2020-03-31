@@ -118,6 +118,11 @@ require(get_theme_path('layout.php', 'admin')); ?>
           <label>Section (optional)</label>
         </div>
       </div>
+      <?php
+      // Output ID if set
+      if (!empty($data->viewLink)) { ?>
+        <p class="cs-body2 cs-pl-2">View page: <a href="<?php echo $data->viewLink; ?>" target="_blank">/<?php echo str_replace(get_site_url(), '', $data->viewLink); ?> <i class="fas fa-link"></i></a></p>
+      <?php } ?>
       <div class="csc-row csc-row--no-gap">
         <div class="csc-col csc-col12 csc-col--md6 cs-my-1 cs-mb-3"><a href="<?php echo get_site_url('admin/pages/'); ?>" class="csc-btn--flat"><span>Cancel</span></a></div>
         <div class="csc-col csc-col12 cs-text-right csc-col--md6 cs-my-1 cs-mb-3"><button type="submit" name="action" tabindex="7" value="save" class="csc-btn csc-btn--success">Save <i class="fas fa-save csc-bi-right"></i></button></div>

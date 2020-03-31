@@ -238,6 +238,7 @@ class Content
         c.content_content,
         c.content_status,
         cs.section_id,
+        cs.section_directory_name,
         (SELECT seo_keyword FROM cs_seo_url WHERE seo_type_id = c.content_id AND seo_type = '0' ORDER BY seo_id DESC LIMIT 1) AS content_slug",
         leftJoin("c", DB_PREFIX . "content_section", "content_section_id", "section_id", "cs"),
         where(
