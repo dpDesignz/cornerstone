@@ -95,6 +95,9 @@ final class Loader
       $data[strtolower($key)] = $value;
     }
 
+    // Check if logged in
+    $this->data['isAdmin'] = (isset($_SESSION['_cs']['user']['uid']) && !empty($_SESSION['_cs']['user']['uid'])) ? TRUE : FALSE;
+
     // Convert the data array into an object
     // This code converts multi-dimensional array
     $data = json_decode(json_encode($data));

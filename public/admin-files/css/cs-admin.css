@@ -186,6 +186,7 @@ body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a 
   line-height: 1.5;
   border-radius: 3px;
   transition: all 0.15s ease-in;
+  cursor: pointer;
 }
 body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li a i.material-icons {
   margin-right: 8px;
@@ -364,6 +365,89 @@ body.cs-admin > main > footer p#footer__copyright {
 }
 body.cs-admin > main > footer p#footer__thankyou {
   text-align: right;
+}
+
+/*------------------------------------*\
+  #CUSTOM SECTION STYLES
+\*------------------------------------*/
+#no-index-data {
+  position: relative;
+  align-content: center;
+  min-height: calc(100vh - 33%);
+  z-index: 2;
+}
+#no-index-data h1 {
+  margin: 0;
+  color: #37474f;
+  font-size: 5rem;
+  font-weight: lighter;
+  position: relative;
+  z-index: 2;
+}
+#no-index-data__tag {
+  color: #546e7a;
+  font-size: 1.2rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.03125em;
+}
+#no-index-data__btn {
+  margin-top: 35px;
+}
+#no-index-data__icon {
+  position: absolute;
+  display: block;
+  right: 0;
+  bottom: 25%;
+  text-align: right;
+  font-size: 200px;
+}
+#no-index-data__icon i.fad {
+  --fa-primary-color: #90a4ae;
+  --fa-secondary-color: #b0bec5;
+}
+
+section#sections-list table tr th:nth-last-child(2) {
+  width: 210px;
+}
+section#sections-list table tr th:last-child {
+  width: 120px;
+  text-align: left;
+}
+section#sections-list table tr td:first-child .item--title {
+  display: block;
+  font-size: 1.1em;
+}
+section#sections-list table tr td:last-child {
+  text-align: left;
+}
+section#sections-list table tr:hover td:first-child i {
+  opacity: 0.75;
+}
+
+section#pages-list table tr th:nth-child(2), section#pages-list table tr th:nth-last-child(2) {
+  width: 210px;
+}
+section#pages-list table tr th:last-child {
+  width: 120px;
+  text-align: left;
+}
+section#pages-list table tr td:first-child .item--title {
+  display: block;
+  font-size: 1.1em;
+}
+section#pages-list table tr td:last-child {
+  text-align: left;
+}
+section#pages-list table tr:hover td:first-child i {
+  opacity: 0.75;
+}
+
+form#page-form .csc-wrapper {
+  max-width: 90%;
+}
+form#page-form .trumbowyg-box,
+form#page-form .trumbowyg-editor {
+  min-height: 50vh;
 }
 
 /* ==========================================================================

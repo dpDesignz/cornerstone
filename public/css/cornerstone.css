@@ -6705,6 +6705,10 @@ body.cs-component__data-tables .csc-data-table__footer--end {
   line-height: 1.66;
   letter-spacing: 0.03333em;
 }
+body.cs-components .csc-data-table td#no-results,
+body.cs-component__data-tables .csc-data-table td#no-results {
+  text-align: center !important;
+}
 
 body.cs-components .blocker,
 body.cs-component__dialogs .blocker {
@@ -9525,6 +9529,7 @@ body.cs-component__trumbowyg .trumbowyg-box {
 }
 body.cs-components .trumbowyg-button-pane,
 body.cs-component__trumbowyg .trumbowyg-button-pane {
+  z-index: 0;
   background: transparent;
   border-bottom: none;
 }

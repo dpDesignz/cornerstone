@@ -74,9 +74,7 @@
   } ?>
 </head>
 
-<body class="cs-page cs-admin cs-components<?php if (!empty($_COOKIE['sbar']) && $_COOKIE['sbar']) {
-                                              echo ' sidebar__collapsed';
-                                            } ?>">
+<body class="cs-page cs-admin cs-components<?php echo (!empty($_COOKIE['csasbs']) && $_COOKIE['csasbs']) ? ' sidebar__collapsed' : ''; ?>">
   <!--[if lte IE 9]>
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->

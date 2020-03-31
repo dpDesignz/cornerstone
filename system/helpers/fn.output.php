@@ -187,3 +187,122 @@ function outputBreadcrumbs(object $breadcrumbs)
   // Return output
   return (!empty($returnOutput)) ? $returnOutput : '<a class="csc-breadcrumb" title="No breadcrumb available">n/a</a>';
 }
+
+/**
+ * Return parent admin menu item
+ *
+ * @param object $item An object array of the parent menu item to output
+ * @param string $currentNav `[optional]` The current navigation identifier. Defaults to empty
+ * @param string $currentSubNav `[optional]` The current sub-navigation identifier. Defaults to empty
+ *
+ * @return string Will return the menu as a string
+ */
+function returnParentAdminMenuItem(object $item, string $currentNav = '', string $currentSubNav = '')
+{
+
+  // Init output
+  $returnOutput = '';
+
+  // Check if currently active item
+  $isActive = (!empty($currentNav) && strtolower($currentNav) == strtolower($item->identifier)) ? TRUE : FALSE;
+  $activeNav = ($isActive) ? ' active' : '';
+  $ariaExpanded = ($isActive) ? 'true' : 'false';
+  $ariaHidden = ($isActive) ? 'false' : 'true';
+
+  // Set title fallback
+  $fallbackTitle = (!empty($item->title)) ? $item->title : $item->text;
+
+  // Set icon fallback
+  $fallbackIcon = (!empty($item->icon)) ? $item->icon : 'fas fa-bars';
+
+  // Add to return output
+  $returnOutput .= '<li class="has-subnav' . $activeNav . '"><a class="tooltip" data-toggle="collapse" title="' . $fallbackTitle . '" aria-expanded="' . $ariaExpanded . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span><b class="caret"></b></a>';
+
+  // Check children isn't empty
+  if (!empty($item->children)) {
+    // Children isn't empty
+
+    // Add to return output
+    $returnOutput .= '<ol class="sidebar__sub-nav" aria-hidden="' . $ariaHidden . '">';
+
+    // Loop through children
+    foreach ($item->children as $childItem) {
+
+      // Make sure the child item is an object
+      $childItem = (object) $childItem;
+
+      // Check if currently active child item
+      $isActiveChild = (!empty($currentSubNav) && strtolower($currentSubNav) == strtolower($item->identifier . '/' . $childItem->identifier)) ? 'class="active"' : '';
+
+      // Set title fallback
+      $fallbackTitle = (!empty($childItem->title)) ? $childItem->title : $childItem->text;
+
+      // Set href fallback
+      $fallbackHref = (!empty($childItem->href)) ? $childItem->href : 'javascript:alert(\'The ' . $fallbackTitle . ' section is coming soon\');';
+
+      // Add to return output
+      $returnOutput .= '<li ' . $isActiveChild . '><a href="' . $fallbackHref . '">' . $childItem->text . '</a></li>';
+    }
+
+    // Add to return output
+    $returnOutput .= '</ol>';
+  }
+
+  // Add to return output
+  $returnOutput .= '</li>';
+
+  // Return output
+  return (!empty($returnOutput)) ? $returnOutput : '';
+}
+
+/**
+ * Output Admin Menu
+ *
+ * @param array $menuItems An array of the menu items to output
+ * @param string $currentNav `[optional]` The current navigation identifier. Defaults to empty
+ * @param string $currentSubNav `[optional]` The current sub-navigation identifier. Defaults to empty
+ *
+ * @return string Will return the menu as a string
+ */
+function outputAdminMenu(array $menuItems, string $currentNav = '', string $currentSubNav = '')
+{
+  // Init output
+  $returnOutput = '';
+
+  // Output menuitem
+  foreach ($menuItems as $item) {
+
+    // Make sure the item is an object
+    $item = (object) $item;
+
+    // Check the item type
+    switch (trim(strtolower($item->type))) {
+      case 'separator':
+        // Add to return output
+        $returnOutput .= '<li class="sidebar__nav-separator"><span>' . $item->text . '</span></li>';
+        break;
+      case 'link':
+        // Check if currently active item
+        $activeNav = (!empty($currentNav) && strtolower($currentNav) == strtolower($item->identifier)) ? 'class="active"' : '';
+        // Set title fallback
+        $fallbackTitle = (!empty($item->title)) ? $item->title : $item->text;
+        // Set href fallback
+        $fallbackHref = (!empty($item->href)) ? $item->href : 'javascript:alert(\'The ' . $fallbackTitle . ' section is coming soon\');';
+        // Set icon fallback
+        $fallbackIcon = (!empty($item->icon)) ? $item->icon : 'fas fa-bars';
+        // Add to return output
+        $returnOutput .= '<li ' . $activeNav . '><a class="tooltip" href="' . $fallbackHref . '" title="' . $fallbackTitle . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span></a></li>';
+        break;
+      case 'parent':
+        // Get parent admin menu item
+        $returnOutput .= returnParentAdminMenuItem((object) $item, $currentNav, $currentSubNav);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  // Return output
+  return (!empty($returnOutput)) ? $returnOutput : '';
+}

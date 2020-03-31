@@ -3,10 +3,10 @@
     <section id="csa-sidebar_identity">
       <?php
       // Output site_logo.svg file if it exists, else output the site name
-      if(file_exists(get_public_path('admin-files/img/site_logo.svg'))) { ?>
-      <a href="<?php echo get_site_url('admin/'); ?>"><img src="<?php echo get_site_url('admin-files/img/site_logo.svg'); ?>" alt="<?php echo SITE_NAME; ?> Logo" /></a>
+      if (file_exists(get_public_path('admin-files/img/site_logo.svg'))) { ?>
+        <a href="<?php echo get_site_url('admin/'); ?>"><img src="<?php echo get_site_url('admin-files/img/site_logo.svg'); ?>" alt="<?php echo $data->site_name; ?> Logo" /></a>
       <?php } else { ?>
-      <h3><a href="<?php echo get_site_url('admin/'); ?>"><?php echo SITE_NAME; ?></a></h3>
+        <h3><a href="<?php echo get_site_url('admin/'); ?>"><?php echo $data->site_name; ?></a></h3>
       <?php } ?>
     </section>
     <nav id="sidebar__nav">
@@ -15,22 +15,25 @@
         <li class="sidebar__nav-separator">
           <span>Dashboard</span>
         </li>
-        <li class="<?php if(!empty($currentNav) && $currentNav === 'dashboard') { echo ' active';} ?>"><a class="tooltip" href="<?php echo get_site_url('admin/dashboard'); ?>" title="Dashboard"><i class="material-icons">dashboard</i> <span>Dashboard</span></a></li>
+        <li <?php echo (!empty($currentNav) && $currentNav === 'dashboard') ? 'class="active"' : '' ?>><a class="tooltip" href="<?php echo get_site_url('admin/dashboard'); ?>" title="Dashboard"><i class="material-icons">dashboard</i> <span>Dashboard</span></a></li>
         <?php
-          // Require any extra menu items
-          require(get_theme_path('ext.navbar.php', 'admin')); ?>
-        <li class="has-subnav<?php if(!empty($currentNav) && $currentNav === 'users') { echo ' active';} ?>">
-          <a class="tooltip" data-toggle="collapse" href="#" title="Users" aria-expanded="false"><i class="fas fa-users"></i> <span>Users</span><b class="caret"></b></a>
-          <ol class="sidebar__sub-nav" aria-hidden="true">
-            <li class="<?php if(!empty($currentSubNav) && $currentSubNav === $currentNav.'/index') { echo ' active';} ?>"><a href="<?php echo get_site_url('admin/users'); ?>">All Users</a></li>
-            <li class="<?php if(!empty($currentSubNav) && $currentSubNav === $currentNav.'/add') { echo ' active';} ?>"><a href="<?php echo get_site_url('admin/users/add'); ?>">Add New</a></li>
-            <li class="<?php if(!empty($currentSubNav) && $currentSubNav === $currentNav.'/groups') { echo ' active';} ?>"><a href="<?php echo get_site_url('admin/users/groups'); ?>">User Groups</a></li>
+        // Set fallbacks
+        $currentNav = (!empty($currentNav)) ? $currentNav : '';
+        $currentSubNav = (!empty($currentSubNav)) ? $currentSubNav : '';
+        // Require any extra menu items
+        require(get_theme_path('ext.navbar.php', 'admin')); ?>
+        <li class="has-subnav<?php echo (!empty($currentNav) && $currentNav === 'users') ? ' active' : '' ?>">
+          <a class="tooltip" data-toggle="collapse" title="Users" aria-expanded="<?php echo (!empty($currentNav) && $currentNav === 'users') ? 'true' : 'false'; ?>"><i class="fas fa-users"></i> <span>Users</span><b class="caret"></b></a>
+          <ol class="sidebar__sub-nav" aria-hidden="<?php echo (!empty($currentNav) && $currentNav === 'users') ? 'false' : 'true'; ?>">
+            <li <?php echo (!empty($currentSubNav) && $currentSubNav === 'users/index') ? 'class="active"' : ''; ?>><a href="<?php echo get_site_url('admin/users'); ?>">All Users</a></li>
+            <li <?php echo (!empty($currentSubNav) && $currentSubNav === 'users/add') ? 'class="active"' : ''; ?>><a href="<?php echo get_site_url('admin/users/add'); ?>">Add New</a></li>
+            <li <?php echo (!empty($currentSubNav) && $currentSubNav === 'users/groups') ? 'class="active"' : ''; ?>><a href="<?php echo get_site_url('admin/users/groups'); ?>">User Groups</a></li>
           </ol>
         </li>
-        <li class="<?php if(!empty($currentNav) && $currentNav === 'settings') { echo ' active';} ?>">
-          <a class="tooltip" href="<?php echo get_site_url('admin/settings'); ?>" title="Settings"><i class="fas fa-cogs"></i> <span>Settings</span></a>
-          <ol class="sidebar__sub-nav">
-            <li class="<?php if(!empty($currentSubNav) && $currentSubNav === $currentNav.'/index') { echo ' active';} ?>"><a href="<?php echo get_site_url('admin/settings'); ?>">Site Settings</a></li>
+        <li class="has-subnav<?php echo (!empty($currentNav) && $currentNav === 'settings') ? ' active' : '' ?>">
+          <a class="tooltip" data-toggle="collapse" title="Settings" aria-expanded="<?php echo (!empty($currentNav) && $currentNav === 'settings') ? 'true' : 'false'; ?>"><i class="fas fa-cogs"></i> <span>Settings</span><b class="caret"></b></a>
+          <ol class="sidebar__sub-nav" aria-hidden="<?php echo (!empty($currentNav) && $currentNav === 'settings') ? 'false' : 'true'; ?>">
+            <li <?php echo (!empty($currentSubNav) && $currentSubNav === 'settings/index') ? 'class="active"' : ''; ?>><a href="<?php echo get_site_url('admin/settings'); ?>">Site Settings</a></li>
           </ol>
         </li>
       </ol>
@@ -43,6 +46,7 @@
     <section id="csa-header__nav">
       <nav>
         <ol>
+          <li><a class="tooltip" href="<?php echo get_site_url(); ?>" title="View Website Front End" target="_blank"><i class="fas fa-home"></i></a></li>
           <li><a href="javascript:alert('Notification system coming soon');" title="Notifications (Coming soon)" class="tooltip"><i class="fas fa-bell"></i></a></li>
           <li><a href="javascript:alert('Help desk coming soon');" title="Need help? (Coming soon)" class="tooltip"><i class="far fa-question-circle"></i></a></li>
           <li><a href="<?php echo get_site_url('admin/logout'); ?>" title="Log out" class="logout tooltip"><i class="fas fa-power-off"></i></a></li>

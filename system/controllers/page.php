@@ -40,34 +40,47 @@ class Page extends Controller
         if ($pageData = $this->coreModel->getContentData((int) $seoData->seo_type_id)) {
           // Page exists
 
+          // Check if directory name is set
+          if (!empty($pageData->section_directory_name)) {
+            // Directory set. Redirect user to correct page loader
+            redirectTo($pageData->section_directory_name . "/" . $seoData->seo_keyword);
+            exit;
+          }
+
           // Set page data
-          foreach ($pageData as $key => $data) {
+          foreach ($pageData->content as $key => $data) {
             $this->data[$key] = htmlspecialchars_decode($data);
           }
 
-          // Check for any meta data
-          if ($metaData = $this->coreModel->getContentMetaData((int) $pageData->content_id)) {
-            // Meta data exists
-
-            // Add meta data to data
-            foreach ($metaData as $metaDataOutput) {
-              $this->data['content_' . $metaDataOutput->cmeta_key] = htmlspecialchars_decode($metaDataOutput->cmeta_value);
-            }
+          // Set meta data
+          foreach ($pageData->content_meta as $key => $data) {
+            $this->data[$key] = htmlspecialchars_decode($data);
           }
 
           // Set page meta title
-          $this->data['page_meta_title'] = (empty($this->data['content_meta_title'])) ? $this->data['content_title'] : $this->data['content_meta_title'];
+          $this->data['page_meta_title'] = (!empty($this->data['content_meta_title'])) ? $this->data['content_meta_title'] : $this->data['content_title'];
 
           // Set page meta description
           $this->data['page_meta_description'] = (empty($this->data['content_meta_description'])) ? trim(preg_replace('/\s+/', ' ', (new \Html2Text\Html2Text($this->data['content_content']))->getText())) : $this->data['content_meta_description'];
           $this->data['page_meta_description'] = (strlen($this->data['page_meta_description']) > 166) ? substr($this->data['page_meta_description'], 0, 165) . '...' : $this->data['page_meta_description']; // Trim if more than 166 characters
           $this->data['page_meta_description'] = filter_var($this->data['page_meta_description'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH); // Fix any unicode characters that slip in
 
+          // Set page meta canonical
+          $this->data['page_meta_canonical'] = (!empty($this->data['content_meta_canonical'])) ? $this->data['content_meta_canonical'] : $seoData->seo_keyword;
+
           // Set page head extras
           $this->data['page_head_extras'] = (!empty($this->data['content_head_extras'])) ? $this->data['content_head_extras'] : '';
 
           // Set page footer extras
           $this->data['page_footer_extras'] = (!empty($this->data['content_footer_extras'])) ? $this->data['content_footer_extras'] : '';
+
+          // Set home menu item
+          $this->data['menuitems'] = array();
+          $this->data['menuitems'][] = array(
+            'path' => 0,
+            'text' => 'Home',
+            'href' => get_site_url()
+          );
 
           // Load page
           $this->load->view('pages/page', $this->data);

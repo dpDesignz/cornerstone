@@ -23,7 +23,7 @@ $pageFooterExtras = $data->page_footer_extras;
 require(get_theme_path('head.php')); ?>
 
 <!-- End Header ~#~ Start Main -->
-<div class="csc-wrapper">
+<div class="csc-wrapper cs-px-3">
   <?php echo $data->content_content; ?>
 </div>
 <!-- End Main ~#~ Start Footer -->

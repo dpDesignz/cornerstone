@@ -1,5 +1,14 @@
 # Cornerstone Change Log
 
+## 0.2.20 - Content (2020-03-30 to 2020-03-31)
+
+- ➕ Added the ability to view the pages list
+- 🧹 Refactored the `admin.js` file to be vanilla js
+- 🧹 Refactored the admin menu code to use an array and output function
+- ➕ Added the ability to view the sections list
+- ➕ Added the ability to add a section
+- ➕ Added the ability to edit a section
+
 ## 0.2.19 - Content (2020-03-27)
 
 - ➕ Added the vanilla JS ready state function
@@ -25,7 +34,7 @@
 - 🔄 Updated egulias email validator to v2.1.15
 - ➕ Added loader, pagination, registry, and request classes
 - ➕ Added the `outputBreadcrumbs()` function to the `output` helper file
-- 🧹 Refractored the core controller
+- 🧹 Refactored the core controller
 - ➕ Added the ability to debug load view data
 - ➖ Removed the `outputPagination()` function from the output helper file
 
