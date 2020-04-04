@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The base configurations of the Cornerstone Framework.
  *
@@ -22,10 +23,10 @@ define('DIR_HELPERS', DIR_SYSTEM . 'helpers' . DIRECTORY_SEPARATOR); // Path to 
 define('ALLOWED_SUBFOLDERS', ['admin' => 'common/index']); // List of allowed sub-folders and their default controllers/methods for the core class
 
 // ** Database settings - You can obtain this information from your web-host ** //
-defined('DB_HOSTNAME') or define('DB_HOSTNAME', ''); // Database Host Name
-defined('DB_NAME') or define('DB_NAME', ''); // Database Name
-defined('DB_USER') or define('DB_USER', ''); // Database Username
-defined('DB_PASSWORD') or define('DB_PASSWORD', ''); // Database Password
+defined('DB_HOSTNAME') or define('DB_HOSTNAME', 'localhost'); // Database Host Name
+defined('DB_NAME') or define('DB_NAME', 'database_name_here'); // Database Name
+defined('DB_USER') or define('DB_USER', 'database_user_here'); // Database Username
+defined('DB_PASSWORD') or define('DB_PASSWORD', 'database_password_here'); // Database Password
 defined('DB_CHARSET') or define('DB_CHARSET', 'utf8mb4'); // Database Charset
 defined('DB_PREFIX') or define('DB_PREFIX', 'cs_'); // Database Prefix
 defined('EZSQL_TYPE') or define('EZSQL_TYPE', 'pdo'); // ezSQL Engine Type (mysqli, pgsql, sqlsrv, sqlite3, or pdo)

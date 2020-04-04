@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.0.1
+-- version 5.0.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 14, 2020 at 12:00 PM
--- Server version: 10.4.6-MariaDB
--- PHP Version: 7.3.9
+-- Generation Time: Apr 04, 2020 at 12:00 PM
+-- Server version: 10.4.11-MariaDB
+-- PHP Version: 7.4.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -58,6 +58,59 @@ CREATE TABLE `cs_auth_cookie` (
   `cookie_set_dtm` datetime NOT NULL DEFAULT current_timestamp(),
   `cookie_expiry_dtm` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cookie when asked to remember password for all users';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cs_content`
+--
+
+CREATE TABLE `cs_content` (
+  `content_id` int(11) UNSIGNED NOT NULL,
+  `content_title` varchar(160) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content_content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content_status` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0: Draft, 1: Published, 2: Private, 3: Archived',
+  `content_type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0: Page, 1: FAQ, 2: Block',
+  `content_section_id` int(11) UNSIGNED NOT NULL DEFAULT 0,
+  `content_added_id` int(11) UNSIGNED NOT NULL,
+  `content_added_dtm` datetime NOT NULL,
+  `content_edited_id` int(11) UNSIGNED DEFAULT NULL,
+  `content_edited_dtm` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cornerstone site content data (e.g. Pages, FAQs etc)';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cs_content_meta`
+--
+
+CREATE TABLE `cs_content_meta` (
+  `cmeta_id` int(11) UNSIGNED NOT NULL,
+  `cmeta_content_id` int(11) UNSIGNED NOT NULL,
+  `cmeta_key` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cmeta_value` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cmeta_added_id` int(11) UNSIGNED NOT NULL,
+  `cmeta_added_dtm` datetime NOT NULL,
+  `cmeta_edited_id` int(11) UNSIGNED DEFAULT NULL,
+  `cmeta_edited_dtm` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cornerstone site content meta data';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cs_content_section`
+--
+
+CREATE TABLE `cs_content_section` (
+  `section_id` int(11) UNSIGNED NOT NULL,
+  `section_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `section_type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0: Page, 1: FAQ',
+  `section_directory_name` varchar(25) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `section_added_id` int(11) UNSIGNED NOT NULL,
+  `section_added_dtm` datetime NOT NULL,
+  `section_edited_id` int(11) UNSIGNED DEFAULT NULL,
+  `section_edited_dtm` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cornerstone site content sections';
 
 -- --------------------------------------------------------
 
@@ -133,7 +186,7 @@ INSERT INTO `cs_options` (`option_id`, `option_type`, `option_name`, `option_val
 (3, 'core', 'site_name', '', 1, NULL, NULL),
 (4, 'core', 'test_site', '1', 0, NULL, NULL),
 (5, 'core', 'site_offline', '0', 0, NULL, NULL),
-(6, 'core', 'site_timezone', 'Pacific/Auckland', 0, NULL, NULL),
+(6, 'core', 'site_timezone', '', 0, NULL, NULL),
 (7, 'core', 'phone_locale', '', 0, NULL, NULL),
 (8, 'core', 'site_version', '0.0.1', 0, NULL, NULL),
 (10, 'core', 'error_log_type', '1,2', 1, NULL, NULL),
@@ -154,18 +207,19 @@ INSERT INTO `cs_options` (`option_id`, `option_type`, `option_name`, `option_val
 (25, 'security', 'password_reset_expire', '1800', 0, NULL, NULL),
 (26, 'security', 'session_expire', '1800', 0, NULL, NULL),
 (27, 'security', 'cookie_expire', '0,30', 0, NULL, NULL),
-(28, 'addon', 'texta_hq_active', '0', 0, NULL, NULL),
-(29, 'addon', 'texta_hq_key', '', 0, NULL, NULL),
-(30, 'addon', 'recaptcha_site_key', '', 0, NULL, NULL),
-(31, 'addon', 'recaptcha_secret_key', '', 0, NULL, NULL),
-(32, 'addon', 'facebook_secret', '', 0, NULL, NULL),
-(33, 'addon', 'facebook_login_active', '0', 0, NULL, NULL),
-(34, 'addon', 'analytics_code', '', 0, NULL, NULL),
-(35, 'site', 'tooltip_settings', '', 0, NULL, NULL),
-(36, 'addon', 'font_awesome_kit_url', '', 0, NULL, NULL),
-(37, 'site', 'docs_private', '0', 0, NULL, NULL),
-(38, 'site', 'site_notice', ',', 0, NULL, NULL),
-(39, 'security', 'browser_tracking', '1', 0, NULL, NULL);
+(28, 'security', 'browser_tracking', '1', 0, NULL, NULL),
+(29, 'addon', 'texta_hq_active', '0', 0, NULL, NULL),
+(30, 'addon', 'texta_hq_key', '', 0, NULL, NULL),
+(31, 'addon', 'recaptcha_site_key', '', 0, NULL, NULL),
+(32, 'addon', 'recaptcha_secret_key', '', 0, NULL, NULL),
+(33, 'addon', 'facebook_secret', '', 0, NULL, NULL),
+(34, 'addon', 'facebook_login_active', '0', 0, NULL, NULL),
+(35, 'addon', 'xero_oauth2', '', 0, NULL, NULL),
+(36, 'addon', 'analytics_code', '', 0, NULL, NULL),
+(37, 'addon', 'font_awesome_kit_url', '', 0, NULL, NULL),
+(38, 'site', 'tooltip_settings', '', 0, NULL, NULL),
+(39, 'site', 'docs_private', '0', 0, NULL, NULL),
+(40, 'site', 'site_notice', ',', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -186,6 +240,20 @@ CREATE TABLE `cs_password_reset` (
   `pwdreset_success_dtm` datetime DEFAULT NULL,
   `pwdreset_expire` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Password Reset Table for all users';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cs_seo_url`
+--
+
+CREATE TABLE `cs_seo_url` (
+  `seo_id` int(11) UNSIGNED NOT NULL,
+  `seo_type` int(11) UNSIGNED NOT NULL COMMENT '0: Page',
+  `seo_type_id` int(11) UNSIGNED NOT NULL,
+  `seo_keyword` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `seo_primary` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEO friendly URL for pages etc';
 
 -- --------------------------------------------------------
 
@@ -285,6 +353,28 @@ ALTER TABLE `cs_auth_cookie`
   ADD KEY `cookie_key` (`cookie_key`);
 
 --
+-- Indexes for table `cs_content`
+--
+ALTER TABLE `cs_content`
+  ADD PRIMARY KEY (`content_id`),
+  ADD KEY `content_type` (`content_type`),
+  ADD KEY `content__id` (`content_id`);
+
+--
+-- Indexes for table `cs_content_meta`
+--
+ALTER TABLE `cs_content_meta`
+  ADD PRIMARY KEY (`cmeta_id`),
+  ADD KEY `cmeta_content_id` (`cmeta_content_id`),
+  ADD KEY `cmeta_key` (`cmeta_key`);
+
+--
+-- Indexes for table `cs_content_section`
+--
+ALTER TABLE `cs_content_section`
+  ADD PRIMARY KEY (`section_id`);
+
+--
 -- Indexes for table `cs_edit_log`
 --
 ALTER TABLE `cs_edit_log`
@@ -320,6 +410,14 @@ ALTER TABLE `cs_password_reset`
   ADD UNIQUE KEY `pwdreset_token` (`pwdreset_token`),
   ADD KEY `pwdreset_user_id` (`pwdreset_user_id`),
   ADD KEY `pwd_reset_selector` (`pwdreset_selector`);
+
+--
+-- Indexes for table `cs_seo_url`
+--
+ALTER TABLE `cs_seo_url`
+  ADD PRIMARY KEY (`seo_id`),
+  ADD UNIQUE KEY `seo_keyword` (`seo_keyword`),
+  ADD KEY `seo_type_id` (`seo_type_id`);
 
 --
 -- Indexes for table `cs_session`
@@ -370,6 +468,24 @@ ALTER TABLE `cs_auth_cookie`
   MODIFY `cookie_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `cs_content`
+--
+ALTER TABLE `cs_content`
+  MODIFY `content_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `cs_content_meta`
+--
+ALTER TABLE `cs_content_meta`
+  MODIFY `cmeta_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `cs_content_section`
+--
+ALTER TABLE `cs_content_section`
+  MODIFY `section_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `cs_edit_log`
 --
 ALTER TABLE `cs_edit_log`
@@ -379,7 +495,7 @@ ALTER TABLE `cs_edit_log`
 -- AUTO_INCREMENT for table `cs_login_log`
 --
 ALTER TABLE `cs_login_log`
-  MODIFY `login_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+  MODIFY `login_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- AUTO_INCREMENT for table `cs_notification`
@@ -398,6 +514,12 @@ ALTER TABLE `cs_options`
 --
 ALTER TABLE `cs_password_reset`
   MODIFY `pwdreset_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `cs_seo_url`
+--
+ALTER TABLE `cs_seo_url`
+  MODIFY `seo_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `cs_users`

@@ -6,7 +6,11 @@
 - ➕ Added the [Intervention Image Cache](https://github.com/Intervention/imagecache) package
 - ❌ Removed the `nielse63/phpimagecache`, `gumlet/php-image-resize`, and `swiftmailer/swiftmailer` packages from production
 - ➕ Added the `Images` controller from the ME project
-- 🔄 Updated the Composer packages (`whichbrowser/parser` (v2.0.41 => v2.0.42), `phpmailer/phpmailer` (v6.1.4 => v6.1.5))
+- 🔄 Updated `whichbrowser/parser` (v2.0.41 => v2.0.42)
+- 🔄 Updated `phpmailer/phpmailer` (v6.1.4 => v6.1.5)
+- ➕ Added the [Roboto font](https://fonts.google.com/specimen/Roboto) from Google for the image placeholder text
+- ➕ Added the placeholder text for the `config-sample.php` file
+- 🔄 Updated the `cornerstone.sql` file
 
 ## 0.2.20 - Content (2020-03-30 to 2020-03-31)
 

@@ -54,6 +54,12 @@ class Images extends Controller
     $img_h = 500;
     $ph_t = 'No image';
 
+    // Set image folder path
+    $imageFolder = implode(_DS, $params);
+    if (!empty($params[count($params) - 1])) {
+      $imageFolder = rtrim($imageFolder, $params[count($params) - 1]);
+    }
+
     // Check for the image type
     if (!empty($params[0])) {
 
@@ -101,17 +107,20 @@ class Images extends Controller
           $skipFile = TRUE;
           break;
 
-        case 'brands':
-          // check for image
-          $imagePath = (!empty($params[1])) ? $rootPath . $imageType . _DS . urlencode(trim($params[1])) : '';
-          break;
-        case 'products':
-          // check for image
-          $imagePath = (!empty($params[1])) ? $rootPath . $imageType . _DS . urlencode(trim($params[1])) : '';
-          break;
+          // Add more case options here as required
 
         default:
-          # code...
+          // check for image folder
+          $imagePath = (!empty($imageFolder)) ? $rootPath . $imageFolder : $rootPath;
+          // check for image
+          if (!empty($params[count($params) - 1])) {
+            $imagePath = $imagePath . urlencode(trim($params[count($params) - 1]));
+          } else {
+            // Set placeholder text
+            $ph_t = 'No image requested';
+            // Skip file loading
+            $skipFile = TRUE;
+          }
           break;
       }
 
