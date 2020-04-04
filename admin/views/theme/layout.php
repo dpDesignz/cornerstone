@@ -21,21 +21,49 @@
         $currentNav = (!empty($currentNav)) ? $currentNav : '';
         $currentSubNav = (!empty($currentSubNav)) ? $currentSubNav : '';
         // Require any extra menu items
-        require(get_theme_path('ext.navbar.php', 'admin')); ?>
-        <li class="has-subnav<?php echo (!empty($currentNav) && $currentNav === 'users') ? ' active' : '' ?>">
-          <a class="tooltip" data-toggle="collapse" title="Users" aria-expanded="<?php echo (!empty($currentNav) && $currentNav === 'users') ? 'true' : 'false'; ?>"><i class="fas fa-users"></i> <span>Users</span><b class="caret"></b></a>
-          <ol class="sidebar__sub-nav" aria-hidden="<?php echo (!empty($currentNav) && $currentNav === 'users') ? 'false' : 'true'; ?>">
-            <li <?php echo (!empty($currentSubNav) && $currentSubNav === 'users/index') ? 'class="active"' : ''; ?>><a href="<?php echo get_site_url('admin/users'); ?>">All Users</a></li>
-            <li <?php echo (!empty($currentSubNav) && $currentSubNav === 'users/add') ? 'class="active"' : ''; ?>><a href="<?php echo get_site_url('admin/users/add'); ?>">Add New</a></li>
-            <li <?php echo (!empty($currentSubNav) && $currentSubNav === 'users/groups') ? 'class="active"' : ''; ?>><a href="<?php echo get_site_url('admin/users/groups'); ?>">User Groups</a></li>
-          </ol>
-        </li>
-        <li class="has-subnav<?php echo (!empty($currentNav) && $currentNav === 'settings') ? ' active' : '' ?>">
-          <a class="tooltip" data-toggle="collapse" title="Settings" aria-expanded="<?php echo (!empty($currentNav) && $currentNav === 'settings') ? 'true' : 'false'; ?>"><i class="fas fa-cogs"></i> <span>Settings</span><b class="caret"></b></a>
-          <ol class="sidebar__sub-nav" aria-hidden="<?php echo (!empty($currentNav) && $currentNav === 'settings') ? 'false' : 'true'; ?>">
-            <li <?php echo (!empty($currentSubNav) && $currentSubNav === 'settings/index') ? 'class="active"' : ''; ?>><a href="<?php echo get_site_url('admin/settings'); ?>">Site Settings</a></li>
-          </ol>
-        </li>
+        require(get_theme_path('ext.navbar.php', 'admin'));
+
+        // Users Menu
+        $adminSidebarUsersMenu = array(array(
+          'type' => 'parent',
+          'identifier' => 'users',
+          'text' => 'Users',
+          'icon' => 'fas fa-users',
+          'children' => array(
+            array(
+              'identifier' => 'index',
+              'text' => 'All Users',
+              'href' => get_site_url('admin/users')
+            ),
+            array(
+              'identifier' => 'add',
+              'text' => 'Add New',
+              'href' => ''
+            ),
+            array(
+              'identifier' => 'groups',
+              'text' => 'User Groups',
+              'href' => ''
+            )
+          )
+        ));
+        echo outputAdminMenu($adminSidebarUsersMenu, $currentNav, $currentSubNav);
+
+        // Settings Menu
+        $adminSidebarSettingsMenu = array(array(
+          'type' => 'parent',
+          'identifier' => 'settings',
+          'text' => 'Settings',
+          'icon' => 'fas fa-cogs',
+          'children' => array(
+            array(
+              'identifier' => 'index',
+              'text' => 'Site Settings',
+              'href' => ''
+            )
+          )
+        ));
+        echo outputAdminMenu($adminSidebarSettingsMenu, $currentNav, $currentSubNav); ?>
       </ol>
     </nav>
   </aside>

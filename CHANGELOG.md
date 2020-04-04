@@ -1,5 +1,13 @@
 # Cornerstone Change Log
 
+## 0.2.21 - Dependencies (2020-04-04)
+
+- ➕ Added the [Intervention Image](http://image.intervention.io) package
+- ➕ Added the [Intervention Image Cache](https://github.com/Intervention/imagecache) package
+- ❌ Removed the `nielse63/phpimagecache`, `gumlet/php-image-resize`, and `swiftmailer/swiftmailer` packages from production
+- ➕ Added the `Images` controller from the ME project
+- 🔄 Updated the Composer packages (`whichbrowser/parser` (v2.0.41 => v2.0.42), `phpmailer/phpmailer` (v6.1.4 => v6.1.5))
+
 ## 0.2.20 - Content (2020-03-30 to 2020-03-31)
 
 - ➕ Added the ability to view the pages list
@@ -8,6 +16,8 @@
 - ➕ Added the ability to view the sections list
 - ➕ Added the ability to add a section
 - ➕ Added the ability to edit a section
+- ➕ Added the ability to add a page
+- ➕ Added the ability to edit a page
 
 ## 0.2.19 - Content (2020-03-27)
 
@@ -15,7 +25,7 @@
 - ➕ Added the `cs_content`, `cs_content_meta`, `cs_content_section`, and `cs_seo_url` tables
 - ➕ Added the `cornerstonecore.model.php` file to the system models for loading seo and content data
 - 🖊️ Changed the `core.class.php` default `$currentMethod` from `error` to `loadpage`
-- ➕ Added the [Html2Text](https://github.com/mtibben/html2text) library
+- ➕ Added the [Html2Text](https://github.com/mtibben/html2text) package
 
 ## 0.2.18 - Options (2020-03-14)
 
@@ -66,12 +76,12 @@
 ## 0.2.13 - UI Changes (2019-12-12 to 2019-12-16)
 
 - ➕ Added component subdirectory for example components
-- ➕ Added [Inflector](https://github.com/ICanBoogie/Inflector)
-- ➕ Added [Pickadate](https://amsul.ca/pickadate.js/)
+- ➕ Added the [Inflector](https://github.com/ICanBoogie/Inflector) package
+- ➕ Added the [Pickadate](https://amsul.ca/pickadate.js/) script
 - ➕ Added custom styling for Pickadate script output
 - Changed the Uppy button to follow the button outlined styling as it was most often be a secondary button
 - ➕ Added function to remove AJAX modals from the DOM on close
-- ➕ Added [Inputmask](http://robinherbots.github.io/Inputmask)
+- ➕ Added the [Inputmask](http://robinherbots.github.io/Inputmask) script
 
 ## 0.2.12 - Functions + UI Changes (2019-12-06 to 2019-12-07)
 
@@ -99,12 +109,12 @@
 ## 0.2.9 - Webpack + Scripts (2019-11-21)
 
 - Started to integrate webpack
-- ➕ Added the [Trumbowyg script](https://alex-d.github.io/Trumbowyg/)
+- ➕ Added the [Trumbowyg](https://alex-d.github.io/Trumbowyg/) script
 - ➕ Added `$pageHasForm` boolean variable to header and footer tags to allow of loading form related scripts and stylesheets only where needed.
 - Removed the default `text-align: center;` on `csc-data-table` elements
-- ➕ Added the [Lazysizes script](https://github.com/aFarkas/lazysizes) for lazy image loading
-- ➕ Added the [php-image-resize script](https://github.com/gumlet/php-image-resize) for image uploading and dynamic resizing
-- ➕ Added the [Uppy script](https://uppy.io/) for image uploading
+- ➕ Added the [Lazysizes](https://github.com/aFarkas/lazysizes) script for lazy image loading
+- ➕ Added the [php-image-resize](https://github.com/gumlet/php-image-resize) package for image uploading and dynamic resizing
+- ➕ Added the [Uppy](https://uppy.io/) script for image uploading
 
 ## 0.2.8 - UI Changes (2019-11-15 to 2019-11-16)
 
@@ -173,7 +183,7 @@
 - Updated Admin UI sidebar navigation
 - Updated password reset templates
 - Fixed fallover if method doesn't exist in controller
-- ➕ Added [JavaScript Cookie](https://github.com/js-cookie/js-cookie) script
+- ➕ Added the [JavaScript Cookie](https://github.com/js-cookie/js-cookie) script
 - ➕ Added cookie for saving collapsed menu state
 - Changed Admin common file to load 'index' model by default.
 - Add "All Users" page
@@ -185,7 +195,7 @@
 - Changed csc-data-table to default to 100% width
 - ➕ Added link visited colour variable to sass
 - Fixed time reset bug when checking if `$_SESSION['_cs']['CREATED']` is expired
-- ➕ Added [Chosen selector](https://harvesthq.github.io/chosen/)
+- ➕ Added [Chosen selector](https://harvesthq.github.io/chosen/) script
 
 ## 0.2.2 - Security updates (2019-09-03)
 
