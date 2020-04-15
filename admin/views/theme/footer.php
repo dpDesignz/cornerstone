@@ -6,17 +6,18 @@
         <p id="footer__thankyou">Thank you for building with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework GitHub">Cornerstone</a> v<?php echo CS_VERSION; ?></p>
       </footer>
       <!-- End Footer -->
-      </main>
     <?php endif; ?>
-    <!-- End Footer -->
+    </div>
+    <!-- End Content -->
     <!-- Waves ~ http://fian.my.id/Waves/ -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/node-waves/0.7.6/waves.min.js" integrity="sha256-R//ABCk0LbG1/TvQQ4+sbwjzmPxJn9SF5f7FJ2AwJ4o=" crossorigin="anonymous"></script>
     <!-- JavaScript Cookie ~ https://github.com/js-cookie/js-cookie -->
     <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <!-- jQuery Modal ~ https://jquerymodal.com/ -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.2/jquery.modal.min.js" integrity="sha256-lw0IsO3Ev8CSVJXYsRVk88L9No90X3s1EKf87RGEiJQ=" crossorigin="anonymous"></script>
-    <!-- Tooltipster ~ http://iamceege.github.io/tooltipster/ -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/js/jquery.tooltipster.min.js" integrity="sha256-lenj6loHcdfu6tFQPUHN6S2O7G2gv7yX/P9OnRc8lno=" crossorigin="anonymous"></script>
+    <!-- Tippy ~ https://atomiks.github.io/tippyjs/ -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
     <!-- Toastify ~ https://apvarun.github.io/toastify-js/ -->
     <script src="//cdn.jsdelivr.net/npm/toastify-js"></script>
     <?php if (!empty($pageHasForm) && $pageHasForm === TRUE) : ?>

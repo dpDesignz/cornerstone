@@ -3,6 +3,23 @@ class Common extends Controller
 {
 
   /**
+   * Class Constructor
+   */
+  public function __construct($registry)
+  {
+    // Load the controller constructor
+    parent::__construct($registry, true);
+
+    // Set role if logged int
+    if (isLoggedInUser()) {
+      $this->role->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
+
+      echo ($this->role->canDo('add_product')) ? 'You can do that' : 'You can not do that';
+      exit;
+    }
+  }
+
+  /**
    * Index Page
    */
   public function index()

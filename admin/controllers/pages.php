@@ -185,12 +185,12 @@ class Pages extends Controller
         // Set row output
         $dataListOut .= '<tr>
             <td class="has-hover-item">
-              <strong class="item--title"><a href="' . get_site_url('admin/pages/edit/' . $data->content_id) . '" title="Edit ' . htmlspecialchars_decode($data->content_title) . '" class="tooltip">' . htmlspecialchars_decode($data->content_title) . '</a>' . $statusOutput . '</strong>
+              <strong class="item--title"><a href="' . get_site_url('admin/pages/edit/' . $data->content_id) . '" data-tippy-content="Edit ' . htmlspecialchars_decode($data->content_title) . '">' . htmlspecialchars_decode($data->content_title) . '</a>' . $statusOutput . '</strong>
               <span class="hover-item cs-caption cs-muted"><a href="' . get_site_url('admin/pages/edit/' . $data->content_id) . '">Edit</a> ' . $viewLink . '</span>
             </td>
             <td>' . $data->added_by . '</td>
             <td>' . $sectionName . '</td>
-            <td><span class="tooltip cs-muted" title="' . $lastUpdatedBy . '"><strong>' . $dateType . '</strong><br>' . $lastUpdatedShort . '</span></td>
+            <td><span class="cs-muted" data-tippy-content="' . $lastUpdatedBy . '"><strong>' . $dateType . '</strong><br>' . $lastUpdatedShort . '</span></td>
           </tr>';
       }
 

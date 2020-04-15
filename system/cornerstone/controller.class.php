@@ -20,13 +20,19 @@ abstract class Controller
   protected $params = array();
   // Set the registry
   protected $registry;
+  // Set the role
+  protected $role;
 
   /**
    * Constructor
    */
-  public function __construct($registry)
+  public function __construct($registry, $role = FALSE)
   {
     $this->registry = $registry;
+    // Set role if requested
+    if ($role == TRUE) {
+      $this->role = new Role();
+    }
   }
 
 

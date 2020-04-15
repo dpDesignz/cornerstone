@@ -40,8 +40,6 @@
   if (!empty($fontAwesomeURL)) { ?>
     <script src="<?php echo $fontAwesomeURL; ?>"></script>
   <?php } ?>
-  <!-- Tooltipster ~ http://iamceege.github.io/tooltipster/ -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css">
   <!-- Toastify ~ https://apvarun.github.io/toastify-js/ -->
   <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <?php if (!empty($pageHasForm) && $pageHasForm === TRUE) : ?>

@@ -47,10 +47,17 @@ Developed:	dpDesignz - www.dpdesignz.co.nz
 body.cs-admin {
   display: grid;
   min-height: 100vh;
-  grid-template-columns: minmax(0, 230px) minmax(0, 1fr);
-  grid-template-rows: auto 1fr;
-  grid-template-areas: "cs--body__sidebar cs--body__header" "cs--body__sidebar cs--body__main";
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas: "cs--body__sidebar" "cs--body__header" "cs--body__main";
   transition: all 1s;
+}
+@media only screen and (min-width : 768px) {
+  body.cs-admin {
+    grid-template-columns: minmax(0, 230px) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "cs--body__sidebar cs--body__header" "cs--body__sidebar cs--body__main";
+  }
 }
 
 /*------------------------------------*\
@@ -59,19 +66,37 @@ body.cs-admin {
 body.cs-admin > header {
   grid-area: cs--body__header;
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  height: 64px;
+  grid-template-columns: 1fr;
+  align-content: start;
   background-color: #263238;
   color: white;
 }
+@media only screen and (min-width : 768px) {
+  body.cs-admin > header {
+    grid-template-columns: 1fr 1fr auto;
+    height: 64px;
+  }
+}
 body.cs-admin > header #csa-header__nav {
   display: flex;
-  justify-content: flex-end;
+  height: 45px;
+}
+@media only screen and (min-width : 768px) {
+  body.cs-admin > header #csa-header__nav {
+    height: inherit;
+    justify-content: flex-end;
+  }
 }
 body.cs-admin > header #csa-header__nav nav {
   display: flex;
+  width: 100%;
   height: 100%;
   margin-left: 8px;
+}
+@media only screen and (min-width : 768px) {
+  body.cs-admin > header #csa-header__nav nav {
+    width: inherit;
+  }
 }
 body.cs-admin > header #csa-header__nav nav ol,
 body.cs-admin > header #csa-header__nav nav li {
@@ -82,9 +107,12 @@ body.cs-admin > header #csa-header__nav nav ol {
   display: grid;
   grid-auto-flow: column;
   margin: 0;
+  width: 100%;
 }
 body.cs-admin > header #csa-header__nav nav ol li {
   list-style: none;
+  text-align: center;
+  border-left: 2px solid #455a64;
 }
 body.cs-admin > header #csa-header__nav nav ol li a {
   display: inline-flex;
@@ -92,7 +120,6 @@ body.cs-admin > header #csa-header__nav nav ol li a {
   height: 100%;
   padding: 0 25px;
   color: white;
-  border-left: 2px solid #455a64;
   border-bottom: 3px solid #263238;
 }
 body.cs-admin > header #csa-header__nav nav ol li a:hover {
@@ -104,38 +131,55 @@ body.cs-admin > header #csa-header__nav nav ol li a.logout:hover {
   color: #ff5722;
   font-weight: 700;
 }
+@media only screen and (max-width : 767px) {
+  body.cs-admin > header #csa-header__nav nav ol li:first-child {
+    border-left: 0;
+  }
+}
 body.cs-admin > header section#csa-header__welcome {
   display: flex;
   align-items: center;
-  padding: 0px 25px;
-  text-align: right;
-  border-left: 2px solid #455a64;
+  padding: 8px;
+  text-align: center;
+  border-top: 2px solid #455a64;
+}
+@media only screen and (min-width : 768px) {
+  body.cs-admin > header section#csa-header__welcome {
+    padding: 0px 25px;
+    height: inherit;
+    border-top: none;
+    border-left: 2px solid #455a64;
+    text-align: right;
+  }
 }
 body.cs-admin > header section#csa-header__welcome p {
+  flex: 1;
   margin: 0;
   font-size: 0.9rem;
 }
-body.cs-admin > header section#csa-header__welcome p span {
-  display: block;
-  font-size: 0.75rem;
+@media only screen and (min-width : 768px) {
+  body.cs-admin > header section#csa-header__welcome p span {
+    display: block;
+    font-size: 0.75rem;
+  }
 }
 
 /*------------------------------------*\
   #MAIN CONTENT
 \*------------------------------------*/
-body.cs-admin > main {
+body.cs-admin > div#main__content {
   grid-area: cs--body__main;
   display: grid;
   grid-template-columns: 1fr;
   grid-gap: 25px;
   grid-template-rows: 1fr auto;
   grid-template-areas: "cs--main__main" "cs--main__footer";
-  padding: 0 25px;
   background-color: #f2f2f2;
   box-shadow: inset 7px 0 9px -7px rgba(0, 0, 0, 0.56);
 }
-body.cs-admin > main > main {
+body.cs-admin > div#main__content > main {
   grid-area: cs--main__main;
+  padding: 0 25px;
 }
 
 /*------------------------------------*\
@@ -149,23 +193,108 @@ body.cs-admin > aside#sidebar__main {
   background-size: cover;
   box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.8);
 }
-body.cs-admin > aside#sidebar__main #csa-sidebar_identity {
-  text-align: center;
-  height: 64px;
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav {
+  position: absolute;
+  top: 20px;
+  left: 10px;
 }
-body.cs-admin > aside#sidebar__main #csa-sidebar_identity h3 a {
+@media only screen and (min-width : 768px) {
+  body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav {
+    display: none;
+  }
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background: transparent;
+  font-size: 24px;
+  color: #4e5765;
+  border: none;
+  cursor: pointer;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 4px;
+  background: white;
+  border-radius: 2px;
+  overflow: hidden;
+  transition: all 0.3s linear;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn span::before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  background: #4e5765;
+  transition: all 0.3s linear;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn span:nth-child(1) {
+  animation: span-first-off 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn span:nth-child(2) {
+  animation: span-second-off 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn span:nth-child(3) {
+  animation: span-third-off 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn.on:hover span::before {
+  width: 100%;
+  transition: all 0.3s linear;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn.on span:nth-child(1) {
+  animation: span-first-on 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn.on span:nth-child(2) {
+  animation: span-second-on 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__mobile-nav__btn.on span:nth-child(3) {
+  animation: span-third-on 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__identity {
+  text-align: center;
+  height: 90px;
+}
+@media only screen and (min-width : 768px) {
+  body.cs-admin > aside#sidebar__main #csa-sidebar__identity {
+    height: 64px;
+  }
+}
+body.cs-admin > aside#sidebar__main #csa-sidebar__identity h3 a {
   color: white;
 }
-body.cs-admin > aside#sidebar__main #csa-sidebar_identity img {
+body.cs-admin > aside#sidebar__main #csa-sidebar__identity img {
   width: 230px;
   height: 100%;
   transition: width 0.7s;
 }
 body.cs-admin > aside#sidebar__main nav#sidebar__nav {
+  display: none;
   position: relative;
   overflow: auto;
   height: calc(100vh - 64px);
   width: 100%;
+}
+@media only screen and (min-width : 768px) {
+  body.cs-admin > aside#sidebar__main nav#sidebar__nav {
+    display: block;
+  }
+}
+@media only screen and (max-width : 767px) {
+  body.cs-admin > aside#sidebar__main nav#sidebar__nav.nav--open {
+    display: block;
+  }
 }
 body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links {
   padding: 0px;
@@ -281,6 +410,11 @@ body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li ol
 body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse {
   margin-top: 5px;
 }
+@media only screen and (max-width : 767px) {
+  body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse {
+    display: none;
+  }
+}
 body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#sidebar__collapse button {
   display: flex;
   vertical-align: middle;
@@ -303,67 +437,141 @@ body.cs-admin > aside#sidebar__main nav#sidebar__nav ol#sidebar__nav-links li#si
   transition: all 0.3s linear;
 }
 
-body.cs-admin.sidebar__collapsed {
-  grid-template-columns: minmax(0, 100px) minmax(0, 1fr);
-}
-body.cs-admin.sidebar__collapsed > aside#sidebar__main section#csa-sidebar_identity img {
-  width: 100px;
-}
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a,
+@media only screen and (min-width : 768px) {
+  body.cs-admin.sidebar__collapsed {
+    grid-template-columns: minmax(0, 100px) minmax(0, 1fr);
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main section#csa-sidebar__identity img {
+    width: 100px;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a,
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button {
-  justify-content: center;
-}
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a span,
+    justify-content: center;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a span,
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button span {
-  display: none;
-}
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.material-icons,
+    display: none;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.material-icons,
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i[class^=fa],
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.material-icons,
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i[class^=fa] {
-  margin-right: 0;
-}
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.material-icons,
+    margin-right: 0;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i.material-icons,
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i.material-icons {
-  font-size: 1.7rem;
-}
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i[class^=fa],
+    font-size: 1.7rem;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a i[class^=fa],
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button i[class^=fa] {
-  font-size: 1.3rem;
-}
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a b.caret,
+    font-size: 1.3rem;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li a b.caret,
 body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li button b.caret {
-  display: none;
+    display: none;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li.sidebar__nav-separator {
+    padding: 2px 0;
+    text-align: center;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li ol.sidebar__sub-nav li a {
+    justify-content: center;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.75em;
+  }
+  body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li#sidebar__collapse button i {
+    transform: rotate(0deg);
+  }
 }
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li.sidebar__nav-separator {
-  padding: 2px 0;
-  text-align: center;
+@keyframes span-first-on {
+  0% {
+    transform: translate(-50%, -300%);
+  }
+  30% {
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
 }
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li ol.sidebar__sub-nav li a {
-  justify-content: center;
-  padding: 5px;
-  text-align: center;
-  font-size: 0.75em;
+@keyframes span-first-off {
+  0% {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+  30% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -300%);
+  }
 }
-body.cs-admin.sidebar__collapsed > aside#sidebar__main nav#sidebar__nav > ol#sidebar__nav-links > li#sidebar__collapse button i {
-  transform: rotate(0deg);
+@keyframes span-second-on {
+  0% {
+    transform: translate(-50%, -50%);
+  }
+  25% {
+    background: #4e5765;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    transform: translate(-150%, -50%) scale(0);
+  }
 }
-
+@keyframes span-second-off {
+  0% {
+    transform: translate(-150%, -50%) scale(0);
+  }
+  25% {
+    background: #4e5765;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    transform: translate(-50%, -50%);
+  }
+}
+@keyframes span-third-on {
+  0% {
+    transform: translate(-50%, 200%);
+  }
+  30% {
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+}
+@keyframes span-third-off {
+  0% {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  30% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, 200%);
+  }
+}
 /*------------------------------------*\
   #FOOTER
 \*------------------------------------*/
-body.cs-admin > main > footer {
+body.cs-admin > div#main__content > footer {
   grid-area: cs--main__footer;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  padding: 0 25px;
   font-size: 0.65rem;
   text-align: center;
   border-top: 1px solid #e7e7e7;
 }
-body.cs-admin > main > footer p#footer__copyright {
+body.cs-admin > div#main__content > footer p#footer__copyright {
   text-align: left;
 }
-body.cs-admin > main > footer p#footer__thankyou {
+body.cs-admin > div#main__content > footer p#footer__thankyou {
   text-align: right;
 }
 

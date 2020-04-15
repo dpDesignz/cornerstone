@@ -137,7 +137,7 @@ class Pagination
       // Check if first page
       $first_page_class = ($current_page == 1) ? 'cs-pagitem--disabled' : 'waves-effect';
       $first_page_URL = ($current_page == 1) ? 'javascript:void();' : $pageURL;
-      $returnOutput .= '<li class="' . $first_page_class . '"><a class="tooltip" href="' . $first_page_URL . '" title="First page"><i class="fas fa-angle-double-left"></i></a></li>';
+      $returnOutput .= '<li class="' . $first_page_class . '"><a href="' . $first_page_URL . '" data-tippy-content="First page"><i class="fas fa-angle-double-left"></i></a></li>';
     }
 
     // Previous page
@@ -152,7 +152,7 @@ class Pagination
       }
       // Rebuild the url
       $pageURL = $base_url . implode('/', $PAGESURI) . $query_string;
-      $returnOutput .= '<li class="waves-effect"><a class="tooltip" href="' . $pageURL . '" title="Previous page"><i class="fas fa-chevron-left"></i></a></li>';
+      $returnOutput .= '<li class="waves-effect"><a href="' . $pageURL . '" data-tippy-content="Previous page"><i class="fas fa-chevron-left"></i></a></li>';
     }
 
     // Display links to specific page numbers IF we have a sufficient number of pages.
@@ -204,7 +204,7 @@ class Pagination
         }
         // Rebuild the url
         $pageURL = $base_url . implode('/', $PAGESURI) . $query_string;
-        $returnOutput .= '<li class="waves-effect"><a class="tooltip" href="' . $pageURL . '" title="Next page"><i class="fas fa-chevron-right"></i></a></li>';
+        $returnOutput .= '<li class="waves-effect"><a href="' . $pageURL . '" data-tippy-content="Next page"><i class="fas fa-chevron-right"></i></a></li>';
       }
 
       // Last Page
@@ -221,7 +221,7 @@ class Pagination
         $pageURL = $base_url . implode('/', $PAGESURI) . $query_string;
         // Check if last page
         $last_page_class = ($current_page == $total_pages) ? 'cs-pagitem--disabled' : 'waves-effect';
-        $returnOutput .= '<li class="' . $last_page_class . '"><a class="tooltip" href="' . $pageURL . '" title="Last page"><i class="fas fa-angle-double-right"></i></a></li>';
+        $returnOutput .= '<li class="' . $last_page_class . '"><a href="' . $pageURL . '" data-tippy-content="Last page"><i class="fas fa-angle-double-right"></i></a></li>';
       }
     }
 

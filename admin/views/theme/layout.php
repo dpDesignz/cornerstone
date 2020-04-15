@@ -1,6 +1,12 @@
   <!-- Start Sidebar -->
   <aside id="sidebar__main">
-    <section id="csa-sidebar_identity">
+    <!-- Mobile Navigation -->
+    <section id="csa-sidebar__mobile-nav">
+      <button id="csa-sidebar__mobile-nav__btn" aria-controls="menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </section>
+    <section id="csa-sidebar__identity">
       <?php
       // Output site_logo.svg file if it exists, else output the site name
       if (file_exists(get_public_path('admin-files/img/site_logo.svg'))) { ?>
@@ -11,11 +17,11 @@
     </section>
     <nav id="sidebar__nav">
       <ol id="sidebar__nav-links">
-        <li id="sidebar__collapse"><button id="collapse-btn" title="Menu Collapse" class="tooltip"><i class="fas fa-play-circle"></i> <span>Collapse Menu</span></button></li>
+        <li id="sidebar__collapse"><button id="collapse-btn" data-tippy-content="Menu Collapse"><i class="fas fa-play-circle"></i> <span>Collapse Menu</span></button></li>
         <li class="sidebar__nav-separator">
           <span>Dashboard</span>
         </li>
-        <li <?php echo (!empty($currentNav) && $currentNav === 'dashboard') ? 'class="active"' : '' ?>><a class="tooltip" href="<?php echo get_site_url('admin/dashboard'); ?>" title="Dashboard"><i class="material-icons">dashboard</i> <span>Dashboard</span></a></li>
+        <li <?php echo (!empty($currentNav) && $currentNav === 'dashboard') ? 'class="active"' : '' ?>><a href="<?php echo get_site_url('admin/dashboard'); ?>" data-tippy-content="Dashboard"><i class="material-icons">dashboard</i> <span>Dashboard</span></a></li>
         <?php
         // Set fallbacks
         $currentNav = (!empty($currentNav)) ? $currentNav : '';
@@ -58,7 +64,7 @@
           'children' => array(
             array(
               'identifier' => 'index',
-              'text' => 'Site Settings',
+              'text' => 'Settings',
               'href' => ''
             )
           )
@@ -74,17 +80,18 @@
     <section id="csa-header__nav">
       <nav>
         <ol>
-          <li><a class="tooltip" href="<?php echo get_site_url(); ?>" title="View Website Front End" target="_blank"><i class="fas fa-home"></i></a></li>
-          <li><a href="javascript:alert('Notification system coming soon');" title="Notifications (Coming soon)" class="tooltip"><i class="fas fa-bell"></i></a></li>
-          <li><a href="javascript:alert('Help desk coming soon');" title="Need help? (Coming soon)" class="tooltip"><i class="far fa-question-circle"></i></a></li>
-          <li><a href="<?php echo get_site_url('admin/logout'); ?>" title="Log out" class="logout tooltip"><i class="fas fa-power-off"></i></a></li>
+          <li><a href="<?php echo get_site_url(); ?>" data-tippy-content="View Website Front End" target="_blank"><i class="fas fa-home"></i></a></li>
+          <li><a href="javascript:alert('Notification system coming soon');" data-tippy-content="Notifications (Coming soon)"><i class="fas fa-bell"></i></a></li>
+          <li><a href="javascript:alert('Help desk coming soon');" data-tippy-content="Need help? (Coming soon)"><i class="far fa-question-circle"></i></a></li>
+          <li><a href="<?php echo get_site_url('admin/logout'); ?>" data-tippy-content="Log out" class="logout"><i class="fas fa-power-off"></i></a></li>
         </ol>
       </nav>
     </section>
     <section id="csa-header__welcome">
-      <p><span>Welcome</span><strong><?php echo $_SESSION['_cs']['user']['name']; ?></strong></p>
+      <p><span>Welcome</span> <strong><?php echo $_SESSION['_cs']['user']['name']; ?></strong></p>
     </section>
   </header>
-  <!-- End Header ~#~ Start Main -->
-  <main id="main__content">
+  <!-- End Header ~#~ Start Content -->
+  <div id="main__content">
+    <!-- Start Main -->
     <main>

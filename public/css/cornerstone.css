@@ -6969,6 +6969,8 @@ body.cs-component__form .csc-form {
   /* Remove default checkbox */
   /* Indeterminate checkbox */
   /* Style Form Details */
+  /* Switch
+  ========================================================================== */
 }
 body.cs-components .csc-form ::placeholder,
 body.cs-component__form .csc-form ::placeholder {
@@ -8530,17 +8532,17 @@ body.cs-components .csc-form .csc-input-field .csc-prefix ~ label,
 body.cs-component__form .csc-form .csc-input-field .csc-prefix ~ label {
   margin-left: 3rem;
 }
-@media screen and (max-width: 991px) {
-  body.cs-components .csc-form .csc-input-field .csc-prefix ~ input,
-body.cs-component__form .csc-form .csc-input-field .csc-prefix ~ input {
-    width: 86%;
-    width: calc(100% - 3rem);
-  }
-}
 @media screen and (max-width: 767px) {
   body.cs-components .csc-form .csc-input-field .csc-prefix ~ input,
 body.cs-component__form .csc-form .csc-input-field .csc-prefix ~ input {
     width: 80%;
+    width: calc(100% - 3rem);
+  }
+}
+@media screen and (max-width: 991px) {
+  body.cs-components .csc-form .csc-input-field .csc-prefix ~ input,
+body.cs-component__form .csc-form .csc-input-field .csc-prefix ~ input {
+    width: 86%;
     width: calc(100% - 3rem);
   }
 }
@@ -8644,8 +8646,8 @@ body.cs-components .csc-form [type=checkbox],
 body.cs-component__form .csc-form [type=checkbox] {
   /* checkbox aspect */
 }
-body.cs-components .csc-form [type=checkbox] + span:not(.lever),
-body.cs-component__form .csc-form [type=checkbox] + span:not(.lever) {
+body.cs-components .csc-form [type=checkbox] + span:not(.csc-lever),
+body.cs-component__form .csc-form [type=checkbox] + span:not(.csc-lever) {
   position: relative;
   padding-left: 35px;
   cursor: pointer;
@@ -8659,9 +8661,9 @@ body.cs-components .csc-form [type=checkbox] + span > i.material-icons,
 body.cs-component__form .csc-form [type=checkbox] + span > i.material-icons {
   font-size: 1em;
 }
-body.cs-components .csc-form [type=checkbox] + span:not(.lever):before, body.cs-components .csc-form [type=checkbox]:not(.filled-in) + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox] + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox]:not(.filled-in) + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox] + span:not(.csc-lever):before, body.cs-components .csc-form [type=checkbox]:not(.csc-filled-in) + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox] + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox]:not(.csc-filled-in) + span:not(.csc-lever):after {
   content: "";
   position: absolute;
   top: 0;
@@ -8674,26 +8676,26 @@ body.cs-component__form .csc-form [type=checkbox]:not(.filled-in) + span:not(.le
   margin-top: 3px;
   transition: 0.2s;
 }
-body.cs-components .csc-form [type=checkbox]:not(.filled-in) + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox]:not(.filled-in) + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox]:not(.csc-filled-in) + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox]:not(.csc-filled-in) + span:not(.csc-lever):after {
   border: 0;
   transform: scale(0);
 }
-body.cs-components .csc-form [type=checkbox]:not(:checked):disabled + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox]:not(:checked):disabled + span:not(.lever):before {
+body.cs-components .csc-form [type=checkbox]:not(:checked):disabled + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox]:not(:checked):disabled + span:not(.csc-lever):before {
   border: none;
   background-color: rgba(0, 0, 0, 0.42);
 }
-body.cs-components .csc-form [type=checkbox].tabbed:focus + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].tabbed:focus + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-tabbed:focus + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-tabbed:focus + span:not(.csc-lever):after {
   transform: scale(1);
   border: 0;
   border-radius: 50%;
   box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
   background-color: rgba(0, 0, 0, 0.1);
 }
-body.cs-components .csc-form [type=checkbox]:checked + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox]:checked + span:not(.lever):before {
+body.cs-components .csc-form [type=checkbox]:checked + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox]:checked + span:not(.csc-lever):before {
   top: -4px;
   left: -5px;
   width: 12px;
@@ -8719,8 +8721,8 @@ body.cs-components .csc-form [type=checkbox]:disabled + span,
 body.cs-component__form .csc-form [type=checkbox]:disabled + span {
   cursor: default;
 }
-body.cs-components .csc-form [type=checkbox]:indeterminate + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox]:indeterminate + span:not(.lever):before {
+body.cs-components .csc-form [type=checkbox]:indeterminate + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox]:indeterminate + span:not(.csc-lever):before {
   top: -11px;
   left: -12px;
   width: 10px;
@@ -8733,19 +8735,19 @@ body.cs-component__form .csc-form [type=checkbox]:indeterminate + span:not(.leve
   backface-visibility: hidden;
   transform-origin: 100% 100%;
 }
-body.cs-components .csc-form [type=checkbox]:indeterminate:disabled + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox]:indeterminate:disabled + span:not(.lever):before {
+body.cs-components .csc-form [type=checkbox]:indeterminate:disabled + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox]:indeterminate:disabled + span:not(.csc-lever):before {
   border-right: 2px solid rgba(0, 0, 0, 0.42);
   background-color: transparent;
 }
-body.cs-components .csc-form [type=checkbox].filled-in + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].filled-in + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-filled-in + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in + span:not(.csc-lever):after {
   border-radius: 2px;
 }
-body.cs-components .csc-form [type=checkbox].filled-in + span:not(.lever):before,
-body.cs-components .csc-form [type=checkbox].filled-in + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].filled-in + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox].filled-in + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-filled-in + span:not(.csc-lever):before,
+body.cs-components .csc-form [type=checkbox].csc-filled-in + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in + span:not(.csc-lever):after {
   content: "";
   left: 0;
   position: absolute;
@@ -8753,8 +8755,8 @@ body.cs-component__form .csc-form [type=checkbox].filled-in + span:not(.lever):a
   transition: border 0.25s, background-color 0.25s, width 0.2s 0.1s, height 0.2s 0.1s, top 0.2s 0.1s, left 0.2s 0.1s;
   z-index: 1;
 }
-body.cs-components .csc-form [type=checkbox].filled-in:not(:checked) + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox].filled-in:not(:checked) + span:not(.lever):before {
+body.cs-components .csc-form [type=checkbox].csc-filled-in:not(:checked) + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in:not(:checked) + span:not(.csc-lever):before {
   width: 0;
   height: 0;
   border: 3px solid transparent;
@@ -8763,8 +8765,8 @@ body.cs-component__form .csc-form [type=checkbox].filled-in:not(:checked) + span
   transform: rotateZ(37deg);
   transform-origin: 100% 100%;
 }
-body.cs-components .csc-form [type=checkbox].filled-in:not(:checked) + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].filled-in:not(:checked) + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-filled-in:not(:checked) + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in:not(:checked) + span:not(.csc-lever):after {
   height: 20px;
   width: 20px;
   background-color: transparent;
@@ -8772,8 +8774,8 @@ body.cs-component__form .csc-form [type=checkbox].filled-in:not(:checked) + span
   top: 0px;
   z-index: 0;
 }
-body.cs-components .csc-form [type=checkbox].filled-in:checked + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox].filled-in:checked + span:not(.lever):before {
+body.cs-components .csc-form [type=checkbox].csc-filled-in:checked + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in:checked + span:not(.csc-lever):before {
   top: 0;
   left: 1px;
   width: 8px;
@@ -8785,8 +8787,8 @@ body.cs-component__form .csc-form [type=checkbox].filled-in:checked + span:not(.
   transform: rotateZ(37deg);
   transform-origin: 100% 100%;
 }
-body.cs-components .csc-form [type=checkbox].filled-in:checked + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].filled-in:checked + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-filled-in:checked + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in:checked + span:not(.csc-lever):after {
   top: 0;
   width: 20px;
   height: 20px;
@@ -8794,34 +8796,34 @@ body.cs-component__form .csc-form [type=checkbox].filled-in:checked + span:not(.
   background-color: #d13f2d;
   z-index: 0;
 }
-body.cs-components .csc-form [type=checkbox].filled-in.tabbed:focus + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].filled-in.tabbed:focus + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-filled-in.tabbed:focus + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in.tabbed:focus + span:not(.csc-lever):after {
   border-radius: 2px;
   border-color: #5a5a5a;
   background-color: rgba(0, 0, 0, 0.1);
 }
-body.cs-components .csc-form [type=checkbox].filled-in.tabbed:checked:focus + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].filled-in.tabbed:checked:focus + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-filled-in.tabbed:checked:focus + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in.tabbed:checked:focus + span:not(.csc-lever):after {
   border-radius: 2px;
   background-color: #d13f2d;
   border-color: #d13f2d;
 }
-body.cs-components .csc-form [type=checkbox].filled-in:disabled:not(:checked) + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox].filled-in:disabled:not(:checked) + span:not(.lever):before {
+body.cs-components .csc-form [type=checkbox].csc-filled-in:disabled:not(:checked) + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in:disabled:not(:checked) + span:not(.csc-lever):before {
   background-color: transparent;
   border: 2px solid transparent;
 }
-body.cs-components .csc-form [type=checkbox].filled-in:disabled:not(:checked) + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].filled-in:disabled:not(:checked) + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-filled-in:disabled:not(:checked) + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in:disabled:not(:checked) + span:not(.csc-lever):after {
   border-color: transparent;
   background-color: #949494;
 }
-body.cs-components .csc-form [type=checkbox].filled-in:disabled:checked + span:not(.lever):before,
-body.cs-component__form .csc-form [type=checkbox].filled-in:disabled:checked + span:not(.lever):before {
+body.cs-components .csc-form [type=checkbox].csc-filled-in:disabled:checked + span:not(.csc-lever):before,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in:disabled:checked + span:not(.csc-lever):before {
   background-color: transparent;
 }
-body.cs-components .csc-form [type=checkbox].filled-in:disabled:checked + span:not(.lever):after,
-body.cs-component__form .csc-form [type=checkbox].filled-in:disabled:checked + span:not(.lever):after {
+body.cs-components .csc-form [type=checkbox].csc-filled-in:disabled:checked + span:not(.csc-lever):after,
+body.cs-component__form .csc-form [type=checkbox].csc-filled-in:disabled:checked + span:not(.csc-lever):after {
   background-color: #949494;
   border-color: #949494;
 }
@@ -8829,6 +8831,99 @@ body.cs-components .csc-form-details,
 body.cs-component__form .csc-form-details {
   background-color: #eceff1;
   border-left: 1px solid #cfd8dc;
+}
+body.cs-components .csc-form .csc-switch,
+body.cs-components .csc-form .csc-switch *,
+body.cs-component__form .csc-form .csc-switch,
+body.cs-component__form .csc-form .csc-switch * {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+body.cs-components .csc-form .csc-switch label,
+body.cs-component__form .csc-form .csc-switch label {
+  color: #9e9e9e;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+body.cs-components .csc-form .csc-switch label input[type=checkbox],
+body.cs-component__form .csc-form .csc-switch label input[type=checkbox] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+body.cs-components .csc-form .csc-switch label input[type=checkbox]:checked + .csc-lever,
+body.cs-component__form .csc-form .csc-switch label input[type=checkbox]:checked + .csc-lever {
+  background-color: #c28bcc;
+}
+body.cs-components .csc-form .csc-switch label input[type=checkbox]:checked + .csc-lever:before, body.cs-components .csc-form .csc-switch label input[type=checkbox]:checked + .csc-lever:after,
+body.cs-component__form .csc-form .csc-switch label input[type=checkbox]:checked + .csc-lever:before,
+body.cs-component__form .csc-form .csc-switch label input[type=checkbox]:checked + .csc-lever:after {
+  left: 18px;
+}
+body.cs-components .csc-form .csc-switch label input[type=checkbox]:checked + .csc-lever:after,
+body.cs-component__form .csc-form .csc-switch label input[type=checkbox]:checked + .csc-lever:after {
+  background-color: #9c27b0;
+}
+body.cs-components .csc-form .csc-switch label .csc-lever,
+body.cs-component__form .csc-form .csc-switch label .csc-lever {
+  content: "";
+  display: inline-block;
+  position: relative;
+  width: 36px;
+  height: 14px;
+  background-color: rgba(0, 0, 0, 0.38);
+  border-radius: 15px;
+  margin-right: 10px;
+  transition: background 0.3s ease;
+  vertical-align: middle;
+  margin: 0 16px;
+}
+body.cs-components .csc-form .csc-switch label .csc-lever:before, body.cs-components .csc-form .csc-switch label .csc-lever:after,
+body.cs-component__form .csc-form .csc-switch label .csc-lever:before,
+body.cs-component__form .csc-form .csc-switch label .csc-lever:after {
+  content: "";
+  position: absolute;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  left: 0;
+  top: -3px;
+  transition: left 0.3s ease, background 0.3s ease, box-shadow 0.1s ease, transform 0.1s ease;
+}
+body.cs-components .csc-form .csc-switch label .csc-lever:before,
+body.cs-component__form .csc-form .csc-switch label .csc-lever:before {
+  background-color: rgba(156, 39, 176, 0.15);
+}
+body.cs-components .csc-form .csc-switch label .csc-lever:after,
+body.cs-component__form .csc-form .csc-switch label .csc-lever:after {
+  background-color: #F1F1F1;
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+body.cs-components .csc-form input[type=checkbox]:checked:not(:disabled) ~ .csc-lever:active::before,
+body.cs-components .csc-form input[type=checkbox]:checked:not(:disabled).csc-switch--tabbed:focus ~ .csc-lever::before,
+body.cs-component__form .csc-form input[type=checkbox]:checked:not(:disabled) ~ .csc-lever:active::before,
+body.cs-component__form .csc-form input[type=checkbox]:checked:not(:disabled).csc-switch--tabbed:focus ~ .csc-lever::before {
+  transform: scale(2.4);
+  background-color: rgba(156, 39, 176, 0.15);
+}
+body.cs-components .csc-form input[type=checkbox]:not(:disabled) ~ .csc-lever:active:before,
+body.cs-components .csc-form input[type=checkbox]:not(:disabled).csc-switch--tabbed:focus ~ .csc-lever::before,
+body.cs-component__form .csc-form input[type=checkbox]:not(:disabled) ~ .csc-lever:active:before,
+body.cs-component__form .csc-form input[type=checkbox]:not(:disabled).csc-switch--tabbed:focus ~ .csc-lever::before {
+  transform: scale(2.4);
+  background-color: rgba(0, 0, 0, 0.08);
+}
+body.cs-components .csc-form .csc-switch input[type=checkbox][disabled] + .csc-lever,
+body.cs-component__form .csc-form .csc-switch input[type=checkbox][disabled] + .csc-lever {
+  cursor: default;
+  background-color: rgba(0, 0, 0, 0.12);
+}
+body.cs-components .csc-form .csc-switch label input[type=checkbox][disabled] + .csc-lever:after,
+body.cs-components .csc-form .csc-switch label input[type=checkbox][disabled]:checked + .csc-lever:after,
+body.cs-component__form .csc-form .csc-switch label input[type=checkbox][disabled] + .csc-lever:after,
+body.cs-component__form .csc-form .csc-switch label input[type=checkbox][disabled]:checked + .csc-lever:after {
+  background-color: #949494;
 }
 
 body.cs-components .csc-reponsive-image,
@@ -9054,21 +9149,43 @@ body.cs-component__pagemenu .csc-pagemenu > ol {
 body.cs-components .csc-pagemenu > ol > li,
 body.cs-component__pagemenu .csc-pagemenu > ol > li {
   list-style: none;
-  display: inline-flex;
+  display: block;
+}
+@media only screen and (min-width : 768px) {
+  body.cs-components .csc-pagemenu > ol > li,
+body.cs-component__pagemenu .csc-pagemenu > ol > li {
+    display: inline-flex;
+  }
 }
 body.cs-components .csc-pmitem,
 body.cs-component__pagemenu .csc-pmitem {
-  display: inline-flex;
+  display: block;
   padding: 8px 12px;
   color: inherit;
   background-color: #e0e0e0;
   border-bottom: 2px solid transparent;
+}
+@media only screen and (min-width : 768px) {
+  body.cs-components .csc-pmitem,
+body.cs-component__pagemenu .csc-pmitem {
+    display: inline-flex;
+  }
 }
 body.cs-components .csc-pmitem--active, body.cs-components .csc-pmitem:hover,
 body.cs-component__pagemenu .csc-pmitem--active,
 body.cs-component__pagemenu .csc-pmitem:hover {
   background-color: white;
   border-bottom-color: #039be5;
+}
+body.cs-components .csc-pmitem--disabled,
+body.cs-component__pagemenu .csc-pmitem--disabled {
+  color: #9e9e9e;
+  cursor: default;
+}
+body.cs-components .csc-pmitem--disabled:hover,
+body.cs-component__pagemenu .csc-pmitem--disabled:hover {
+  background-color: #e0e0e0;
+  border-bottom-color: transparent;
 }
 
 body.cs-components ul.cs-pagination,
@@ -9132,6 +9249,21 @@ body.cs-components .cs-pagitem--disabled > a,
 body.cs-component__pagination .cs-pagitem--disabled > a {
   cursor: default;
   border-bottom: none !important;
+}
+
+/* Tippy Themes ~ https://atomiks.github.io/tippyjs/v6/themes/ */
+.tippy-box {
+  border-radius: 5px;
+  border: none;
+  background: #233344;
+  color: #fff;
+}
+.tippy-content {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 16px;
+  padding: 8px 10px;
+  overflow: hidden;
 }
 
 /* Tooltipster Styling ~ http://iamceege.github.io/tooltipster/#styling */

@@ -42,7 +42,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
     <div class="csc-col csc-col12">
       <h1>Add a section</h1>
       <p id="no-index-data__tag">Add a section to display content on your site</p>
-      <p id="no-index-data__btn"><a class="csc-btn tooltip" href="<?php echo get_site_url('admin/sections/add'); ?>" title="Add a new section"><i class="material-icons csc-bi-left">add</i> Add section</a></p>
+      <p id="no-index-data__btn"><a class="csc-btn" href="<?php echo get_site_url('admin/sections/add'); ?>" data-tippy-content="Add a new section"><i class="material-icons csc-bi-left">add</i> Add section</a></p>
       <span id="no-index-data__icon"><i class="fas fa-th-large"></i></span>
     </div>
   </div>
@@ -73,9 +73,9 @@ require(get_theme_path('layout.php', 'admin')); ?>
         <table>
           <thead class="csc-table-header">
             <tr>
-              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('name', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a class="tooltip" href="<?php echo get_site_url(get_sort_url('name')); ?>" title="Sort by Section Name">Section <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
-              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('directory', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a class="tooltip" href="<?php echo get_site_url(get_sort_url('directory')); ?>" title="Sort by Directory">Directory <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
-              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('type', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a class="tooltip" href="<?php echo get_site_url(get_sort_url('type')); ?>" title="Sort by Type">Type <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
+              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('name', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a href="<?php echo get_site_url(get_sort_url('name')); ?>" data-tippy-content="Sort by Section Name">Section <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
+              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('directory', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a href="<?php echo get_site_url(get_sort_url('directory')); ?>" data-tippy-content="Sort by Directory">Directory <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
+              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('type', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a href="<?php echo get_site_url(get_sort_url('type')); ?>" data-tippy-content="Sort by Type">Type <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
             </tr>
           </thead>
           <tbody class="csc-table-body csc-table-body--zebra">

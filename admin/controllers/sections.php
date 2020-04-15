@@ -146,7 +146,7 @@ class Sections extends Controller
         // Set row output
         $dataListOut .= '<tr class="has-hover-item">
             <td>
-              <strong class="item--title"><a href="' . get_site_url('admin/sections/edit/' . $data->section_id) . '" title="Edit ' . htmlspecialchars_decode($data->section_name) . '" class="tooltip">' . htmlspecialchars_decode($data->section_name) . ' <span class="hover-item"><i class="fas fa-edit"></i></span></a></strong>
+              <strong class="item--title"><a href="' . get_site_url('admin/sections/edit/' . $data->section_id) . '" data-tippy-content="Edit ' . htmlspecialchars_decode($data->section_name) . '">' . htmlspecialchars_decode($data->section_name) . ' <span class="hover-item"><i class="fas fa-edit"></i></span></a></strong>
 
             </td>
             <td>' . $sectionDirectory . '</td>

@@ -40,8 +40,6 @@
   if (!empty($fontAwesomeURL)) { ?>
     <script src="<?php echo $fontAwesomeURL; ?>" crossorigin="anonymous"></script>
   <?php } ?>
-  <!-- Tooltipster ~ http://iamceege.github.io/tooltipster/ -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css">
   <!-- Chosen ~ https://harvesthq.github.io/chosen/ -->
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
   <!-- Site Styling -->

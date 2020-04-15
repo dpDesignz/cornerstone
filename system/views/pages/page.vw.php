@@ -10,7 +10,7 @@
 // Set the meta/og information for the page
 $pageMetaTitle = $data->page_meta_title . " | " . $data->site_name;
 $pageMetaDescription = $data->page_meta_description;
-$pageMetaImage = get_site_url('img/cornerstone_framework_logo_white.png');
+$pageMetaImage = get_site_url('img/site_ogp_image.png');
 $pageMetaCanonical = get_site_url($data->seo_keyword);
 $pageMetaType = "website";
 

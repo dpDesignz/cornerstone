@@ -216,7 +216,7 @@ function returnParentAdminMenuItem(object $item, string $currentNav = '', string
   $fallbackIcon = (!empty($item->icon)) ? $item->icon : 'fas fa-bars';
 
   // Add to return output
-  $returnOutput .= '<li class="has-subnav' . $activeNav . '"><a class="tooltip" data-toggle="collapse" title="' . $fallbackTitle . '" aria-expanded="' . $ariaExpanded . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span><b class="caret"></b></a>';
+  $returnOutput .= '<li class="has-subnav' . $activeNav . '"><a data-toggle="collapse" data-tippy-content="' . $fallbackTitle . '" aria-expanded="' . $ariaExpanded . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span><b class="caret"></b></a>';
 
   // Check children isn't empty
   if (!empty($item->children)) {
@@ -291,7 +291,7 @@ function outputAdminMenu(array $menuItems, string $currentNav = '', string $curr
         // Set icon fallback
         $fallbackIcon = (!empty($item->icon)) ? $item->icon : 'fas fa-bars';
         // Add to return output
-        $returnOutput .= '<li ' . $activeNav . '><a class="tooltip" href="' . $fallbackHref . '" title="' . $fallbackTitle . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span></a></li>';
+        $returnOutput .= '<li ' . $activeNav . '><a href="' . $fallbackHref . '" data-tippy-content="' . $fallbackTitle . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span></a></li>';
         break;
       case 'parent':
         // Get parent admin menu item

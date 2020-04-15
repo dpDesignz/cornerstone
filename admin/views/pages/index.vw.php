@@ -44,7 +44,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
     <div class="csc-col csc-col12">
       <h1>Add a page</h1>
       <p id="no-index-data__tag">Add a page to display on your site</p>
-      <p id="no-index-data__btn"><a class="csc-btn tooltip" href="<?php echo get_site_url('admin/pages/add'); ?>" title="Add a new page"><i class="material-icons csc-bi-left">add</i> Add page</a></p>
+      <p id="no-index-data__btn"><a class="csc-btn" href="<?php echo get_site_url('admin/pages/add'); ?>" data-tippy-content="Add a new page"><i class="material-icons csc-bi-left">add</i> Add page</a></p>
       <span id="no-index-data__icon"><i class="far fa-file"></i></span>
     </div>
   </div>
@@ -79,10 +79,10 @@ require(get_theme_path('layout.php', 'admin')); ?>
         <table>
           <thead class="csc-table-header">
             <tr>
-              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('title', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a class="tooltip" href="<?php echo get_site_url(get_sort_url('title')); ?>" title="Sort by Title">Title <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
-              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('creator', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a class="tooltip" href="<?php echo get_site_url(get_sort_url('creator')); ?>" title="Sort by Creator">Creator <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
-              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('section', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a class="tooltip" href="<?php echo get_site_url(get_sort_url('section')); ?>" title="Sort by Section">Section <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
-              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('updated', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a class="tooltip" href="<?php echo get_site_url(get_sort_url('updated')); ?>" title="Sort by Last Updated">Date <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
+              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('title', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a href="<?php echo get_site_url(get_sort_url('title')); ?>" data-tippy-content="Sort by Title">Title <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
+              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('creator', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a href="<?php echo get_site_url(get_sort_url('creator')); ?>" data-tippy-content="Sort by Creator">Creator <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
+              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('section', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a href="<?php echo get_site_url(get_sort_url('section')); ?>" data-tippy-content="Sort by Section">Section <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
+              <th><span class="csc-table-header__title<?php echo ($sort_response = check_sort_item('updated', $data->defaultSort)) ? ' csc-table-header__title--active  csc-table-header__title--' . $sort_response->dir . '" aria-sort="' . $sort_response->dir : ''; ?>"><a href="<?php echo get_site_url(get_sort_url('updated')); ?>" data-tippy-content="Sort by Last Updated">Date <i class="fas fa-long-arrow-alt-down direction-icon"></i></a></span></th>
             </tr>
           </thead>
           <tbody class="csc-table-body csc-table-body--zebra">

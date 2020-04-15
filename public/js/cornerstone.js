@@ -372,11 +372,28 @@ $(document).ready(function() {
       }
     });
 
-  // Activate Tooltipster
-  $('.tooltip').tooltipster({ contentAsHTML: true });
+  if ($.fn.tooltipster !== undefined) {
+    // Activate Tooltipster
+    $('.tooltip').tooltipster({ contentAsHTML: true });
 
-  // Add Tooltipster to elements dynamically added to the DOM ~ http://iamceege.github.io/tooltipster/#delegation
-  $('body').on('mouseenter', '.tooltip:not(.tooltipstered)', function() {
-    $(this).tooltipster({ contentAsHTML: true });
-  });
+    // Add Tooltipster to elements dynamically added to the DOM ~ http://iamceege.github.io/tooltipster/#delegation
+    $('body').on('mouseenter', '.tooltip:not(.tooltipstered)', function() {
+      $(this).tooltipster({ contentAsHTML: true });
+    });
+  } else {
+    console.error(
+      'Tooltipster is not loaded. Please load Tooltipster to enable.'
+    );
+  }
+
+  // Activate Tippy
+  try {
+    // Activate Tippy
+    tippy('[data-tippy-content]', {
+      allowHTML: true,
+      delay: 200,
+    });
+  } catch (error) {
+    console.error('Tippy is not loaded. Please load Tippy.js to enable.');
+  }
 });

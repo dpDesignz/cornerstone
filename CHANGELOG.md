@@ -1,5 +1,17 @@
 # Cornerstone Change Log
 
+## 0.2.23 - User roles (2020-04-15)
+
+- ➕ Added the `cs_roles`, `cs_roler_permissions`, and `cs_role_perms` tables
+- 🖊️ Changed the `user_group_id` column to `user_role_id` in the `cs_users` table
+- ➕ Added `role()` class for handling user role permissions
+- ➕ Added the ability to load user permissions in the core controller
+
+## 0.2.22 - Styling (2020-04-10)
+
+- ➕ Added mobile support for the admin section
+- ➕ Added form switch element and moved the form components into a sub-folder for easier readability
+
 ## 0.2.21 - Dependencies (2020-04-04)
 
 - ➕ Added the [Intervention Image](http://image.intervention.io) package
@@ -11,6 +23,8 @@
 - ➕ Added the [Roboto font](https://fonts.google.com/specimen/Roboto) from Google for the image placeholder text
 - ➕ Added the placeholder text for the `config-sample.php` file
 - 🔄 Updated the `cornerstone.sql` file
+- ➕ Added the [Tippy.js](https://atomiks.github.io/tippyjs/) script as a vanilla JS alternative to Tooltipster
+- 🖊️ Changed all instances of Tooltipster to Tippy and phased out Tooltipster
 
 ## 0.2.20 - Content (2020-03-30 to 2020-03-31)
 

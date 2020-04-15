@@ -131,61 +131,40 @@ class Images extends Controller
         if (file_exists($imagePath)) {
 
           // Create the image
-          // $img = $this->manager->cache(
-          //   function ($image) use ($imagePath) {
+          $cached_image = $this->manager->cache(
+            function ($image) use ($imagePath) {
 
-          //     $image = $image->make($imagePath);
+              $image = $image->make($imagePath);
 
-          //     // Check for dimensions
-          //     if (
-          //       (!empty($_GET['w']) && is_numeric($_GET['w'])) || (!empty($_GET['h']) && is_numeric($_GET['h']))
-          //     ) {
-          //       // Dimensions set
+              // Check for dimensions
+              if (
+                (!empty($_GET['w']) && is_numeric($_GET['w'])) || (!empty($_GET['h']) && is_numeric($_GET['h']))
+              ) {
+                // Dimensions set
 
-          //       // Set default options
-          //       $width = (!empty($_GET['w'])) ? (int) trim($_GET['w']) : null;
-          //       $height = (!empty($_GET['h'])) ? (int) trim($_GET['h']) : null;
+                // Set default options
+                $width = (!empty($_GET['w'])) ? (int) trim($_GET['w']) : null;
+                $height = (!empty($_GET['h'])) ? (int) trim($_GET['h']) : null;
 
-          //       // Resize and return the image
-          //       return $image->resize($width, $height, function ($constraint) {
-          //         $constraint->aspectRatio();
-          //         // prevent possible upsizing
-          //         if (empty($_GET['e']) || trim($_GET['e']) !== 'y') {
-          //           $constraint->upsize();
-          //         }
-          //       });
-          //     } else {
-          //       // Return the image
-          //       return $image;
-          //     }
-          //   }
-          // );
-
-          // Create the image
-          $img = $this->manager->make($imagePath);
-
-          // Check for dimensions
-          if (
-            (!empty($_GET['w']) && is_numeric($_GET['w'])) || (!empty($_GET['h']) && is_numeric($_GET['h']))
-          ) {
-            // Dimensions set
-
-            // Set default options
-            $width = (!empty($_GET['w'])) ? (int) trim($_GET['w']) : null;
-            $height = (!empty($_GET['h'])) ? (int) trim($_GET['h']) : null;
-
-            // Resize and return the image
-            $img = $img->resize($width, $height, function ($constraint) {
-              $constraint->aspectRatio();
-              // prevent possible upsizing
-              if (empty($_GET['e']) || trim($_GET['e']) !== 'y') {
-                $constraint->upsize();
+                // Resize and return the image
+                return $image->resize($width, $height, function ($constraint) {
+                  $constraint->aspectRatio();
+                  // prevent possible upsizing
+                  if (empty($_GET['e']) || trim($_GET['e']) !== 'y') {
+                    $constraint->upsize();
+                  }
+                }, 10, TRUE);
+              } else {
+                // Return the image
+                return $image;
               }
-            });
-          }
+            },
+            10,
+            TRUE
+          );
 
           // Output the image
-          echo $img->response();
+          echo $cached_image->response();
           exit;
         } // File doesn't exist. Output the placeholder
 

@@ -95,7 +95,7 @@ require(get_theme_path('head.php', 'admin')); ?>
         <p class="csc-col csc-col12 csc-col--md7 cs-text-left-md cs-my-1 cs-mb-3"><label><input type="checkbox" name="remember" id="remember-me" <?php if (!empty($data->remember) && !$data->remember) echo ' checked'; ?>><span>Remember me</span></label></p>
         <p class="csc-col csc-col12 csc-col--md5 cs-text-right-md cs-my-1 cs-mb-3 cs-caption"><a href="<?php echo get_site_url('admin/users/forgot-password'); ?>" class="csc-text-grey text-darken-2">Forgot Password?</a></p>
       </div>
-      <button type="submit" name="action" value="log-in" class="csc-btn csc-btn--wide green">Sign In <i class="material-icons csc-bi-right">exit_to_app</i></button>
+      <button type="submit" name="action" value="log-in" class="csc-btn csc-btn--wide csc-btn--success">Sign In <i class="material-icons csc-bi-right">exit_to_app</i></button>
     </form>
   </section>
 </main>
