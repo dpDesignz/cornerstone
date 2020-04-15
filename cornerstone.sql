@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 04, 2020 at 12:00 PM
+-- Generation Time: Apr 15, 2020 at 12:29 PM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.3
 
@@ -190,8 +190,8 @@ INSERT INTO `cs_options` (`option_id`, `option_type`, `option_name`, `option_val
 (7, 'core', 'phone_locale', '', 0, NULL, NULL),
 (8, 'core', 'site_version', '0.0.1', 0, NULL, NULL),
 (10, 'core', 'error_log_type', '1,2', 1, NULL, NULL),
-(11, 'core', 'site_from_email', '', 1, NULL, NULL),
-(12, 'core', 'errors_to_email', '', 1, NULL, NULL),
+(11, 'mail', 'site_from_email', '', 1, NULL, NULL),
+(12, 'mail', 'errors_to_email', '', 1, NULL, NULL),
 (13, 'mail', 'enable_phpmailer', '1', 0, NULL, NULL),
 (14, 'mail', 'smtp_host', '', 0, NULL, NULL),
 (15, 'mail', 'smtp_username', '', 0, NULL, NULL),
@@ -244,6 +244,51 @@ CREATE TABLE `cs_password_reset` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `cs_roles`
+--
+
+CREATE TABLE `cs_roles` (
+  `role_id` int(11) UNSIGNED NOT NULL,
+  `role_key` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role_meta` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role_edited_id` int(11) UNSIGNED DEFAULT NULL,
+  `role_edited_dtm` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cornerstone user roles';
+
+--
+-- Dumping data for table `cs_roles`
+--
+
+INSERT INTO `cs_roles` (`role_id`, `role_key`, `role_name`, `role_meta`, `role_edited_id`, `role_edited_dtm`) VALUES
+(1, 'master', 'Master', '{\"locked\":true,\"color\":\"#FFFFFF\"}', NULL, NULL),
+(2, 'admin', 'Admin', '{\"color\":\"#FFFFFF\"}', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cs_role_permissions`
+--
+
+CREATE TABLE `cs_role_permissions` (
+  `rp_id` int(11) UNSIGNED NOT NULL,
+  `rp_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cornerstone user role permissions';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cs_role_perms`
+--
+
+CREATE TABLE `cs_role_perms` (
+  `rpl_role_id` int(11) UNSIGNED NOT NULL,
+  `rpl_rp_id` int(11) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cornerstone user role permission links';
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `cs_seo_url`
 --
 
@@ -284,39 +329,13 @@ CREATE TABLE `cs_users` (
   `user_email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_first_name` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_last_name` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_group_id` int(11) UNSIGNED NOT NULL DEFAULT 0,
+  `user_role_id` int(11) UNSIGNED NOT NULL DEFAULT 0,
   `user_auth_rqd` tinyint(1) NOT NULL DEFAULT 0,
   `user_status` tinyint(1) NOT NULL DEFAULT 0,
   `user_created_dtm` datetime NOT NULL,
   `user_edited_id` int(11) UNSIGNED DEFAULT NULL,
   `user_edited_dtm` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Site users';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `cs_user_groups`
---
-
-CREATE TABLE `cs_user_groups` (
-  `ugroup_id` int(11) UNSIGNED NOT NULL,
-  `ugroup_key` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ugroup_title` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ugroup_display` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ugroup_colour` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FFFFFF',
-  `ugroup_locked` tinyint(1) NOT NULL DEFAULT 0,
-  `ugroup_priority` tinyint(3) NOT NULL,
-  `ugroup_edited_id` int(11) UNSIGNED DEFAULT NULL,
-  `ugroup_edited_dtm` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='User Groups (Levels)';
-
---
--- Dumping data for table `cs_user_groups`
---
-
-INSERT INTO `cs_user_groups` (`ugroup_id`, `ugroup_key`, `ugroup_title`, `ugroup_display`, `ugroup_colour`, `ugroup_locked`, `ugroup_priority`, `ugroup_edited_id`, `ugroup_edited_dtm`) VALUES
-(1, 'master', 'Master', 'Master', 'FFFFFF', 1, 0, NULL, NULL),
-(2, 'admin', 'Admin', 'Admin', 'FFFFFF', 1, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -412,6 +431,28 @@ ALTER TABLE `cs_password_reset`
   ADD KEY `pwd_reset_selector` (`pwdreset_selector`);
 
 --
+-- Indexes for table `cs_roles`
+--
+ALTER TABLE `cs_roles`
+  ADD PRIMARY KEY (`role_id`),
+  ADD KEY `role_edited_id` (`role_edited_id`);
+
+--
+-- Indexes for table `cs_role_permissions`
+--
+ALTER TABLE `cs_role_permissions`
+  ADD PRIMARY KEY (`rp_id`),
+  ADD UNIQUE KEY `rp_key` (`rp_key`);
+
+--
+-- Indexes for table `cs_role_perms`
+--
+ALTER TABLE `cs_role_perms`
+  ADD PRIMARY KEY (`rpl_role_id`,`rpl_rp_id`),
+  ADD KEY `cs_role_perms_ibfk_2` (`rpl_rp_id`),
+  ADD KEY `rpl_role_id` (`rpl_role_id`,`rpl_rp_id`) USING BTREE;
+
+--
 -- Indexes for table `cs_seo_url`
 --
 ALTER TABLE `cs_seo_url`
@@ -432,16 +473,8 @@ ALTER TABLE `cs_users`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `user_username` (`user_login`),
   ADD UNIQUE KEY `user_email` (`user_email`),
-  ADD KEY `user_group_id` (`user_group_id`),
-  ADD KEY `user_edited_id` (`user_edited_id`);
-
---
--- Indexes for table `cs_user_groups`
---
-ALTER TABLE `cs_user_groups`
-  ADD PRIMARY KEY (`ugroup_id`),
-  ADD UNIQUE KEY `ugroup_key` (`ugroup_key`),
-  ADD UNIQUE KEY `ugroup_sort_order` (`ugroup_priority`);
+  ADD KEY `user_edited_id` (`user_edited_id`),
+  ADD KEY `user_role_id` (`user_role_id`) USING BTREE;
 
 --
 -- Indexes for table `cs_user_meta`
@@ -495,7 +528,7 @@ ALTER TABLE `cs_edit_log`
 -- AUTO_INCREMENT for table `cs_login_log`
 --
 ALTER TABLE `cs_login_log`
-  MODIFY `login_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
+  MODIFY `login_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
 
 --
 -- AUTO_INCREMENT for table `cs_notification`
@@ -516,6 +549,18 @@ ALTER TABLE `cs_password_reset`
   MODIFY `pwdreset_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
+-- AUTO_INCREMENT for table `cs_roles`
+--
+ALTER TABLE `cs_roles`
+  MODIFY `role_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `cs_role_permissions`
+--
+ALTER TABLE `cs_role_permissions`
+  MODIFY `rp_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `cs_seo_url`
 --
 ALTER TABLE `cs_seo_url`
@@ -526,12 +571,6 @@ ALTER TABLE `cs_seo_url`
 --
 ALTER TABLE `cs_users`
   MODIFY `user_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `cs_user_groups`
---
-ALTER TABLE `cs_user_groups`
-  MODIFY `ugroup_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `cs_user_meta`
@@ -562,10 +601,23 @@ ALTER TABLE `cs_options`
   ADD CONSTRAINT `cs_options_ibfk_1` FOREIGN KEY (`option_edited_id`) REFERENCES `cs_users` (`user_id`);
 
 --
+-- Constraints for table `cs_roles`
+--
+ALTER TABLE `cs_roles`
+  ADD CONSTRAINT `cs_roles_ibfk_1` FOREIGN KEY (`role_edited_id`) REFERENCES `cs_users` (`user_id`);
+
+--
+-- Constraints for table `cs_role_perms`
+--
+ALTER TABLE `cs_role_perms`
+  ADD CONSTRAINT `cs_role_perms_ibfk_1` FOREIGN KEY (`rpl_role_id`) REFERENCES `cs_roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `cs_role_perms_ibfk_2` FOREIGN KEY (`rpl_rp_id`) REFERENCES `cs_role_permissions` (`rp_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `cs_users`
 --
 ALTER TABLE `cs_users`
-  ADD CONSTRAINT `cs_users_ibfk_1` FOREIGN KEY (`user_group_id`) REFERENCES `cs_user_groups` (`ugroup_id`),
+  ADD CONSTRAINT `cs_users_ibfk_1` FOREIGN KEY (`user_role_id`) REFERENCES `cs_roles` (`role_id`),
   ADD CONSTRAINT `cs_users_ibfk_2` FOREIGN KEY (`user_edited_id`) REFERENCES `cs_users` (`user_id`);
 
 --
