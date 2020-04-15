@@ -73,28 +73,28 @@ class UserAuth
   public function getUserEmail()
   {
 
-    // Set $userID
-    $userID = $this->uid;
+    // Make sure data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
-    // Make sure the $userID is a number
-    if (!empty($userID) && is_numeric($userID)) {
-
-      // Run query to find active user
-      $this->conn->dbh->query_prepared("SELECT user_email FROM " . DB_PREFIX . "users WHERE user_id=:uid", [":uid" => $userID]);
+      // Run query
+      $emailResult = $this->conn->dbh->selecting(
+        DB_PREFIX . "users",
+        "user_email",
+        where(
+          eq("user_id", $this->uid)
+        )
+      );
 
       // Return if results
-      if ($this->conn->dbh->getNum_Rows() > 0) {
-
-        // Get the data
-        $userData = $this->conn->dbh->get_row(NULL);
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($emailResult)) {
 
         // Return user email
-        return $userData->user_email;
+        return $emailResult[0]->user_email;
       } // No results. Return FALSE.
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
-    // Return false if $userID is empty or not a number
+    // Return FALSE
     return false;
   }
 
@@ -125,8 +125,8 @@ class UserAuth
     // Try get user data
     try {
 
-      // Get 'user_id', 'user_password', 'user_password_key', and 'user_auth_rqd' from 'cs_users' table that match entered $userData and `user_status` is active ("1")
-      $this->conn->dbh->query_prepared("SELECT user_id, user_password, user_password_key, user_auth_rqd FROM cs_users WHERE (user_login=:userData  OR user_email=:userData) AND user_status=:userStatus", [":userData" => $userData, ":userStatus" => 1]);
+      // Get user data
+      $userData = $this->conn->dbh->query_prepared("SELECT user_id, user_password, user_password_key, user_auth_rqd FROM cs_users WHERE (user_login=:userData  OR user_email=:userData) AND user_status=:userStatus", [":userData" => $userData, ":userStatus" => 1]);
     } catch (\PDOException $ex) {
 
       // Log error if any
@@ -184,11 +184,8 @@ class UserAuth
   public function checkFailedLogins()
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number
-    if (!empty($userID) && is_numeric($userID)) {
+    // Make sure data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Get options from database to reduce calls to database
       $options = $this->optn->get(array('password_reset_expire', 'max_logins'));
@@ -198,13 +195,31 @@ class UserAuth
       $max_time_check->modify('-' . $options->password_reset_expire . ' seconds');
 
       // Run query to check of locked login set within defined time
-      $this->conn->dbh->selecting(DB_PREFIX . "login_log", "login_id", where(gt("login_dtm", $max_time_check->format('Y-m-d H:i:s'), _AND), eq("login_status", "3", _AND), eq("login_user_id", $userID, _AND), eq("login_user_type", "1")));
+      $this->conn->dbh->selecting(
+        DB_PREFIX . "login_log",
+        "login_id",
+        where(
+          gt("login_dtm", $max_time_check->format('Y-m-d H:i:s'), _AND),
+          eq("login_status", "3", _AND),
+          eq("login_user_id", $this->uid, _AND),
+          eq("login_user_type", "1")
+        )
+      );
 
       // Check if locked login set
       if ($this->conn->dbh->getNum_Rows() < 1) {
 
         // Run query to find if limit is reached within defined time
-        $this->conn->dbh->selecting(DB_PREFIX . "login_log", "login_id", where(gt("login_dtm", $max_time_check->format('Y-m-d H:i:s'), _AND), neq("login_status", "1", _AND), eq("login_user_id", $userID, _AND), eq("login_user_type", "1")));
+        $this->conn->dbh->selecting(
+          DB_PREFIX . "login_log",
+          "login_id",
+          where(
+            gt("login_dtm", $max_time_check->format('Y-m-d H:i:s'), _AND),
+            neq("login_status", "1", _AND),
+            eq("login_user_id", $this->uid, _AND),
+            eq("login_user_type", "1")
+          )
+        );
 
         // Check if more than `max_logins` results
         if ($this->conn->dbh->getNum_Rows() < $options->max_logins) {
@@ -218,7 +233,7 @@ class UserAuth
         }
       } // Locked login set. Return FALSE.
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -234,26 +249,30 @@ class UserAuth
   public function getLoginLock()
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number
-    if (!empty($userID) && is_numeric($userID)) {
+    // Make sure data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Run query to find the last locked login_dtm
-      $result = $this->conn->dbh->selecting(DB_PREFIX . "login_log", "login_dtm", where(eq("login_status", "3", _AND), eq("login_user_id", $userID, _AND), eq("login_user_type", "1")), orderBy("login_dtm", "DESC"), limit(1));
+      $lockResult = $this->conn->dbh->selecting(
+        DB_PREFIX . "login_log",
+        "login_dtm",
+        where(
+          eq("login_status", "3", _AND),
+          eq("login_user_id", $this->uid, _AND),
+          eq("login_user_type", "1")
+        ),
+        orderBy("login_dtm", "DESC"),
+        limit(1)
+      );
 
       // Check if timestamp exists
-      if ($this->conn->dbh->getNum_Rows() > 0) {
-
-        // Set results
-        $result = $result[0];
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($lockResult)) {
 
         // Return timestamp
-        return $result->login_dtm;
+        return $lockResult[0]->login_dtm;
       } // Unable to find timestamp. Return FALSE.
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -269,14 +288,20 @@ class UserAuth
   public function setLoginLog(int $status = 0)
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number
-    if (!empty($userID) && is_numeric($userID)) {
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Log user login into `cs_login_log`
-      $this->conn->dbh->insert('cs_login_log', array('login_user_id' => $userID, 'login_user_type' => '1', 'login_dtm' => date('Y-m-d H:i:s'), 'login_ip_address' => $_SERVER['REMOTE_ADDR'], 'login_status ' => $status));
+      $this->conn->dbh->insert(
+        DB_PREFIX . "login_log",
+        array(
+          'login_user_id' => $this->uid,
+          'login_user_type' => '1',
+          'login_dtm' => date('Y-m-d H:i:s'),
+          'login_ip_address' => $_SERVER['REMOTE_ADDR'],
+          'login_status ' => $status
+        )
+      );
 
       // Check if added to log successfully
       if ($this->conn->dbh->affectedRows() > 0) {
@@ -285,7 +310,7 @@ class UserAuth
         return TRUE;
       } // Unable to add login to log. Return FALSE.
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -301,14 +326,14 @@ class UserAuth
   public function setAuthorization(bool $remember = FALSE)
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number
-    if (!empty($userID) && is_numeric($userID)) {
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Delete all other authorization codes for this user
-      $this->conn->dbh->delete('cs_authorization', eq('auth_user_id', $userID));
+      $this->conn->dbh->delete(
+        DB_PREFIX . 'authorization',
+        eq('auth_user_id', $this->uid)
+      );
 
       // Get and set selector for link
       $selector = get_crypto_key(16);
@@ -336,7 +361,19 @@ class UserAuth
       $expireDtm->modify('+' . (int) $this->optn->get("auth_expire") . ' seconds');
 
       // Save authorization token to database
-      $token_id = $this->conn->dbh->insert('cs_authorization', array('auth_user_id' => $userID, 'auth_selector' => $selector, 'auth_token' => $random_token_hash, 'auth_remember' => $remember, 'auth_ip_address' => $_SERVER['REMOTE_ADDR'], 'auth_user_agent' => $browser, 'auth_dtm ' => date('Y-m-d H:i:s'), 'auth_expire ' => $expireDtm->format('Y-m-d H:i:s')));
+      $token_id = $this->conn->dbh->insert(
+        DB_PREFIX . 'authorization',
+        array(
+          'auth_user_id' => $this->uid,
+          'auth_selector' => $selector,
+          'auth_token' => $random_token_hash,
+          'auth_remember' => $remember,
+          'auth_ip_address' => $_SERVER['REMOTE_ADDR'],
+          'auth_user_agent' => $browser,
+          'auth_dtm ' => date('Y-m-d H:i:s'),
+          'auth_expire ' => $expireDtm->format('Y-m-d H:i:s')
+        )
+      );
 
       // Check if token added to the database
       if ($token_id != false) {
@@ -347,13 +384,18 @@ class UserAuth
         }
 
         // Set the token variable and user ID in the $_SESSION for verification
-        $_SESSION['_cs']['auth_check'] = $token_id . ':' . $userID;
+        $_SESSION['_cs']['auth_check'] = $token_id . ':' . $this->uid;
 
         // Return array with authorization selector, token, user agent, and expiry
-        return (object) array('selector' => $selector, 'token' => $random_token, 'user_agent' => $browser, 'expires' => $expireDtm->format('Y-m-d H:i:s'));
+        return (object) array(
+          'selector' => $selector,
+          'token' => $random_token,
+          'user_agent' => $browser,
+          'expires' => $expireDtm->format('Y-m-d H:i:s')
+        );
       } // There was an issue adding the token to the database. Return FALSE.
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -370,8 +412,7 @@ class UserAuth
   public function checkAuthorization(string $authSelector, int $authToken)
   {
 
-    // Make sure the $authSelector is not empty
-    // Make sure the $authToken is not empty and is a number
+    // Make sure the data is valid
     if (!empty($authSelector) && !empty($authToken) && is_numeric($authToken)) {
 
       // Check the token information is in the $_SESSION
@@ -380,8 +421,20 @@ class UserAuth
         // Get token information from the $_SESSION
         $authInfo = explode(':', $_SESSION['_cs']['auth_check']);
 
-        // Get the authorization token from the databse
-        $result = $this->conn->dbh->selecting('cs_authorization', array('auth_token', 'auth_remember', 'auth_dtm'), where(eq('auth_id', $authInfo[0], _AND), eq('auth_selector', $authSelector, _AND), eq('auth_user_id', $authInfo[1])));
+        // Get the authorization token from the database
+        $result = $this->conn->dbh->selecting(
+          DB_PREFIX . 'authorization',
+          array(
+            'auth_token',
+            'auth_remember',
+            'auth_dtm'
+          ),
+          where(
+            eq('auth_id', $authInfo[0], _AND),
+            eq('auth_selector', $authSelector, _AND),
+            eq('auth_user_id', $authInfo[1])
+          )
+        );
 
         // Check if the token is available
         if ($result != false) {
@@ -421,7 +474,7 @@ class UserAuth
 
       } // Token information not in the session. Return FALSE.
 
-    } // $authSelector is not empty or $authToken is empty or not an integer. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -438,18 +491,24 @@ class UserAuth
   protected function deleteAuthorization($authID, $deleteAllForUser = 0)
   {
 
-    // Make sure the $authID is not empty and is a number
+    // Make sure the data is valid
     if (!empty($authID) && is_numeric($authID)) {
 
       // Check if $deleteAllForUser is set
       if ($deleteAllForUser) {
 
         // Delete all authorization tokens for user ID
-        $delete_status = $this->conn->dbh->delete('cs_authorization', eq('auth_user_id', $authID));
+        $delete_status = $this->conn->dbh->delete(
+          DB_PREFIX . 'authorization',
+          eq('auth_user_id', $authID)
+        );
       } else { // Delete authorization token
 
         // Delete authorization token
-        $delete_status = $this->conn->dbh->delete('cs_authorization', eq('auth_id', $authID));
+        $delete_status = $this->conn->dbh->delete(
+          DB_PREFIX . 'authorization',
+          eq('auth_id', $authID)
+        );
       }
 
       // Check the delete didn't error
@@ -462,7 +521,7 @@ class UserAuth
         return TRUE;
       } // Not deleted successfully. Return FALSE
 
-    } // $authID is empty or is not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -478,11 +537,8 @@ class UserAuth
   public function authenticateUser()
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is not empty and is a number
-    if (!empty($userID) && is_numeric($userID)) {
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Check if session set (just in case) and restart if it isn't
       if (session_id() == '') {
@@ -492,13 +548,23 @@ class UserAuth
       // Regenerate a new session ID
       session_regenerate_id(true);
 
-      // Get the user information where `user_id` = $userID and `user_status` isn't '0'
-      $result = $this->conn->dbh->selecting('cs_users', 'user_login, user_email, user_first_name, user_last_name', where(eq('user_id', $userID, _AND), neq('user_status', '0')));
+      // Get the user information
+      $userResult = $this->conn->dbh->selecting(
+        DB_PREFIX . 'users',
+        'user_login,
+        user_email,
+        user_first_name,
+        user_last_name',
+        where(
+          eq('user_id', $this->uid, _AND),
+          neq('user_status', '0')
+        )
+      );
       // Check if the user is available
-      if ($result != false) {
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userResult)) {
 
         // If it is, set initial $_SESSION info
-        $result = $result[0];
+        $result = $userResult[0];
 
         // Set the Cornerstone array
         if (empty($_SESSION['_cs']))
@@ -508,7 +574,7 @@ class UserAuth
         // Set the user array
         $_SESSION['_cs']['user'] = array();
         // Set user ID
-        $_SESSION['_cs']['user']['uid'] = $userID;
+        $_SESSION['_cs']['user']['uid'] = $this->uid;
         // Set user email address
         $_SESSION['_cs']['user']['email'] = $result->user_email;
         // Set user login name
@@ -521,7 +587,7 @@ class UserAuth
          * to add any custom set $_SESSION items
          */
         require_once(DIR_ROOT . 'admin/models/cornerstone/ext.userauth.php');
-        setCustomAuth($userID);
+        setCustomAuth($this->uid);
 
         // Log user login into `cs_login_log`
         $this->setLoginLog(1);
@@ -530,7 +596,7 @@ class UserAuth
         return TRUE;
       } // User not available. Return FALSE.
 
-    } // $userID is empty or not an error. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -544,11 +610,8 @@ class UserAuth
   public function setAuthCookie()
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number
-    if (!empty($userID) && is_numeric($userID)) {
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Clear any residue authentication cookies already set
       $this->clearAuthCookie();
@@ -583,7 +646,15 @@ class UserAuth
       $random_key = get_crypto_key(32);
 
       // Set cookie
-      setcookie('_cs', $random_key . '.' . bin2hex($random_password), $cookie_expiration->format('U'), "/", str_replace('www', '', $this->optn->get('site_url')), $setSSL, true);
+      setcookie(
+        '_cs',
+        $random_key . '.' . bin2hex($random_password),
+        $cookie_expiration->format('U'),
+        "/",
+        str_replace('www', '', $this->optn->get('site_url')),
+        $setSSL,
+        true
+      );
 
       // Hash random password
       $random_password_hash = password_hash($random_password, PASSWORD_DEFAULT);
@@ -604,7 +675,20 @@ class UserAuth
       $cookie_set = new \DateTime();
 
       // Save cookie information to database
-      $this->conn->dbh->insert('cs_auth_cookie', array('cookie_user_id' => $userID, 'cookie_user_type' => '1', 'cookie_password_hash' => $random_password_hash, 'cookie_key' => $random_key, 'cookie_ip_address' => $_SERVER['REMOTE_ADDR'], ' 	cookie_user_agent' => $browser, 'cookie_friendly_name' => $browser_friendly_name, 'cookie_set_dtm' => $cookie_set->format('Y-m-d H:i:s'), 'cookie_expiry_dtm' => $cookie_expiration->format('Y-m-d H:i:s')));
+      $this->conn->dbh->insert(
+        DB_PREFIX . 'auth_cookie',
+        array(
+          'cookie_user_id' => $this->uid,
+          'cookie_user_type' => '1',
+          'cookie_password_hash' => $random_password_hash,
+          'cookie_key' => $random_key,
+          'cookie_ip_address' => $_SERVER['REMOTE_ADDR'],
+          'cookie_user_agent' => $browser,
+          'cookie_friendly_name' => $browser_friendly_name,
+          'cookie_set_dtm' => $cookie_set->format('Y-m-d H:i:s'),
+          'cookie_expiry_dtm' => $cookie_expiration->format('Y-m-d H:i:s')
+        )
+      );
 
       // Check if cookie added to the database
       if ($this->conn->dbh->affectedRows() > 0) {
@@ -619,7 +703,7 @@ class UserAuth
         // Return FALSE
         return FALSE;
       }
-    } else { // $userID is empty or not a number. Return FALSE.
+    } else { // Data invalid. Return FALSE.
 
       // Return FALSE
       return FALSE;
@@ -636,7 +720,7 @@ class UserAuth
   public function checkAuthCookie(bool $returnBool = TRUE)
   {
 
-    // Check if $_COOKIE['_cs'] is set
+    // Check if the data is valid
     if (!empty($_COOKIE['_cs'])) {
 
       // Get cookie data
@@ -648,8 +732,17 @@ class UserAuth
       // Make sure the $cookieKey is not empty and is 32 characters
       if (!empty($cookieKey) && strlen($cookieKey) == 32) {
 
-        // Get the cookie token from the databse
-        $cookieToken = $this->conn->dbh->selecting(DB_PREFIX . 'auth_cookie', array('cookie_id', 'cookie_password_hash', 'cookie_user_id', 'cookie_expiry_dtm'), eq('cookie_key', $cookieKey));
+        // Get the cookie token from the database
+        $cookieToken = $this->conn->dbh->selecting(
+          DB_PREFIX . 'auth_cookie',
+          array(
+            'cookie_id',
+            'cookie_password_hash',
+            'cookie_user_id',
+            'cookie_expiry_dtm'
+          ),
+          eq('cookie_key', $cookieKey)
+        );
 
         // Check if the token is available
         if ($this->conn->dbh->getNum_Rows() > 0) {
@@ -674,7 +767,7 @@ class UserAuth
 
         } // Token is not available. Return FALSE
 
-      } // $cookieID is empty or not an integer. Return FALSE
+      } // Data invalid. Return FALSE
 
     } // Cookie isn't set. Return FALSE
 
@@ -693,7 +786,15 @@ class UserAuth
 
     // Reset Cookie
     unset($_COOKIE['_cs']);
-    setcookie('_cs', '', 1, "/", str_replace('www', '', $this->optn->get('site_url')), $setSSL, true);
+    setcookie(
+      '_cs',
+      '',
+      1,
+      "/",
+      str_replace('www', '', $this->optn->get('site_url')),
+      $setSSL,
+      true
+    );
   }
 
   /**
@@ -706,7 +807,7 @@ class UserAuth
   public function deleteAuthCookie(string $cookieKey = '')
   {
 
-    // Check if $cookieKey is empty and set to cookie key if the key is set
+    // Check data is valid
     if (empty($cookieKey) && !empty($_COOKIE['_cs'])) {
       $cookieKey = explode('.', $_COOKIE['_cs'])[0];
     }
@@ -715,7 +816,10 @@ class UserAuth
     if (!empty($cookieKey) && strlen($cookieKey) == 32) {
 
       // Delete cookie information from database
-      if ($this->conn->dbh->delete('cs_auth_cookie', eq('cookie_key', $cookieKey))) {
+      if ($this->conn->dbh->delete(
+        DB_PREFIX . 'auth_cookie',
+        eq('cookie_key', $cookieKey)
+      )) {
 
         // Unset cookies
         $this->clearAuthCookie();
@@ -724,7 +828,7 @@ class UserAuth
         return TRUE;
       } // Unable to delete Cookie. Return FALSE
 
-    } // $cookieKey is empty or is not 32 characters. Return FALSE
+    } // Data invalid. Return FALSE
 
     // Return FALSE
     return FALSE;

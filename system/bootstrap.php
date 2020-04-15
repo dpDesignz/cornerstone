@@ -51,9 +51,11 @@ $registry = new Registry();
 $option = new Option();
 $registry->set('optn', $option);
 
+// Role
+$role = new Role();
+
 // Loader
-$loader = new Loader($registry, $option);
-$registry->set('load', $loader);
+$loader = new Loader($registry, $option, $role);
 
 // Request
 $registry->set('request', new Request());
@@ -65,6 +67,16 @@ if (!ini_get('date.timezone')) {
 
 // Load the session settings file
 require_once(DIR_HELPERS . 'fn.session.php');
+
+// Set role if user is logged in
+if (isLoggedInUser()) {
+  $role->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
+  $loader->updateRole($role);
+}
+
+// Set role and loader to registry
+$registry->set('role', $role);
+$registry->set('load', $loader);
 
 // Load the rest of the Cornerstone Helper files
 require_once(DIR_HELPERS . 'fn.generate.php'); // Generate related functions

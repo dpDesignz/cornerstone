@@ -192,12 +192,13 @@ function outputBreadcrumbs(object $breadcrumbs)
  * Return parent admin menu item
  *
  * @param object $item An object array of the parent menu item to output
+ * @param object $userRoles The user roles object for checking permissions
  * @param string $currentNav `[optional]` The current navigation identifier. Defaults to empty
  * @param string $currentSubNav `[optional]` The current sub-navigation identifier. Defaults to empty
  *
  * @return string Will return the menu as a string
  */
-function returnParentAdminMenuItem(object $item, string $currentNav = '', string $currentSubNav = '')
+function returnParentAdminMenuItem(object $item, $userRoles, string $currentNav = '', string $currentSubNav = '')
 {
 
   // Init output
@@ -231,17 +232,21 @@ function returnParentAdminMenuItem(object $item, string $currentNav = '', string
       // Make sure the child item is an object
       $childItem = (object) $childItem;
 
-      // Check if currently active child item
-      $isActiveChild = (!empty($currentSubNav) && strtolower($currentSubNav) == strtolower($item->identifier . '/' . $childItem->identifier)) ? 'class="active"' : '';
+      // Check if a user permission is required
+      if (empty($childItem->permission) || (!empty($userRoles) && $userRoles->canDo($childItem->permission))) {
 
-      // Set title fallback
-      $fallbackTitle = (!empty($childItem->title)) ? $childItem->title : $childItem->text;
+        // Check if currently active child item
+        $isActiveChild = (!empty($currentSubNav) && strtolower($currentSubNav) == strtolower($item->identifier . '/' . $childItem->identifier)) ? 'class="active"' : '';
 
-      // Set href fallback
-      $fallbackHref = (!empty($childItem->href)) ? $childItem->href : 'javascript:alert(\'The ' . $fallbackTitle . ' section is coming soon\');';
+        // Set title fallback
+        $fallbackTitle = (!empty($childItem->title)) ? $childItem->title : $childItem->text;
 
-      // Add to return output
-      $returnOutput .= '<li ' . $isActiveChild . '><a href="' . $fallbackHref . '">' . $childItem->text . '</a></li>';
+        // Set href fallback
+        $fallbackHref = (!empty($childItem->href)) ? $childItem->href : 'javascript:alert(\'The ' . $fallbackTitle . ' section is coming soon\');';
+
+        // Add to return output
+        $returnOutput .= '<li ' . $isActiveChild . '><a href="' . $fallbackHref . '">' . $childItem->text . '</a></li>';
+      }
     }
 
     // Add to return output
@@ -266,6 +271,15 @@ function returnParentAdminMenuItem(object $item, string $currentNav = '', string
  */
 function outputAdminMenu(array $menuItems, string $currentNav = '', string $currentSubNav = '')
 {
+
+  // Get the current user role permissions
+  $userRoles = '';
+  if (isLoggedInUser()) {
+    global $role;
+    $userRoles = $role;
+    $userRoles->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
+  }
+
   // Init output
   $returnOutput = '';
 
@@ -275,31 +289,35 @@ function outputAdminMenu(array $menuItems, string $currentNav = '', string $curr
     // Make sure the item is an object
     $item = (object) $item;
 
-    // Check the item type
-    switch (trim(strtolower($item->type))) {
-      case 'separator':
-        // Add to return output
-        $returnOutput .= '<li class="sidebar__nav-separator"><span>' . $item->text . '</span></li>';
-        break;
-      case 'link':
-        // Check if currently active item
-        $activeNav = (!empty($currentNav) && strtolower($currentNav) == strtolower($item->identifier)) ? 'class="active"' : '';
-        // Set title fallback
-        $fallbackTitle = (!empty($item->title)) ? $item->title : $item->text;
-        // Set href fallback
-        $fallbackHref = (!empty($item->href)) ? $item->href : 'javascript:alert(\'The ' . $fallbackTitle . ' section is coming soon\');';
-        // Set icon fallback
-        $fallbackIcon = (!empty($item->icon)) ? $item->icon : 'fas fa-bars';
-        // Add to return output
-        $returnOutput .= '<li ' . $activeNav . '><a href="' . $fallbackHref . '" data-tippy-content="' . $fallbackTitle . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span></a></li>';
-        break;
-      case 'parent':
-        // Get parent admin menu item
-        $returnOutput .= returnParentAdminMenuItem((object) $item, $currentNav, $currentSubNav);
-        break;
+    // Check if a user permission is required
+    if (empty($item->permission) || (!empty($userRoles) && $userRoles->canDo($item->permission))) {
 
-      default:
-        break;
+      // Check the item type
+      switch (trim(strtolower($item->type))) {
+        case 'separator':
+          // Add to return output
+          $returnOutput .= '<li class="sidebar__nav-separator"><span>' . $item->text . '</span></li>';
+          break;
+        case 'link':
+          // Check if currently active item
+          $activeNav = (!empty($currentNav) && strtolower($currentNav) == strtolower($item->identifier)) ? 'class="active"' : '';
+          // Set title fallback
+          $fallbackTitle = (!empty($item->title)) ? $item->title : $item->text;
+          // Set href fallback
+          $fallbackHref = (!empty($item->href)) ? $item->href : 'javascript:alert(\'The ' . $fallbackTitle . ' section is coming soon\');';
+          // Set icon fallback
+          $fallbackIcon = (!empty($item->icon)) ? $item->icon : 'fas fa-bars';
+          // Add to return output
+          $returnOutput .= '<li ' . $activeNav . '><a href="' . $fallbackHref . '" data-tippy-content="' . $fallbackTitle . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span></a></li>';
+          break;
+        case 'parent':
+          // Get parent admin menu item
+          $returnOutput .= returnParentAdminMenuItem((object) $item, $userRoles, $currentNav, $currentSubNav);
+          break;
+
+        default:
+          break;
+      }
     }
   }
 

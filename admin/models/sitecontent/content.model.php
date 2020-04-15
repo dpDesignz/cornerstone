@@ -66,7 +66,7 @@ class Content
   /**
    * Get list of sections
    *
-   * @param array $params Multiple paramters as required
+   * @param array $params Multiple parameters as required
    *
    * @return object Return object with list of sections
    */

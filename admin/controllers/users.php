@@ -12,6 +12,18 @@ class Users extends Controller
 
     // Load the user model
     $this->userModel = $this->load->model('cornerstone/user', 'admin');
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'] = array(
+      array(
+        'text' => 'Dashboard',
+        'href' => get_site_url('admin')
+      ),
+      array(
+        'text' => 'Users',
+        'href' => get_site_url('admin/users')
+      )
+    );
   }
 
   /**
@@ -35,17 +47,17 @@ class Users extends Controller
           // Get email
           $this->data['email'] = htmlspecialchars(stripslashes(trim($_POST['email'])));
           if (empty($this->data['email'])) {
-            // If email not set, return error
+            // Data not set, return error
             $this->data['err']['email'] = 'Please enter your email address';
           } else if (!filter_var($this->data['email'], FILTER_VALIDATE_EMAIL)) {
-            // If email address isn't a valid email address, return error
-            $this->data['err']['udata'] = 'Please enter a valid email address';
+            // Data isn't a valid email address, return error
+            $this->data['err']['email'] = 'Please enter a valid email address';
           }
         } catch (Exception $e) {
 
           // Log error if any and set flash message
           error_log($e->getMessage(), 0);
-          flashMsg('admin_forgot_pwd', '<strong>Error</strong> - There was an error with your email address. Please try again', 'warning');
+          flashMsg('admin_forgot_pwd', '<strong>Error</strong> There was an error with your email address. Please try again', 'warning');
         }
       } else { // If data not set, set errors
 
@@ -71,7 +83,7 @@ class Users extends Controller
             if ($resetObject != FALSE) {
 
               // Create the options
-              $actionURL = 'admin/users/new-password/' . urlencode($resetObject->selector) . '/' . urlencode($resetObject->token);
+              $actionURL = get_site_url('admin/users/new-password/' . urlencode($resetObject->selector) . '/' . urlencode($resetObject->token));
               $resetExpireDtm = new \DateTime($resetObject->expires);
               if (!empty($resetObject->user_agent) || $resetObject->user_agent != '') {
                 $browserInfo = 'For security, this relates to a reset request from a device using ' . $resetObject->user_agent . '. ';
@@ -83,14 +95,40 @@ class Users extends Controller
               $sendMail = new \SendMail();
 
               // Set the HTML message from the template
-              if ($message = $sendMail->createEmailTemplate('password-reset.html', array('name' => $resetObject->user_name, 'action_url' => get_site_url($actionURL), 'expire_dtm' => $resetExpireDtm->format('g:ia \o\n l, jS M Y T'), 'browser_security' => $browserInfo))) {
+              if ($message = $sendMail->createEmailTemplate(
+                'password-reset.html',
+                array(
+                  'name' => $resetObject->user_name,
+                  'action_url' => $actionURL,
+                  'expire_dtm' => $resetExpireDtm->format('g:ia \o\n l, jS M Y T'),
+                  'browser_security' => $browserInfo
+                )
+              )) {
 
                 // Set the plaintext message from the template
-                if ($plainEmail = $sendMail->createEmailTemplate('password-reset.txt', array('name' => $resetObject->user_name, 'action_url' => get_site_url($actionURL), 'expire_dtm' => $resetExpireDtm->format('g:ia \o\n l, jS M Y T'), 'browser_security' => $browserInfo))) {
+                if ($plainEmail = $sendMail->createEmailTemplate(
+                  'password-reset.txt',
+                  array(
+                    'name' => $resetObject->user_name,
+                    'action_url' => $actionURL,
+                    'expire_dtm' => $resetExpireDtm->format('g:ia \o\n l, jS M Y T'),
+                    'browser_security' => $browserInfo
+                  )
+                )) {
 
                   // Send user their authorization email
                   $emailSubject = ' Reset your ' . $this->optn->get('site_name') . ' password';
-                  if ($sendMail->sendPHPMail($this->optn->get('site_from_email'), $this->optn->get('site_from_email'), $this->optn->get('site_name'), $this->data['email'], '', $emailSubject, $message, $plainEmail, '')) { // Email sent
+                  if ($sendMail->sendPHPMail(
+                    $this->optn->get('site_from_email'),
+                    $this->optn->get('site_from_email'),
+                    $this->optn->get('site_name'),
+                    $this->data['email'],
+                    '',
+                    $emailSubject,
+                    $message,
+                    $plainEmail,
+                    ''
+                  )) { // Email sent
 
                     // Redirect user to login page
                     flashMsg('admin_login', 'Your password reset email has been sent. Please check your email account for the link to reset your password', 'success');
@@ -109,7 +147,7 @@ class Users extends Controller
         } else { // No user exists, send reset error email
 
           // Create the options
-          $actionURL = 'admin/users/forgot-password';
+          $actionURL = get_site_url('admin/users/forgot-password');
           // Get browser info if browser tracking enabled
           if ($this->optn->get('browser_tracking')) {
             $browser = new \WhichBrowser\Parser(getallheaders());
@@ -123,14 +161,38 @@ class Users extends Controller
           $sendMail = new \SendMail();
 
           // Set the HTML message from the template
-          if ($message = $sendMail->createEmailTemplate('password-reset-help.html', array('email_address' => $this->data['email'], 'action_url' => get_site_url($actionURL), 'browser_security' => $browserInfo))) {
+          if ($message = $sendMail->createEmailTemplate(
+            'password-reset-help.html',
+            array(
+              'email_address' => $this->data['email'],
+              'action_url' => $actionURL,
+              'browser_security' => $browserInfo
+            )
+          )) {
 
             // Set the plaintext message from the template
-            if ($plainEmail = $sendMail->createEmailTemplate('password-reset-help.txt', array('email_address' => $this->data['email'], 'action_url' => get_site_url($actionURL), 'browser_security' => $browserInfo))) {
+            if ($plainEmail = $sendMail->createEmailTemplate(
+              'password-reset-help.txt',
+              array(
+                'email_address' => $this->data['email'],
+                'action_url' => $actionURL,
+                'browser_security' => $browserInfo
+              )
+            )) {
 
               // Send user their authorization email
               $emailSubject = $this->optn->get('site_name') . ' Password Reset Help';
-              if ($sendMail->sendPHPMail($this->optn->get('site_from_email'), $this->optn->get('site_from_email'), $this->optn->get('site_name'), $this->data['email'], '', $emailSubject, $message, $plainEmail, '')) { // Email sent
+              if ($sendMail->sendPHPMail(
+                $this->optn->get('site_from_email'),
+                $this->optn->get('site_from_email'),
+                $this->optn->get('site_name'),
+                $this->data['email'],
+                '',
+                $emailSubject,
+                $message,
+                $plainEmail,
+                ''
+              )) { // Email sent
 
                 // Redirect user to login page
                 flashMsg('admin_login', 'Your password reset email has been sent. Please check your email account for the link to reset your password', 'success');
@@ -145,7 +207,7 @@ class Users extends Controller
         }
 
         // Set error
-        flashMsg('admin_forgot_pwd', '<strong>Error</strong> - There was an error processing your password reset request. Please try again.', 'warning');
+        flashMsg('admin_forgot_pwd', '<strong>Error</strong> There was an error processing your password reset request. Please try again.', 'warning');
       } // Errors were set. Continue on to view.
 
       // Load view with data
@@ -185,7 +247,7 @@ class Users extends Controller
             // Password selector or token is empty
 
             // Set error
-            flashMsg('admin_forgot_pwd', '<strong>Error</strong> - Sorry, your reset request seems to have glitched. Please request a new password reset link.', 'warning');
+            flashMsg('admin_forgot_pwd', '<strong>Error</strong> Sorry, your reset request seems to have glitched. Please request a new password reset link.', 'warning');
 
             // Redirect to forgot password page
             redirectTo('admin/users/forgot-password');
@@ -197,7 +259,7 @@ class Users extends Controller
             // Password reset is not valid
 
             // Set error
-            flashMsg('admin_forgot_pwd', '<strong>Error</strong> - Sorry, your reset request seems to have expired. Please request a new password reset link.', 'warning');
+            flashMsg('admin_forgot_pwd', '<strong>Error</strong> Sorry, your reset request seems to have expired. Please request a new password reset link.', 'warning');
 
             // Redirect to forgot password page
             redirectTo('admin/users/forgot-password');
@@ -207,12 +269,12 @@ class Users extends Controller
 
           // Log error if any and set flash message
           error_log($e->getMessage(), 0);
-          flashMsg('admin_new_pwd', '<strong>Error</strong> - There was an error checking your request. Please try again', 'warning');
+          flashMsg('admin_new_pwd', '<strong>Error</strong> There was an error checking your request. Please try again', 'warning');
         }
       } else { // If data not set, set error and redirect to forgot password
 
         // Set error
-        flashMsg('admin_forgot_pwd', '<strong>Error</strong> - Sorry, There was an issue processing your request. Please request a new password reset link.', 'danger');
+        flashMsg('admin_forgot_pwd', '<strong>Error</strong> Sorry, There was an issue processing your request. Please request a new password reset link.', 'danger');
 
         // Redirect to forgot password page
         redirectTo('admin/users/forgot-password');
@@ -258,7 +320,7 @@ class Users extends Controller
 
           // Log error if any and set flash message
           error_log($e->getMessage(), 0);
-          flashMsg('admin_new_pwd', '<strong>Error</strong> - There was an error checking your new password. Please try again', 'warning');
+          flashMsg('admin_new_pwd', '<strong>Error</strong> There was an error checking your new password. Please try again', 'warning');
         }
       } else { // If data not set, set errors
 
@@ -308,14 +370,38 @@ class Users extends Controller
               $sendMail = new \SendMail();
 
               // Set the HTML message from the template
-              if ($message = $sendMail->createEmailTemplate('new-password.html', array('action_url' => get_site_url($actionURL), 'reset_dtm' => $currentDtm->format('g:ia \o\n l, jS M Y T'), 'browser_security' => $browserInfo))) {
+              if ($message = $sendMail->createEmailTemplate(
+                'new-password.html',
+                array(
+                  'action_url' => get_site_url($actionURL),
+                  'reset_dtm' => $currentDtm->format('g:ia \o\n l, jS M Y T'),
+                  'browser_security' => $browserInfo
+                )
+              )) {
 
                 // Set the plaintext message from the template
-                if ($plainEmail = $sendMail->createEmailTemplate('new-password.txt', array('action_url' => get_site_url($actionURL), 'reset_dtm' => $currentDtm->format('g:ia \o\n l, jS M Y T'), 'browser_security' => $browserInfo))) {
+                if ($plainEmail = $sendMail->createEmailTemplate(
+                  'new-password.txt',
+                  array(
+                    'action_url' => get_site_url($actionURL),
+                    'reset_dtm' => $currentDtm->format('g:ia \o\n l, jS M Y T'),
+                    'browser_security' => $browserInfo
+                  )
+                )) {
 
                   // Send user email confirming password change
                   $emailSubject = 'You\'ve successfully reset your ' . $this->optn->get('site_name') . 'password';
-                  if ($sendMail->sendPHPMail($this->optn->get('site_from_email'), $this->optn->get('site_from_email'), $this->optn->get('site_name'), $userEmail, '', $emailSubject, $message, $plainEmail, '')) { // Email sent
+                  if ($sendMail->sendPHPMail(
+                    $this->optn->get('site_from_email'),
+                    $this->optn->get('site_from_email'),
+                    $this->optn->get('site_name'),
+                    $userEmail,
+                    '',
+                    $emailSubject,
+                    $message,
+                    $plainEmail,
+                    ''
+                  )) { // Email sent
 
                     // Redirect to login page with success
                     flashMsg('admin_login', 'Your password has been changed!');
@@ -334,7 +420,7 @@ class Users extends Controller
         } else { // Token invalid. Redirect to get new link
 
           // Set error
-          flashMsg('admin_forgot_pwd', '<strong>Error</strong> - Sorry, There was an issue with your token. Please request a new password reset link.', 'danger');
+          flashMsg('admin_forgot_pwd', '<strong>Error</strong> Sorry, There was an issue with your token. Please request a new password reset link.', 'danger');
 
           // Redirect to forgot password page
           redirectTo('admin/users/forgot-password');
@@ -361,7 +447,7 @@ class Users extends Controller
         // Data is empty.
 
         // Set error
-        flashMsg('admin_forgot_pwd', '<strong>Error</strong> - Sorry, something went wrong.<br>Please request a new password reset link.', 'danger');
+        flashMsg('admin_forgot_pwd', '<strong>Error</strong> Sorry, something went wrong.<br>Please request a new password reset link.', 'danger');
 
         // Redirect to forgot password page
         redirectTo('admin/users/forgot-password');
@@ -370,7 +456,7 @@ class Users extends Controller
         // Password reset is not valid
 
         // Set error
-        flashMsg('admin_forgot_pwd', '<strong>Error</strong> - Sorry, that request seems to have expired. Please request a new password reset link.', 'danger');
+        flashMsg('admin_forgot_pwd', '<strong>Error</strong> Sorry, that request seems to have expired. Please request a new password reset link.', 'danger');
 
         // Redirect to forgot password page
         redirectTo('admin/users/forgot-password');
@@ -387,7 +473,7 @@ class Users extends Controller
   /**
    * All Users Page
    */
-  public function index()
+  public function index(...$params)
   {
 
     // Check if user is logged in
@@ -399,39 +485,93 @@ class Users extends Controller
       exit;
     } else { // Output user index page
 
+      // Check for search and rebuild URL
+      if (isset($this->request->get['search'])) {
+        redirectTo('admin/users/search/' . urlencode($this->request->get['search']));
+        exit;
+      }
+
+      // Set parameters
+      $this->request->set_params($params);
+      $this->params = array();
+      $this->data['showFilter'] = FALSE;
+      $this->data['filterData'] = '';
+
+      // Check for a search term
+      if (isset($this->request->params['search']) && !empty($this->request->params['search'])) {
+        $this->params['search'] = $this->request->params['search'];
+        $this->data['search'] = $this->params['search'];
+        $this->data['breadcrumbs'][] = array(
+          'text' => 'Search: ' . $this->params['search'],
+          'href' => get_site_url('admin/users/search/' . urlencode($this->params['search']))
+        );
+      }
+
+      // Allowed sort fields
+      $this->canSortBy = array('username' => 'user_login', 'name' => 'user_first_name', 'email' => 'user_email', 'role' => 'role_name', 'login' => 'login_dtm');
+
+      // Check for sort
+      $sortOrder = get_sort_order($this->canSortBy, array('sort' => 'user_login', 'order' => 'ASC'), ...$params);
+
+      // Set sort to params
+      foreach ($sortOrder as $key => $value) {
+        $this->params[$key] = $value;
+      }
+
+      // Set the default sort item
+      $this->data['defaultSort'] = 'username';
+
+      // Set show filter
+      if (!empty($this->params['showFilter'])) {
+        $this->data['showFilter'] = $this->params['showFilter'];
+        $this->data['filterData'] .= 'Sort by = ' . $this->params['sortFilter'] . ', ';
+      }
+
+      // Check for page number
+      if (isset($this->request->params['page']) && !empty($this->request->params['page'])) {
+        // Set page number
+        $this->params['page'] = (int) $this->request->params['page'];
+      } else { // No page number. Set page number
+        $this->params['page'] = 1;
+      }
+
+      // Check for a page limit
+      if (isset($this->request->params['limit']) && !empty($this->request->params['limit'])) {
+        $this->params['limit'] = (int) $this->request->params['limit'];
+      } else { // No page limit. Set page limit
+        $this->params['limit'] = 25;
+      }
+
+      // Output users list
+
       // Get users
-      if ($userList = $this->userModel->listUsers()) {
+      if ($dataList = $this->userModel->listUsers($this->params)) {
 
-        // Set user list output
-        $userListOut = '<div class="csc-col csc-col12 csc-data-table csc-container">
-            <section class="csc-data-table__table">
-              <table>
-                <thead class="csc-table-header">
-                  <tr>
-                    <th><span class="csc-table-header__title">Username</span></th>
-                    <th><span class="csc-table-header__title">Name</span></th>
-                    <th><span class="csc-table-header__title">Email</span></th>
-                    <th><span class="csc-table-header__title">User Group</span></th>
-                    <th><span class="csc-table-header__title">Last Login</span></th>
-                  </tr>
-                </thead>
-                <tbody class="csc-table-body">';
+        // Count how many items match the results
+        $this->params['count'] = TRUE;
+        $this->data['totalResults'] = $this->userModel->listUsers($this->params);
 
-        // Loop through user data
-        foreach ($userList as $userData) {
+        // Set data list output
+        $dataListOut = '';
 
-          // Get user group
-          if (!$userGroupName = $this->userModel->getGroupName($userData->user_group_id)) {
+        // Set the pagination
+        $pagination = new Pagination;
+        $pagination->total_records = (int) $this->data['totalResults'];
+        $pagination->current_page = (int) $this->params['page'];
+        $pagination->items_per_page = (int) $this->params['limit'];
+        $this->data['pagination'] = $pagination->render();
 
-            // Set default value if group not found
-            $userGroupName = 'n/a';
-          }
+        // Loop through data
+        foreach ($dataList->results as $data) {
+
+          // Set role fallback
+          $outputRole = (!empty($data->role_name)) ? $data->role_name : 'n/a';
 
           // Get last login
-          if ($userLastLogin = $this->userModel->getLastLogin($userData->user_id)) {
+          if (!empty($data->login_dtm)) {
 
             // Set timestamp
-            $userLastLogin = new \DateTime($userLastLogin);
+            $userLastLogin = new \DateTime($data->login_dtm);
             $userLastLogin = $userLastLogin->format('D, jS M Y h:ia');
           } else { // Unable to find last login. Set default value.
 
@@ -440,28 +580,45 @@ class Users extends Controller
           }
 
           // Set row output
-          $userListOut .= '<tr>
-              <td>' . $userData->user_login . '</td>
-              <td>' . $userData->user_first_name . ' ' . $userData->user_last_name . '</td>
-              <td><a href="mailto:' . $userData->user_email . '">' . $userData->user_email . '</a></td>
-              <td>' . $userGroupName . '</td>
+          $dataListOut .= '<tr>
+              <td>' . $data->user_login . '</td>
+              <td><strong class="item--title">' . $data->user_first_name . ' ' . $data->user_last_name . '</strong></td>
+              <td><a href="mailto:' . $data->user_email . '">' . $data->user_email . '</a></td>
+              <td>' . $outputRole . '</td>
               <td>' . $userLastLogin . '</td>
             </tr>';
         }
 
-        // Close user list output
-        $userListOut .= '</tbody></table></section></div>';
-
         // Output User List
-        $this->data['userListOut'] = $userListOut;
-      } else { // Output message if no results
+        $this->data['dataListOut'] = $dataListOut;
+      } else { // No results. Output message.
 
-        // Set userListOut message
-        $this->data['userListOut'] = '<div class="csc-col csc-col12 csc-container"><p class="cs-body1">There are no users yet.</p></div>';
+        // Set the pagination
+        $this->data['pagination'] = '';
+
+        // Set dataListOut to message
+        if ($this->data['showFilter']) {
+          // No filter results. Output message.
+          $outputMessage = '<p class="csc-body1">Sorry, there were no results that matched your filter.</p>';
+        } else if (!empty($this->data['search'])) {
+          // No search results. Output message
+          $outputMessage = '<p class="csc-body1">Sorry, there were no results that matched your search for <em>"' . $this->data['search'] . '"</em>.</p><p class="csc-body2"><a href="' . get_site_url('admin/users') . '" title="Clear search results">Clear search results</a></p>';
+        } else {
+          // No results. Output default.
+          $this->data['noData'] = TRUE;
+          $outputMessage = '';
+        }
+
+        // Set output
+        $this->data['dataListOut'] = '<tr><td colspan="5" id="no-results">' . $outputMessage . '</td></tr>';
       }
 
-      // Load Dashboard
+      // Trim filter data
+      $this->data['filterData'] = rtrim($this->data['filterData'], ', ');
+
+      // Load view
       $this->load->view('users/index', $this->data, 'admin');
+      exit;
     }
   }
 }

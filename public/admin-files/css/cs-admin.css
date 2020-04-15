@@ -658,6 +658,53 @@ form#page-form .trumbowyg-editor {
   min-height: 50vh;
 }
 
+section#users-list table tr th:nth-child(1) {
+  width: 250px;
+}
+section#users-list table tr th:nth-child(3) {
+  width: 300px;
+}
+section#users-list table tr th:nth-child(4) {
+  width: 150px;
+}
+section#users-list table tr th:last-child {
+  width: 250px;
+  text-align: left;
+}
+section#users-list table tr td:nth-child(2) .item--title {
+  display: block;
+  font-size: 1.1em;
+}
+section#users-list table tr td:last-child {
+  text-align: left;
+}
+section#users-list table tr:hover td:first-child i {
+  opacity: 0.75;
+}
+
+section#roles-list table tr th:nth-last-child(2) {
+  width: 100px;
+  text-align: center;
+}
+section#roles-list table tr th:last-child {
+  width: 125px;
+}
+section#roles-list table tr td:nth-child(1) .item--title {
+  display: block;
+  font-size: 1.1em;
+}
+section#roles-list table tr td:nth-last-child(2) {
+  text-align: center;
+  padding: 4px;
+}
+section#roles-list table tr td:nth-last-child(2) span {
+  filter: invert(1);
+  mix-blend-mode: difference;
+}
+section#roles-list table tr:hover td:first-child i {
+  opacity: 0.75;
+}
+
 /* ==========================================================================
    Media Queries for Responsive Design.
    These templates override the primary ('mobile first') styles.

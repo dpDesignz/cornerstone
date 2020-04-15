@@ -32,6 +32,7 @@
         // Users Menu
         $adminSidebarUsersMenu = array(array(
           'type' => 'parent',
+          'permission' => 'view_user',
           'identifier' => 'users',
           'text' => 'Users',
           'icon' => 'fas fa-users',
@@ -42,14 +43,16 @@
               'href' => get_site_url('admin/users')
             ),
             array(
+              'permission' => 'add_user',
               'identifier' => 'add',
               'text' => 'Add New',
               'href' => ''
             ),
             array(
-              'identifier' => 'groups',
-              'text' => 'User Groups',
-              'href' => ''
+              'permission' => 'view_user_role',
+              'identifier' => 'roles',
+              'text' => 'Roles',
+              'href' => get_site_url('admin/roles')
             )
           )
         ));
@@ -58,6 +61,7 @@
         // Settings Menu
         $adminSidebarSettingsMenu = array(array(
           'type' => 'parent',
+          'permission' => 'view_settings',
           'identifier' => 'settings',
           'text' => 'Settings',
           'icon' => 'fas fa-cogs',
@@ -65,7 +69,7 @@
             array(
               'identifier' => 'index',
               'text' => 'Settings',
-              'href' => ''
+              'href' => get_site_url('admin/settings')
             )
           )
         ));

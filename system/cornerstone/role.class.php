@@ -19,6 +19,7 @@ class Role
   // Set Properties
   protected $conn;
   protected $permissions;
+  protected $isMasterUser;
 
   /**
    * Constructor
@@ -29,6 +30,8 @@ class Role
     $this->conn = new CornerstoneDBH;
     // Create array in $permissions property
     $this->permissions = array();
+    // Set master user to false
+    $this->isMasterUser = FALSE;
   }
 
   /**
@@ -72,6 +75,40 @@ class Role
   }
 
   /**
+   * Check if the user is a master user
+   *
+   * @param	int	$roleID The ID of the role to check
+   *
+   * (No return)
+   */
+  protected function setMasterUser(int $roleID)
+  {
+    // Check if data is valid
+    if (!empty($roleID) && is_numeric($roleID)) {
+      // Data is valid
+
+      // Get the role permissions
+      $roleResults = $this->conn->dbh->selecting(
+        DB_PREFIX . "roles",
+        "role_key",
+        where(
+          eq('role_id', $roleID)
+        )
+      );
+
+      // Check if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($roleResults)) {
+
+        // Check and set if master user
+        $this->isMasterUser = ($roleResults[0]->role_key === "master") ? TRUE : FALSE;
+        return;
+      } // No results. Set as FALSE
+    } // Data is invalid. Set as FALSE
+
+    $this->isMasterUser = FALSE;
+  }
+
+  /**
    * Check if a permissions is available
    *
    * @param	string	$permission The permission to check for
@@ -80,7 +117,19 @@ class Role
    */
   public function canDo(string $permission)
   {
-    return isset($this->permissions[trim($permission)]);
+    return ($this->isMasterUser() || isset($this->permissions[trim($permission)])) ? TRUE : FALSE;
+  }
+
+  /**
+   * Check if is a master user
+   *
+   * (No params)
+   *
+   * @return bool
+   */
+  public function isMasterUser()
+  {
+    return $this->isMasterUser;
   }
 
   /**
@@ -132,10 +181,18 @@ class Role
 
       // Get the role
       $userRoleResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
-        "user_role_id",
+        DB_PREFIX . "users AS u",
+        "u.user_role_id,
+        r.role_key",
+        leftJoin(
+          "u",
+          DB_PREFIX . "roles",
+          "user_role_id",
+          "role_id",
+          "r"
+        ),
         where(
-          eq('user_id', $userID)
+          eq('u.user_id', $userID)
         )
       );
 
@@ -144,6 +201,8 @@ class Role
 
         // Get users permissions
         $this->getRolePerms((int) $userRoleResults[0]->user_role_id);
+        // Check and set if master user
+        $this->isMasterUser = ($userRoleResults[0]->role_key === "master") ? TRUE : FALSE;
       } // No results
     } // Data is invalid
   }

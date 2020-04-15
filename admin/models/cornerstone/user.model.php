@@ -74,17 +74,20 @@ class User
   public function setUserIDFromEmail(string $email)
   {
 
-    // Run query to find user id by email
-    $this->conn->dbh->query_prepared("SELECT user_id FROM " . DB_PREFIX . "users WHERE user_email=:email", array(':email' => $email));
+    // Run query
+    $userIDResult = $this->conn->dbh->selecting(
+      DB_PREFIX . "users",
+      "user_id",
+      where(
+        eq("user_email", $email)
+      )
+    );
 
     // Check if there are any results
-    if ($this->conn->dbh->getNum_Rows() > 0) {
-
-      // Get the data
-      $userData = $this->conn->dbh->get_row(NULL);
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userIDResult)) {
 
       // Set user ID
-      $this->uid = $userData->user_id;
+      $this->uid = $userIDResult[0]->user_id;
 
       // Return True
       return TRUE;
@@ -105,20 +108,27 @@ class User
   private function getUserKeyName()
   {
 
-    // Check uid set
-    if (!empty($this->uid)) {
+    // Check data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Run query to find user key
-      $this->conn->dbh->query_prepared("SELECT user_password_key, user_first_name FROM " . DB_PREFIX . "users WHERE user_id=:uid", array(':uid' => $this->uid));
+      $userKeyNameResult = $this->conn->dbh->selecting(
+        DB_PREFIX . "users",
+        "user_password_key,
+        user_first_name",
+        where(
+          eq("user_id", $this->uid)
+        )
+      );
 
       // Check if there are any results
-      if ($this->conn->dbh->getNum_Rows() > 0) {
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userKeyNameResult)) {
 
         // Return user data
-        return $this->conn->dbh->get_row(NULL);
+        return $userKeyNameResult[0];;
       } // No results. Return FALSE.
 
-    } // uid not set. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -132,28 +142,28 @@ class User
   public function getUserEmail()
   {
 
-    // Set $userID
-    $userID = $this->uid;
+    // Make sure data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
-    // Make sure the $userID is a number
-    if (!empty($userID) && is_numeric($userID)) {
-
-      // Run query to find active user
-      $this->conn->dbh->query_prepared("SELECT user_email FROM " . DB_PREFIX . "users WHERE user_id=:uid", [":uid" => $userID]);
+      // Run query
+      $emailResult = $this->conn->dbh->selecting(
+        DB_PREFIX . "users",
+        "user_email",
+        where(
+          eq("user_id", $this->uid)
+        )
+      );
 
       // Return if results
-      if ($this->conn->dbh->getNum_Rows() > 0) {
-
-        // Get the data
-        $userData = $this->conn->dbh->get_row(NULL);
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($emailResult)) {
 
         // Return user email
-        return $userData->user_email;
+        return $emailResult[0]->user_email;
       } // No results. Return FALSE.
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
-    // Return false if $userID is empty or not a number
+    // Return FALSE
     return false;
   }
 
@@ -165,11 +175,8 @@ class User
   public function setPasswordReset()
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number
-    if (!empty($userID) && is_numeric($userID)) {
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Get and set selector for link
       $selector = get_crypto_key(34);
@@ -198,18 +205,35 @@ class User
         $expireDtm->modify('+' . (int) $this->optn->get("password_reset_expire") . ' seconds');
 
         // Save reset request in database
-        $token_id = $this->conn->dbh->insert('cs_password_reset', array('pwdreset_user_id' => $userID, 'pwdreset_selector' => $selector, 'pwdreset_token' => $random_token_hash, 'pwdreset_request_ip' => $_SERVER['REMOTE_ADDR'], 'pwdreset_user_agent' => $browser, 'pwdreset_dtm ' => date('Y-m-d H:i:s'), 'pwdreset_expire ' => $expireDtm->format('Y-m-d H:i:s')));
+        $token_id = $this->conn->dbh->insert(
+          'cs_password_reset',
+          array(
+            'pwdreset_user_id' => $this->uid,
+            'pwdreset_selector' => $selector,
+            'pwdreset_token' => $random_token_hash,
+            'pwdreset_request_ip' => $_SERVER['REMOTE_ADDR'],
+            'pwdreset_user_agent' => $browser,
+            'pwdreset_dtm ' => date('Y-m-d H:i:s'),
+            'pwdreset_expire ' => $expireDtm->format('Y-m-d H:i:s')
+          )
+        );
 
         // Check if token added to the database
-        if ($token_id != false) {
+        if ($this->conn->dbh->affectedRows() > 0 && $token_id != false) {
 
           // Return array with user name, reset selector, token, user agent, and expiry
-          return (object) array('user_name' => $userdata->user_first_name, 'selector' => $selector, 'token' => $random_token, 'user_agent' => $browser, 'expires' => $expireDtm->format('Y-m-d H:i:s'));
+          return (object) array(
+            'user_name' => $userdata->user_first_name,
+            'selector' => $selector,
+            'token' => $random_token,
+            'user_agent' => $browser,
+            'expires' => $expireDtm->format('Y-m-d H:i:s')
+          );
         } // Token failed to save. Return FALSE.
 
       } // Unable to get user key and name. Return FALSE
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -225,29 +249,34 @@ class User
   public function checkPasswordReset(string $selector)
   {
 
-    // Check selector set
+    // Check data is valid
     if (!empty($selector)) {
 
       // Set current dtm
       $now = new \DateTime();
 
       // Run query to find user key
-      $this->conn->dbh->query_prepared("SELECT pwdreset_user_id FROM " . DB_PREFIX . "password_reset WHERE pwdreset_selector=:selector AND pwdreset_status=:status AND pwdreset_expire > :currentDtm", array(':selector' => $selector, ':status' => '0', ':currentDtm' => $now->format('Y-m-d H:i:s')));
+      $resetResult = $this->conn->dbh->selecting(
+        DB_PREFIX . "password_reset",
+        "pwdreset_user_id",
+        where(
+          eq("pwdreset_selector", $selector, _AND),
+          eq("pwdreset_status", "0", _AND),
+          gt("pwdreset_expire", $now->format('Y-m-d H:i:s'))
+        )
+      );
 
       // Check if there are any results
       if ($this->conn->dbh->getNum_Rows() > 0) {
 
-        // Get id
-        $userData = $this->conn->dbh->get_row(NULL);
-
         // Set uid
-        $this->uid = $userData->pwdreset_user_id;
+        $this->uid = $resetResult[0]->pwdreset_user_id;
 
         // Return TRUE
         return TRUE;
       } // No results. Return FALSE.
 
-    } // $selector not set. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -268,19 +297,23 @@ class User
     if (!empty($selector) && !empty($token)) {
 
       // Run query to get token to check
-      $this->conn->dbh->query_prepared("SELECT pwdreset_token FROM " . DB_PREFIX . "password_reset WHERE pwdreset_selector=:selector AND pwdreset_status=:status", array(':selector' => $selector, ':status' => '0'));
+      $tokenResult = $this->conn->dbh->selecting(
+        DB_PREFIX . "password_reset",
+        "pwdreset_token",
+        where(
+          eq("pwdreset_selector", $selector, _AND),
+          eq("pwdreset_status", "0", _AND)
+        )
+      );
 
       // Check if there are any results
-      if ($this->conn->dbh->getNum_Rows() > 0) {
-
-        // Get token
-        $resetToken = $this->conn->dbh->get_row(NULL);
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($tokenResult)) {
 
         // Get user key
         if ($userData = $this->getUserKeyName()) {
 
           // Check token verifies
-          if (password_verify($token . $userData->user_password_key, $resetToken->pwdreset_token)) {
+          if (password_verify($token . $userData->user_password_key, $tokenResult[0]->pwdreset_token)) {
 
             // Return TRUE
             return TRUE;
@@ -290,7 +323,7 @@ class User
 
       } // No results. Return FALSE.
 
-    } // $selector or $token not set. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -307,15 +340,18 @@ class User
   public function setNewPassword(string $password, string $key)
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number
-    // and make sure $password and $key are set
-    if (!empty($userID) && is_numeric($userID) && !empty($password) && !empty($key)) {
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid) && !empty($password) && !empty($key)) {
 
       // Save new password to database
-      $this->conn->dbh->update(DB_PREFIX . "users", array('user_password' => $password, 'user_password_key' => $key), eq('user_id', $userID));
+      $this->conn->dbh->update(
+        DB_PREFIX . "users",
+        array(
+          'user_password' => $password,
+          'user_password_key' => $key
+        ),
+        eq('user_id', $this->uid)
+      );
 
       // Check if password updated in the database
       if ($this->conn->dbh->affectedRows() > 0) {
@@ -324,7 +360,7 @@ class User
         return TRUE;
       } // New password failed to save. Return FALSE.
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -338,21 +374,25 @@ class User
   public function invalidateLogins()
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number and make sure $selector is set
-    if (!empty($userID) && is_numeric($userID) && !empty($selector)) {
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Delete session data for user
-      $this->conn->dbh->delete(DB_PREFIX . 'session', eq('session_user_id', $userID));
+      $this->conn->dbh->delete(
+        DB_PREFIX . 'session',
+        eq('session_user_id', $this->uid)
+      );
 
       // Delete cookie data for user
-      $this->conn->dbh->delete(DB_PREFIX . 'auth_cookie', eq('cookie_user_id', $userID, _AND), eq('cookie_user_type', '1'));
+      $this->conn->dbh->delete(
+        DB_PREFIX . 'auth_cookie',
+        eq('cookie_user_id', $this->uid, _AND),
+        eq('cookie_user_type', '1')
+      );
 
       // Return TRUE
       return TRUE;
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -368,17 +408,22 @@ class User
   public function markPasswordReset(string $selector)
   {
 
-    // Set $userID
-    $userID = $this->uid;
-
-    // Make sure the $userID is a number and make sure $selector is set
-    if (!empty($userID) && is_numeric($userID) && !empty($selector)) {
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid) && !empty($selector)) {
 
       // Set current dtm
       $now = new \DateTime();
 
       // Update password reset as successful in database
-      $this->conn->dbh->update(DB_PREFIX . 'password_reset', array('pwdreset_status' => '1', 'pwdreset_success_dtm' => $now->format('Y-m-d H:i:s')), eq('pwdreset_user_id', $userID, _AND), eq('pwdreset_selector', $selector));
+      $this->conn->dbh->update(
+        DB_PREFIX . 'password_reset',
+        array(
+          'pwdreset_status' => '1',
+          'pwdreset_success_dtm' => $now->format('Y-m-d H:i:s')
+        ),
+        eq('pwdreset_user_id', $this->uid, _AND),
+        eq('pwdreset_selector', $selector)
+      );
 
       // Check if password updated in the database
       if ($this->conn->dbh->affectedRows() > 0) {
@@ -387,7 +432,7 @@ class User
         return TRUE;
       } // Update failed to save. Return FALSE.
 
-    } // $userID is empty or not a number. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
@@ -396,19 +441,103 @@ class User
   /**
    * Get list of users
    *
+   * @param array $params Multiple parameters as required
+   *
    * @return object Return object with list of users
    */
-  public function listUsers()
+  public function listUsers($params = array())
   {
 
-    // Run query to find active users
-    $results = $this->conn->dbh->selecting(DB_PREFIX . "users", "user_id, user_login, user_first_name, user_last_name, user_email, user_group_id", where(eq("user_status", "1")), orderBy("user_first_name", "ASC"));
+    // Set if counting or not
+    $countResults = (!empty($params['count']) && $params['count'] == TRUE) ? TRUE : FALSE;
+
+    // Build query
+    $this->sql = "";
+    $this->sqlItems = array();
+
+    // Start SQL based on count results
+    if ($countResults) {
+      $this->sql .= "SELECT COUNT(u.user_id) AS total_results";
+    } else {
+      $this->sql .= "SELECT u.user_id,
+      u.user_login,
+      u.user_first_name,
+      u.user_last_name,
+      u.user_email,
+      r.role_id,
+      r.role_name,
+      l.login_dtm";
+    }
+
+    // Set FROM
+    $this->sql .= " FROM " . DB_PREFIX . "users AS u";
+
+    // Set LEFT JOIN for the user roles
+    $this->sql .= " LEFT JOIN " . DB_PREFIX . "roles AS r ON r.role_id = u.user_role_id";
+
+    // Set LEFT JOIN for the last login
+    $this->sql .= " LEFT JOIN (SELECT * FROM " . DB_PREFIX . "login_log WHERE login_status = '1' ORDER BY login_dtm DESC LIMIT 1) AS l ON l.login_user_id = u.user_id";
+
+    // Set WHERE
+    $this->sql .= " WHERE u.user_status = '1'";
+
+    // Set search
+    if (!empty($params['search'])) {
+      $this->sqlItems[':searchTerm'] = "%" . strtolower($this->conn->dbh->escape($params['search'])) . "%";
+      $this->sql .= " AND (
+      (LOWER(u.user_login) LIKE :searchTerm) OR
+      (LOWER(CONCAT(u.user_first_name, ' ' , u.user_last_name)) LIKE :searchTerm) OR
+      (LOWER(u.user_last_name) LIKE :searchTerm) OR
+      (LOWER(u.user_email) LIKE :searchTerm)
+    )";
+    }
+
+    // Check for sort
+    if (!$countResults && !empty($params['sort']) && !empty($params['order'])) {
+      $this->sql .= " " . orderBy($params['sort'], $params['order']);
+    } else if ($countResults) {
+      $this->sql .= "";
+    } else {
+      $this->sql .= " " . orderBy("user_first_name", "ASC");
+    }
+
+    // Check for page number/limit
+    if (!$countResults && !empty($params['limit'])) {
+      // Check for page number
+      if (!empty($params['page'])) {
+        $offset = ($params['page'] - 1) * $params['limit'];
+      } else {
+        $offset = 0;
+      }
+      $this->sql .= " " . limit($params['limit'], $offset);
+    }
+
+    // Flush any previous results
+    $this->conn->dbh->flush();
+
+    // Run query
+    $this->conn->dbh->query_prepared(
+      $this->sql,
+      $this->sqlItems
+    );
 
     // Return if results
     if ($this->conn->dbh->getNum_Rows() > 0) {
 
-      // Return results
-      return $results;
+      // Check if wanting the count returned
+      if ($countResults) {
+
+        // Return the total count
+        return $this->conn->dbh->get_row(NULL)->total_results;
+        exit;
+      } else { // Wanting to return data
+
+        // Get the results
+        $userResults = $this->conn->dbh->queryResult();
+
+        // Return results
+        return json_decode(json_encode(array('count' => $this->conn->dbh->getNum_Rows(), 'results' => json_decode(json_encode($userResults)), FALSE)), FALSE);
+      }
     } // No results. Return FALSE.
 
     // Return FALSE
@@ -416,29 +545,35 @@ class User
   }
 
   /**
-   * Get group display name
+   * Get role name
    *
-   * @param int $groupID ID of user group
+   * @param int $roleID ID of user role
    *
-   * @return string Return string of users group name
+   * @return string Return string of users role name
    */
-  public function getGroupName(int $groupID)
+  public function getRoleName(int $roleID)
   {
 
-    // Make sure the $groupID is a number and isn't empty
-    if (!empty($groupID) && is_numeric($groupID)) {
+    // Make sure the data is valid
+    if (!empty($roleID) && is_numeric($roleID)) {
 
       // Run query to find users group
-      $results = $this->conn->dbh->selecting(DB_PREFIX . "user_groups", "ugroup_display", where(eq("ugroup_id", $groupID)));
+      $roleResults = $this->conn->dbh->selecting(
+        DB_PREFIX . "roles",
+        "role_name",
+        where(
+          eq("role_id", $roleID)
+        )
+      );
 
       // Return if results
-      if ($this->conn->dbh->getNum_Rows() > 0) {
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($roleResults)) {
 
         // Return first result
-        return $results[0]->ugroup_display;
+        return $roleResults[0]->role_id;
       } // No results. Return FALSE.
 
-    } // $groupID was empty or not numeric. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return false;
@@ -454,20 +589,29 @@ class User
   public function getLastLogin(int $userID)
   {
 
-    // Make sure the $userID is a number and isn't empty
+    // Make sure the data is valid
     if (!empty($userID) && is_numeric($userID)) {
 
       // Run query to find users last successful login
-      $results = $this->conn->dbh->selecting(DB_PREFIX . "login_log", "login_dtm", where(eq("login_user_id", $userID, _AND), eq("login_status", "1")), orderBy("login_dtm", "DESC"), limit(1));
+      $loginResults = $this->conn->dbh->selecting(
+        DB_PREFIX . "login_log",
+        "login_dtm",
+        where(
+          eq("login_user_id", $userID, _AND),
+          eq("login_status", "1")
+        ),
+        orderBy("login_dtm", "DESC"),
+        limit(1)
+      );
 
       // Return if results
-      if ($this->conn->dbh->getNum_Rows() > 0) {
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($loginResults)) {
 
         // Return first result
-        return $results[0]->login_dtm;
+        return $loginResults[0]->login_dtm;
       } // No results. Return FALSE.
 
-    } // $userID was empty or not numeric. Return FALSE.
+    } // Data invalid. Return FALSE.
 
     // Return FALSE
     return false;

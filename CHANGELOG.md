@@ -1,11 +1,18 @@
 # Cornerstone Change Log
 
-## 0.2.23 - User roles (2020-04-15)
+## 0.2.23 - User + Roles (2020-04-15)
 
 - ➕ Added the `cs_roles`, `cs_roler_permissions`, and `cs_role_perms` tables
 - 🖊️ Changed the `user_group_id` column to `user_role_id` in the `cs_users` table
 - ➕ Added `role()` class for handling user role permissions
-- ➕ Added the ability to load user permissions in the core controller
+- ➕ Added the `canDo(x)` and `isMasterUser()` checks on the role class
+- ➕ Added loading user permissions in the bootstrap
+- ➕ Added the `permission` variable to the `outputAdminMenu` function to allow setting a permission to a menu item
+- 🧹 Refactored the user model
+- 🧹 Refactored the userauth model
+- ➕ Added the settings section
+- ➕ Added the ability to view, add, and edit user roles
+- ➕ Added the ability for a master user to add a permission
 
 ## 0.2.22 - Styling (2020-04-10)
 

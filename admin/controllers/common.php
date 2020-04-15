@@ -8,14 +8,14 @@ class Common extends Controller
   public function __construct($registry)
   {
     // Load the controller constructor
-    parent::__construct($registry, true);
+    parent::__construct($registry);
 
-    // Set role if logged int
+    // Set role if logged in
     if (isLoggedInUser()) {
-      $this->role->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
+      // $this->role->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
 
-      echo ($this->role->canDo('add_product')) ? 'You can do that' : 'You can not do that';
-      exit;
+      // echo ($this->role->isMasterUser()) ? 'You are a master' : 'You are not a master';
+      // exit;
     }
   }
 

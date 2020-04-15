@@ -19,6 +19,8 @@ final class Loader
   protected $registry;
   // Set the options
   protected $option;
+  // Set the role
+  protected $role;
 
   /**
    * Constructor
@@ -26,10 +28,11 @@ final class Loader
    * @param	object	$registry
    * @param	object	$option
    */
-  public function __construct($registry, $option)
+  public function __construct($registry, $option, $role)
   {
     $this->registry = $registry;
     $this->option = $option;
+    $this->role = $role;
   }
 
   /**
@@ -109,8 +112,9 @@ final class Loader
       exit;
     }
 
-    // Pass the option data onto the view
+    // Pass the option and role data onto the view
     $option = $this->option;
+    $role = $this->role;
 
     // Check for allowed sub-folders
     $directory =  (!array_key_exists($directory, ALLOWED_SUBFOLDERS)) ? 'system' : $directory;
@@ -148,5 +152,16 @@ final class Loader
     } else {
       throw new \Exception('Error: Could not load helper ' . $helper . '!');
     }
+  }
+
+  /**
+   * Update Loader Role
+   * Used to update the loader role property
+   *
+   * @param string $role
+   */
+  public function updateRole($role)
+  {
+    $this->role = $role;
   }
 }
