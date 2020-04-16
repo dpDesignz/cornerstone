@@ -97,7 +97,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
               <?php echo $data->editOptions; ?>
             </div>
             <div class="csc-col csc-col12 csc-col--md6 csc-col--lg4 csc-input-field">
-              <h4>Delete Options</h4>
+              <h4>Archive/Delete Options</h4>
               <?php echo $data->deleteOptions; ?>
             </div>
             <div class="csc-col csc-col12 csc-col--md6 csc-col--lg4 csc-input-field">

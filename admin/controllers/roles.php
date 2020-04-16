@@ -249,6 +249,7 @@ class Roles extends Controller
             $this->data['editOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
             break;
           case 'delete':
+          case 'archive':
             $this->data['deleteOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
             break;
 
@@ -437,6 +438,7 @@ class Roles extends Controller
             $this->data['editOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
             break;
           case 'delete':
+          case 'archive':
             $this->data['deleteOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
             break;
 
@@ -799,6 +801,63 @@ class Roles extends Controller
 
     // Load add view
     $this->load->view('roles/permission', $this->data, 'admin');
+    exit;
+  }
+
+  /**
+   * View Permission Page
+   */
+  public function viewpermissions()
+  {
+    // Check user is allowed to view this
+    if (!$this->role->isMasterUser()) {
+      // Redirect user with error
+      flashMsg('admin_roles', '<strong>Error</strong> Sorry, you are not allowed to view permissions. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/roles');
+      exit;
+    }
+
+    // Action URL
+    $this->data['action_url'] = get_site_url('admin/roles/viewpermissions');
+    // H1
+    $this->data['page_title'] = 'Permissions List';
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => $this->data['page_title'],
+      'href' => $this->data['action_url']
+    );
+
+    ################################
+    ####    PERMISSIONS LIST    ####
+    ################################
+
+    // Init permissions json
+    $this->data['permissions'] = '[';
+    // Get list of permissions for assigning
+    if ($permissionsData = $this->roleModel->listPermissions()) {
+
+      // Loop through data and create options
+      foreach ($permissionsData as $permission) {
+
+        // Output permission
+        $this->data['permissions'] .= '{
+          "key" : "' . $permission->rp_key . '",
+          "name" : "' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '"
+        },';
+      }
+
+      // Remove trailing comma
+      $this->data['permissions'] = rtrim($this->data['permissions'], ',');
+    } else {
+      // Set blank options
+      $this->data['permissions'] .= '{"empty" : true}';
+    }
+
+    // Close the JSON
+    $this->data['permissions'] .= ']';
+
+    // Load view
+    $this->load->view('roles/permissions', $this->data, 'admin');
     exit;
   }
 

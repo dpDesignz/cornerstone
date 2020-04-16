@@ -58,9 +58,10 @@ require(get_theme_path('layout.php', 'admin')); ?>
     <section class="csc-col csc-col12 csc-col--md6 cs-text-center cs-text-right-md csc-col--ga-middle">
       <?php if ($role->canDo('add_user_role')) { ?>
         <p class="cs-mt-0 cs-mt-md-3">
-          <a class="csc-btn--small" href="<?php echo get_site_url('admin/roles/add'); ?>" title="Add a user role"><i class="material-icons csc-bi-left">add</i> Add</a>
+          <a class="csc-btn--small" href="<?php echo get_site_url('admin/roles/add'); ?>" title="Add a user role"><i class="fas fa-plus csc-bi-left"></i> Add</a>
           <?php if ($role->isMasterUser()) { ?>
-            <a class="csc-btn--small" href="<?php echo get_site_url('admin/roles/addpermission'); ?>" title="Add a permission"><i class="material-icons csc-bi-left">add</i> Add Permission</a>
+            <a class="csc-btn--small" href="<?php echo get_site_url('admin/roles/addpermission'); ?>" title="Add a permission"><i class="fas fa-plus csc-bi-left"></i> Add Permission</a>
+            <a class="csc-btn--small" href="<?php echo get_site_url('admin/roles/viewpermissions'); ?>" title="View permissions"><i class="fas fa-eye csc-bi-left"></i> View Permissions</a>
           <?php } ?>
         </p>
       <?php } ?>
