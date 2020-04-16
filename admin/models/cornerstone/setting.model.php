@@ -60,4 +60,37 @@ class Setting
     // Return FALSE
     return FALSE;
   }
+
+  /**
+   * Edit Option
+   *
+   * @param string $optionName Name of the option
+   * @param string $optionValue Value of the option
+   *
+   * @return int Will return FALSE if failed or TRUE if successful.
+   */
+  public function editOption(string $optionName, string $optionValue)
+  {
+
+    // Update row
+    $updateResult = $this->conn->dbh->update(
+      DB_PREFIX . "options",
+      array(
+        'option_value' => $optionValue,
+        'option_edited_id' => $_SESSION['_cs']['user']['uid'],
+        'option_edited_dtm' => date('Y-m-d H:i:s')
+      ),
+      eq("option_name", $optionName)
+    );
+
+    // Check if updated successfully
+    if ($this->conn->dbh->affectedRows() > 0) {
+
+      // Return TRUE
+      return TRUE;
+    } // Unable to edit. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
 }

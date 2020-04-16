@@ -109,7 +109,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
       <a href="<?php echo get_site_url('admin/settings/security'); ?>">
         <i class="fas fa-shield-alt"></i>
         <h3>Security</h3>
-        <p>Browser tracking, Registrations, Password options +</p>
+        <p>Registrations, Password options, Browser tracking +</p>
       </a>
     </article>
   <?php }
@@ -118,7 +118,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
       <a href="<?php echo get_site_url('admin/settings/site'); ?>">
         <i class="fas fa-sitemap"></i>
         <h3>Site</h3>
-        <p>Tooltip, Site notice, Docs +</p>
+        <p>Tooltip, Docs, Site notice</p>
       </a>
     </article>
   <?php }

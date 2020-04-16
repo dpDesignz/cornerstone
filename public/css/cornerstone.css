@@ -8467,8 +8467,9 @@ body.cs-components .csc-form .csc-input-field > label.active span.label-hide,
 body.cs-component__form .csc-form .csc-input-field > label.active span.label-hide {
   display: none;
 }
-body.cs-components .csc-form .csc-input-field > label.active.tooltipstered,
-body.cs-component__form .csc-form .csc-input-field > label.active.tooltipstered {
+body.cs-components .csc-form .csc-input-field > label.active.tooltipstered, body.cs-components .csc-form .csc-input-field > label.active[data-tippy-content],
+body.cs-component__form .csc-form .csc-input-field > label.active.tooltipstered,
+body.cs-component__form .csc-form .csc-input-field > label.active[data-tippy-content] {
   cursor: help;
   border-bottom: 1px dotted #039be5;
 }

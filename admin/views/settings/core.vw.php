@@ -51,9 +51,10 @@ require(get_theme_path('layout.php', 'admin')); ?>
 </style>
 <div class="csc-wrapper">
   <h1 class="cs-h2 cs-my-2">Core Settings</h1>
+  <?php flashMsg('settings_core'); ?>
 </div>
-<?php flashMsg('settings_core'); ?>
-<form action="<?php echo get_site_url('admin/settings/core'); ?>" method="POST" id="category-form" class="csc-wrapper csc-form cs-mt-4">
+<form action="<?php echo get_site_url('admin/settings/save'); ?>" method="POST" id="setting-form" class="csc-wrapper csc-form cs-mt-4">
+  <input type="hidden" name="set_type" value="core">
   <section class="csc-container cs-mb-3 cs-p-3">
     <fieldset>
       <legend>Site Information</legend>
@@ -65,6 +66,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
         </div>
       </div>
       <input type="hidden" name="setting[site_https][current]" <?php if (!empty($data->curr_site_https)) echo ' value="' . $data->curr_site_https . '"'; ?>>
+      <input type="hidden" name="setting[site_https][bool]" value="TRUE">
       <input type="hidden" name="setting[site_url][current]" <?php if (!empty($data->curr_site_url)) echo ' value="' . $data->curr_site_url . '"'; ?>>
       <div class="csc-row">
         <div class="csc-col csc-col4 csc-input-field">
@@ -79,19 +81,20 @@ require(get_theme_path('layout.php', 'admin')); ?>
         </div>
         <div class="csc-col csc-col8 csc-input-field">
           <input type="text" name="setting[site_url][set]" id="site_url" tabindex="3" <?php if (!empty($data->set_site_url)) echo ' value="' . $data->set_site_url . '"'; ?> autocapitalize="off" required>
-          <label for="site_url">Site URL*</label>
+          <label for="site_url" data-tippy-content="Don't include the 'https://' or 'http://' at the beginning or the trailing '/' at the end.">Site URL* <i class="far fa-question-circle"></i></label>
         </div>
       </div>
       <input type="hidden" name="setting[site_offline][current]" <?php if (!empty($data->curr_site_offline)) echo ' value="' . $data->curr_site_offline . '"'; ?>>
+      <input type="hidden" name="setting[site_offline][bool]" value="TRUE">
       <div class="csc-row">
         <div class="csc-col csc-col8">
-          <p class="cs-body2">Maintenance Mode</p>
+          <p class="cs-body1 cs-mt-0">Maintenance Mode</p>
         </div>
         <div class="csc-col csc-col4 cs-text-right">
           <div class="csc-switch">
             <label>
               Off
-              <input type="checkbox" name="setting[site_offline][set]" tabindex="4" <?php if (!empty($data->set_site_offline) && $data->set_site_site_offline) echo 'checked'; ?>>
+              <input type="checkbox" name="setting[site_offline][set]" tabindex="4" <?php if (!empty($data->set_site_offline) && $data->set_site_offline) echo 'checked'; ?>>
               <span class="csc-lever"></span>
               On
             </label>
@@ -115,8 +118,8 @@ require(get_theme_path('layout.php', 'admin')); ?>
       <input type="hidden" name="setting[phone_locale][current]" <?php if (!empty($data->curr_phone_locale)) echo ' value="' . $data->curr_phone_locale . '"'; ?>>
       <div class="csc-row">
         <div class="csc-col csc-col12 csc-input-field">
-          <input type="text" name="setting[phone_locale][set]" id="phone_locale" tabindex="6" <?php if (!empty($data->set_phone_locale)) echo ' value="' . $data->set_phone_locale . '"'; ?> autocapitalize="off" required>
-          <label for="phone_locale">Phone Locale*</label>
+          <input type="text" name="setting[phone_locale][set]" id="phone_locale" tabindex="6" <?php if (!empty($data->set_phone_locale)) echo ' value="' . $data->set_phone_locale . '"'; ?> autocapitalize="off">
+          <label for="phone_locale">Phone Locale</label>
         </div>
       </div>
     </fieldset>
@@ -127,12 +130,46 @@ require(get_theme_path('layout.php', 'admin')); ?>
         <a href="<?php echo get_site_url('admin/settings'); ?>" class="csc-btn--flat"><span>Cancel</span></a>
       </div>
       <div class="csc-col csc-col6 cs-text-right cs-my-1 cs-mb-3">
-        <button type="submit" name="action" tabindex="11" value="save" class="csc-btn csc-btn--success" disabled>Save <i class="fas fa-save csc-bi-right"></i></button>
+        <button type="submit" name="action" tabindex="11" value="save" class="csc-btn csc-btn--success">Save <i class="fas fa-save csc-bi-right"></i></button>
       </div>
     </div>
     <p class="cs-caption cs-text-grey cs-text-center cs-my-0"><em>*notes a required field</em></p>
   </section>
 </form>
+
+<script>
+  // Init validation on document ready
+  $(document).ready(function() {
+    let validator = $("#setting-form").validate({
+      rules: {
+        site_name: {
+          required: true,
+          minlength: 3
+        },
+        site_url: {
+          required: true,
+          url: true
+        }
+      },
+      messages: {
+        site_name: {
+          required: "Please enter a site name",
+          minlength: "Please enter at least 3 characters"
+        },
+        site_url: {
+          required: "Please enter a site URL",
+          minlength: "Please enter a valid URL"
+        }
+      }
+    });
+    <?php
+    // Output errors if they exist
+    if (!empty($data->err)) {
+      // Call the formatting function
+      echo 'validator' . showValidationErrors($data->err);
+    } ?>
+  });
+</script>
 
 <?php
 // Load html footer

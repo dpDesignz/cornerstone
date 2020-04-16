@@ -221,25 +221,53 @@ class Roles extends Controller
     ################################
 
     // Init permission options
-    $permOptions = '';
+    $this->data['viewOptions'] = '';
+    $this->data['addOptions'] = '';
+    $this->data['editOptions'] = '';
+    $this->data['deleteOptions'] = '';
+    $this->data['otherOptions'] = '';
     // Get list of permissions for assigning
     if ($permissionsData = $this->roleModel->listPermissions()) {
 
       // Loop through data and create options
       foreach ($permissionsData as $permission) {
 
-        // Set selected if chosen
-        $selected = (!empty($rolePermissions) && in_array($permission->rp_id, $rolePermissions)) ? ' selected' : '';
+        // Set checked if chosen
+        $checked = (!empty($rolePermissions) && array_key_exists($permission->rp_id, $rolePermissions)) ? ' checked' : '';
 
-        // Set to output
-        $permOptions .= '<option value="' . $permission->rp_id . '"' . $selected . '>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</option>';
+        // Get type
+        $permissionType = explode('_', $permission->rp_key);
+        // Check which option to add to
+        switch ($permissionType[0]) {
+          case 'view':
+            $this->data['viewOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+          case 'add':
+            $this->data['addOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+          case 'edit':
+            $this->data['editOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+          case 'delete':
+            $this->data['deleteOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+
+          default:
+            $this->data['otherOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+        }
       }
     } else {
       // Set blank options
-      $permOptions = '<option disabled>There are currently no permissions available to assign to this role.</option>';
+      $this->data['no_perm_options'] = '<p class="cs-body2">There are currently no permissions available to assign to this role.</p>';
     }
-    // Set permission list options to data
-    $this->data['permission_options'] = $permOptions;
+
+    // Set fallbacks
+    $this->data['viewOptions'] = (!empty($this->data['viewOptions'])) ? $this->data['viewOptions'] : '<p class="cs-caption">No view options available</p>';
+    $this->data['addOptions'] = (!empty($this->data['addOptions'])) ? $this->data['addOptions'] : '<p class="cs-caption">No add options available</p>';
+    $this->data['editOptions'] = (!empty($this->data['editOptions'])) ? $this->data['editOptions'] : '<p class="cs-caption">No edit options available</p>';
+    $this->data['deleteOptions'] = (!empty($this->data['deleteOptions'])) ? $this->data['deleteOptions'] : '<p class="cs-caption">No delete options available</p>';
+    $this->data['otherOptions'] = (!empty($this->data['otherOptions'])) ? $this->data['otherOptions'] : '<p class="cs-caption">No other options available</p>';
   }
 
   /**
@@ -319,7 +347,7 @@ class Roles extends Controller
           // Added
 
           // Loop through submitted data
-          foreach ($this->data['permissions'] as $permissionID) {
+          foreach ($this->data['permissions'] as $permissionID => $true) {
             // Add permission
             $this->roleModel->addRolePermission(
               (int) $roleID,
@@ -381,25 +409,53 @@ class Roles extends Controller
     ################################
 
     // Init permission options
-    $permOptions = '';
+    $this->data['viewOptions'] = '';
+    $this->data['addOptions'] = '';
+    $this->data['editOptions'] = '';
+    $this->data['deleteOptions'] = '';
+    $this->data['otherOptions'] = '';
     // Get list of permissions for assigning
     if ($permissionsData = $this->roleModel->listPermissions()) {
 
       // Loop through data and create options
       foreach ($permissionsData as $permission) {
 
-        // Set selected if chosen
-        $selected = (!empty($rolePermissions) && in_array($permission->rp_id, $rolePermissions)) ? ' selected' : '';
+        // Set checked if chosen
+        $checked = (!empty($rolePermissions) && array_key_exists($permission->rp_id, $rolePermissions)) ? ' checked' : '';
 
-        // Set to output
-        $permOptions .= '<option value="' . $permission->rp_id . '"' . $selected . '>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</option>';
+        // Get type
+        $permissionType = explode('_', $permission->rp_key);
+        // Check which option to add to
+        switch ($permissionType[0]) {
+          case 'view':
+            $this->data['viewOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+          case 'add':
+            $this->data['addOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+          case 'edit':
+            $this->data['editOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+          case 'delete':
+            $this->data['deleteOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+
+          default:
+            $this->data['otherOptions'] .= '<p><label><input type="checkbox" name="permissions[' . $permission->rp_id . ']" id="permission_' . $permission->rp_id . '"' . $checked . '><span>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</span></label></p>';
+            break;
+        }
       }
     } else {
       // Set blank options
-      $permOptions = '<option disabled>There are currently no permissions available to assign to this role.</option>';
+      $this->data['no_perm_options'] = '<p class="cs-body2">There are currently no permissions available to assign to this role.</p>';
     }
-    // Set permission list options to data
-    $this->data['permission_options'] = $permOptions;
+
+    // Set fallbacks
+    $this->data['viewOptions'] = (!empty($this->data['viewOptions'])) ? $this->data['viewOptions'] : '<p class="cs-caption">No view options available</p>';
+    $this->data['addOptions'] = (!empty($this->data['addOptions'])) ? $this->data['addOptions'] : '<p class="cs-caption">No add options available</p>';
+    $this->data['editOptions'] = (!empty($this->data['editOptions'])) ? $this->data['editOptions'] : '<p class="cs-caption">No edit options available</p>';
+    $this->data['deleteOptions'] = (!empty($this->data['deleteOptions'])) ? $this->data['deleteOptions'] : '<p class="cs-caption">No delete options available</p>';
+    $this->data['otherOptions'] = (!empty($this->data['otherOptions'])) ? $this->data['otherOptions'] : '<p class="cs-caption">No other options available</p>';
   }
 
   /**
@@ -425,9 +481,6 @@ class Roles extends Controller
 
       // Check ID
       if (!empty($params) && is_numeric($params[0]) && $params[0] == $_POST['id']) {
-
-        // Sanitize POST data
-        $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
         // Get information submitted and validate
         if (isset($_POST['name'])) {
@@ -497,7 +550,7 @@ class Roles extends Controller
               // Loop through already assigned categories
               foreach ($rolePermissionList as $rpData) {
                 // Check if category exists in posted data
-                if (!in_array($rpData->rpl_rp_id, $this->data['permissions'])) {
+                if (!array_key_exists($rpData->rpl_rp_id, $this->data['permissions'])) {
                   // Permission doesn't exist. Delete link
                   $this->roleModel->deleteRPLink(
                     (int) $dataID,
@@ -511,7 +564,7 @@ class Roles extends Controller
             }
 
             // Loop through submitted data
-            foreach ($this->data['permissions'] as $permissionID) {
+            foreach ($this->data['permissions'] as $permissionID => $true) {
               // Check if already assigned
               if (empty($existingData) || !in_array($permissionID, $existingData)) {
                 // Permission isn't already assigned. Add it
@@ -579,7 +632,7 @@ class Roles extends Controller
           // Loop through permissions and create an array
           foreach ($permissionResults as $key => $value) {
             // Add permissions to array
-            $rolePermissions[] = $value->rpl_rp_id;
+            $rolePermissions[$value->rpl_rp_id] = true;
           }
 
           // Decode the meta information

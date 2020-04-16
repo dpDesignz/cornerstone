@@ -79,12 +79,32 @@ require(get_theme_path('layout.php', 'admin')); ?>
           </div>
         </div>
         <div class="csc-row">
-          <div class="csc-col csc-col12 csc-input-field">
-            <select name="permissions[]" id="permissions" data-placeholder="Select the role permissions" tabindex="3" multiple required>
-              <?php echo $data->permission_options; ?>
-            </select>
-            <label>Permissions*</label>
-          </div>
+          <?php if (!empty($data->no_perm_options)) { ?>
+            <div class="csc-col csc-col12">
+              <?php echo $data->no_perm_options; ?>
+            </div>
+          <?php } else { ?>
+            <div class="csc-col csc-col12 csc-col--md6 csc-col--lg4 csc-input-field">
+              <h4>View Options</h4>
+              <?php echo $data->viewOptions; ?>
+            </div>
+            <div class="csc-col csc-col12 csc-col--md6 csc-col--lg4 csc-input-field">
+              <h4>Add Options</h4>
+              <?php echo $data->addOptions; ?>
+            </div>
+            <div class="csc-col csc-col12 csc-col--md6 csc-col--lg4 csc-input-field">
+              <h4>Edit Options</h4>
+              <?php echo $data->editOptions; ?>
+            </div>
+            <div class="csc-col csc-col12 csc-col--md6 csc-col--lg4 csc-input-field">
+              <h4>Delete Options</h4>
+              <?php echo $data->deleteOptions; ?>
+            </div>
+            <div class="csc-col csc-col12 csc-col--md6 csc-col--lg4 csc-input-field">
+              <h4>Other Options</h4>
+              <?php echo $data->otherOptions; ?>
+            </div>
+          <?php } ?>
         </div>
       </fieldset>
       <div class="csc-row csc-row--no-gap">

@@ -1,5 +1,12 @@
 # Cornerstone Change Log
 
+## 0.2.24 - Settings (2020-04-16)
+
+- 🧹 Fixed bug when viewing the user list and the last login date wasn't populating
+- 🧹 Fixed bug where user list has been changed. Added `listUsersBasic()` to fix this
+- ➕ Added styling to input labels with a `data-tippy-content` attribute
+- ➕ Added the ability to view and change core, mail, security, site, and add-on settings
+
 ## 0.2.23 - User + Roles (2020-04-15)
 
 - ➕ Added the `cs_roles`, `cs_roler_permissions`, and `cs_role_perms` tables

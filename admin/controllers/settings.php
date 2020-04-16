@@ -47,6 +47,123 @@ class Settings extends Controller
   }
 
   /**
+   * Save Settings
+   */
+  public function save()
+  {
+
+    // Get type
+    if (isset($_POST['set_type']) && !empty($_POST['set_type'])) {
+      $settingType = htmlspecialchars(trim($_POST['set_type']));
+    } else { // Unable to get type. Set error.
+      flashMsg('admin_settings', '<strong>Error</strong> Sorry, there was any error saving those settings. Please contact your site administrator for debugging.', 'warning');
+      redirectTo('admin/settings');
+      exit;
+    }
+
+    // Check user is allowed to view this
+    if (!empty($settingType) && !$this->role->canDo('edit_' . $settingType . '_settings')) {
+      // Redirect user with error
+      flashMsg('admin_settings', '<strong>Error</strong> Sorry, you are not allowed to edit the ' . $settingType . ' settings. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/settings');
+      exit;
+    }
+
+    //Check if page posted and process form if it is
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "save") {
+
+      // Sanitize POST data
+      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+      // Try validating
+      try {
+
+        // Get setting data
+        $this->data['setting'] = (isset($_POST['setting'])) ? $_POST['setting'] : array();
+        if (empty($this->data['setting'])) {
+          // Data not set. Return error.
+          $this->data['err']['setting'] = 'There was an error updating the settings';
+          flashMsg('settings_' . $settingType, '<strong>Error</strong> here was an error updating the ' . ucfirst($settingType) . ' settings. Please try again.', 'warning');
+        }
+      } catch (Exception $e) {
+
+        // Log error if any and set flash message
+        error_log($e->getMessage(), 0);
+        flashMsg('settings_' . $settingType, '<strong>Error</strong> There was an error updating the ' . ucfirst($settingType) . ' settings. Please try again.', 'warning');
+      }
+
+      // If valid, update
+      if (empty($this->data['err'])) {
+        // Validated
+
+        // Init total updated
+        $totalUpdated = 0;
+
+        // Loop through submitted information
+        foreach ($this->data['setting'] as $setting => $values) {
+          // Get setting
+          $settingName = htmlspecialchars(trim($setting));
+          // Get current value
+          $this->data['cur_' . $settingName] = htmlspecialchars(trim($values['current']));
+          // Get set value
+          if (isset($values['set']) && !is_array($values['set'])) {
+            $this->data['set_' . $settingName] = htmlspecialchars(trim($values['set']));
+          } else if (isset($values['set']) && is_array($values['set'])) {
+            // Sort the array
+            ksort($values['set']);
+            // Set the value
+            $this->data['set_' . $settingName] = htmlspecialchars(trim(implode(',', $values['set'])));
+          } else {
+            $this->data['set_' . $settingName] = "0";
+          }
+
+          // Strip content if site_url
+          $this->data['set_' . $settingName] = ($settingName === "site_url") ? str_replace(array('http://', 'https://', '//'), '', rtrim($this->data['set_' . $settingName], '/')) : $this->data['set_' . $settingName];
+
+          // Check if boolean value
+          $this->data['cur_' . $settingName] = (isset($values['bool']) && empty($this->data['cur_' . $settingName])) ? "0" : $this->data['cur_' . $settingName];
+          $this->data['set_' . $settingName] = (isset($values['bool']) && $this->data['set_' . $settingName] == "on") ? "1" : $this->data['set_' . $settingName];
+          if (isset($values['bool'])) {
+            $this->data[$settingName . '_bool'] = TRUE;
+          }
+
+          // Check if the value is different
+          if ($this->data['cur_' . $settingName] !== $this->data['set_' . $settingName]) {
+            // Update setting
+            if ($this->settingModel->editOption(
+              $settingName,
+              $this->data['set_' . $settingName]
+            )) {
+              // Updated
+              $totalUpdated++;
+            }
+          }
+        }
+
+        // Set success message
+        flashMsg('admin_settings', '<strong>Success</strong>' . ucfirst($settingType) . ' settings saved with ' . $totalUpdated . ' option(s) updated successfully.');
+
+        // Return to page
+        redirectTo('admin/settings');
+        exit;
+      }
+
+      // If it's made it this far there were errors. Redirect to page with data
+
+      // Load method
+      $this->$settingType(TRUE);
+      exit;
+    } // Failed to validate. Return to main settings page
+
+    // Set error
+    flashMsg('admin_settings', '<strong>Error</strong> There was an saving the settings. Please try again', 'warning');
+
+    // Redirect
+    redirectTo('admin/settings');
+    exit;
+  }
+
+  /**
    * Timezone list
    */
   protected function getTimezoneList()
@@ -503,7 +620,7 @@ class Settings extends Controller
   /**
    * Core Settings Page
    */
-  public function core()
+  public function core($failedSave = FALSE)
   {
     // Check user is allowed to view this
     if (!$this->role->canDo('edit_core_settings')) {
@@ -520,37 +637,258 @@ class Settings extends Controller
     );
 
     //Check if page posted and process form if it is
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "save") {
+    if ($failedSave === TRUE) {
 
-      // Sanitize POST data
-      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+      // If it's made it this far there were errors. Load edit view with data
 
-      echo '<pre>';
-      print_r($_POST);
-      echo '</pre>';
-      exit;
-    } else {
-
-      // Get options
-      if ($optionResults = $this->settingModel->getOptions('core')) {
-
-        // Set option data
-        foreach ($optionResults as $optionData) {
-          $this->data['curr_' . $optionData->option_name] = $optionData->option_value;
-          $this->data['set_' . $optionData->option_name] = $optionData->option_value;
-        }
-
-        // Get the timezone options
-        $this->getTimezoneOptions($this->data['set_site_timezone']);
-
-        // Load view
-        $this->load->view('settings/core', $this->data, 'admin');
-        exit;
-      } // Failed to get options. Return to main settings page
+      // Set error message
+      flashMsg('settings_core', '<strong>Error</strong> There was an error updating the core settings. Please try again.', 'danger');
     }
+
+    // Get options
+    if ($optionResults = $this->settingModel->getOptions('core')) {
+
+      // Set option data
+      foreach ($optionResults as $optionData) {
+        $this->data['curr_' . $optionData->option_name] = $optionData->option_value;
+        $this->data['set_' . $optionData->option_name] = $optionData->option_value;
+
+        // Check if bool
+        if (strlen($optionData->option_value) === 1 && ($optionData->option_value == "0" || $optionData->option_value == "1")) {
+          $this->data[$optionData->option_name . '_bool'] = TRUE;
+        }
+      }
+
+      // Get the timezone options
+      $this->getTimezoneOptions($this->data['set_site_timezone']);
+
+      // Load view
+      $this->load->view('settings/core', $this->data, 'admin');
+      exit;
+    } // Failed to get options. Return to main settings page
 
     // Set error
     flashMsg('admin_settings', '<strong>Error</strong> There was an error loading the core settings. Please try again', 'warning');
+
+    // Redirect
+    redirectTo('admin/settings');
+    exit;
+  }
+
+  /**
+   * Mail Settings Page
+   */
+  public function mail($failedSave = FALSE)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('edit_mail_settings')) {
+      // Redirect user with error
+      flashMsg('admin_settings', '<strong>Error</strong> Sorry, you are not allowed to edit the mail settings. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/settings');
+      exit;
+    }
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => 'Mail',
+      'href' => get_site_url('admin/settings/mail')
+    );
+
+    //Check if page posted and process form if it is
+    if ($failedSave === TRUE) {
+
+      // If it's made it this far there were errors. Load edit view with data
+
+      // Set error message
+      flashMsg('settings_mail', '<strong>Error</strong> There was an error updating the mail settings. Please try again.', 'danger');
+    }
+
+    // Get options
+    if ($optionResults = $this->settingModel->getOptions('mail')) {
+
+      // Set option data
+      foreach ($optionResults as $optionData) {
+        $this->data['curr_' . $optionData->option_name] = $optionData->option_value;
+        $this->data['set_' . $optionData->option_name] = $optionData->option_value;
+
+        // Check if bool
+        if (strlen($optionData->option_value) === 1 && ($optionData->option_value == "0" || $optionData->option_value == "1")) {
+          $this->data[$optionData->option_name . '_bool'] = TRUE;
+        }
+      }
+
+      // Load view
+      $this->load->view('settings/mail', $this->data, 'admin');
+      exit;
+    } // Failed to get options. Return to main settings page
+
+    // Set error
+    flashMsg('admin_settings', '<strong>Error</strong> There was an error loading the mail settings. Please try again', 'warning');
+
+    // Redirect
+    redirectTo('admin/settings');
+    exit;
+  }
+
+  /**
+   * Security Settings Page
+   */
+  public function security($failedSave = FALSE)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('edit_security_settings')) {
+      // Redirect user with error
+      flashMsg('admin_settings', '<strong>Error</strong> Sorry, you are not allowed to edit the security settings. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/settings');
+      exit;
+    }
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => 'Security',
+      'href' => get_site_url('admin/settings/security')
+    );
+
+    //Check if page posted and process form if it is
+    if ($failedSave === TRUE) {
+
+      // If it's made it this far there were errors. Load edit view with data
+
+      // Set error message
+      flashMsg('settings_security', '<strong>Error</strong> There was an error updating the security settings. Please try again.', 'danger');
+    }
+
+    // Get options
+    if ($optionResults = $this->settingModel->getOptions('security')) {
+
+      // Set option data
+      foreach ($optionResults as $optionData) {
+        $this->data['curr_' . $optionData->option_name] = $optionData->option_value;
+        $this->data['set_' . $optionData->option_name] = $optionData->option_value;
+
+        // Check if bool
+        if (strlen($optionData->option_value) === 1 && ($optionData->option_value == "0" || $optionData->option_value == "1")) {
+          $this->data[$optionData->option_name . '_bool'] = TRUE;
+        }
+      }
+
+      // Load view
+      $this->load->view('settings/security', $this->data, 'admin');
+      exit;
+    } // Failed to get options. Return to main settings page
+
+    // Set error
+    flashMsg('admin_settings', '<strong>Error</strong> There was an error loading the security settings. Please try again', 'warning');
+
+    // Redirect
+    redirectTo('admin/settings');
+    exit;
+  }
+
+  /**
+   * Site Settings Page
+   */
+  public function site($failedSave = FALSE)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('edit_site_settings')) {
+      // Redirect user with error
+      flashMsg('admin_settings', '<strong>Error</strong> Sorry, you are not allowed to edit the site settings. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/settings');
+      exit;
+    }
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => 'Site',
+      'href' => get_site_url('admin/settings/site')
+    );
+
+    //Check if page posted and process form if it is
+    if ($failedSave === TRUE) {
+
+      // If it's made it this far there were errors. Load edit view with data
+
+      // Set error message
+      flashMsg('settings_site', '<strong>Error</strong> There was an error updating the site settings. Please try again.', 'danger');
+    }
+
+    // Get options
+    if ($optionResults = $this->settingModel->getOptions('site')) {
+
+      // Set option data
+      foreach ($optionResults as $optionData) {
+        $this->data['curr_' . $optionData->option_name] = $optionData->option_value;
+        $this->data['set_' . $optionData->option_name] = $optionData->option_value;
+
+        // Check if bool
+        if (strlen($optionData->option_value) === 1 && ($optionData->option_value == "0" || $optionData->option_value == "1")) {
+          $this->data[$optionData->option_name . '_bool'] = TRUE;
+        }
+      }
+
+      // Load view
+      $this->load->view('settings/site', $this->data, 'admin');
+      exit;
+    } // Failed to get options. Return to main settings page
+
+    // Set error
+    flashMsg('admin_settings', '<strong>Error</strong> There was an error loading the site settings. Please try again', 'warning');
+
+    // Redirect
+    redirectTo('admin/settings');
+    exit;
+  }
+
+  /**
+   * Add-on Settings Page
+   */
+  public function addons($failedSave = FALSE)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('edit_addon_settings')) {
+      // Redirect user with error
+      flashMsg('admin_settings', '<strong>Error</strong> Sorry, you are not allowed to edit the add-on settings. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/settings');
+      exit;
+    }
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => 'Add-ons',
+      'href' => get_site_url('admin/settings/add-ons')
+    );
+
+    //Check if page posted and process form if it is
+    if ($failedSave === TRUE) {
+
+      // If it's made it this far there were errors. Load edit view with data
+
+      // Set error message
+      flashMsg('settings_site', '<strong>Error</strong> There was an error updating the add-on settings. Please try again.', 'danger');
+    }
+
+    // Get options
+    if ($optionResults = $this->settingModel->getOptions('addon')) {
+
+      // Set option data
+      foreach ($optionResults as $optionData) {
+        $this->data['curr_' . $optionData->option_name] = $optionData->option_value;
+        $this->data['set_' . $optionData->option_name] = $optionData->option_value;
+
+        // Check if bool
+        if (strlen($optionData->option_value) === 1 && ($optionData->option_value == "0" || $optionData->option_value == "1")) {
+          $this->data[$optionData->option_name . '_bool'] = TRUE;
+        }
+      }
+
+      // Load view
+      $this->load->view('settings/addon', $this->data, 'admin');
+      exit;
+    } // Failed to get options. Return to main settings page
+
+    // Set error
+    flashMsg('admin_settings', '<strong>Error</strong> There was an error loading the add-on settings. Please try again', 'warning');
 
     // Redirect
     redirectTo('admin/settings');

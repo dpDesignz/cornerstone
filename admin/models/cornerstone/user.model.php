@@ -461,8 +461,7 @@ class User
     } else {
       $this->sql .= "SELECT u.user_id,
       u.user_login,
-      u.user_first_name,
-      u.user_last_name,
+      CONCAT(u.user_first_name, ' ', u.user_last_name) AS users_name,
       u.user_email,
       r.role_id,
       r.role_name,
@@ -476,7 +475,7 @@ class User
     $this->sql .= " LEFT JOIN " . DB_PREFIX . "roles AS r ON r.role_id = u.user_role_id";
 
     // Set LEFT JOIN for the last login
-    $this->sql .= " LEFT JOIN (SELECT * FROM " . DB_PREFIX . "login_log WHERE login_status = '1' ORDER BY login_dtm DESC LIMIT 1) AS l ON l.login_user_id = u.user_id";
+    $this->sql .= " LEFT JOIN (SELECT login_user_id, MAX(login_dtm) AS login_dtm FROM " . DB_PREFIX . "login_log WHERE login_user_type = login_status = '1' GROUP BY login_user_id) AS l ON l.login_user_id = u.user_id";
 
     // Set WHERE
     $this->sql .= " WHERE u.user_status = '1'";
@@ -538,6 +537,38 @@ class User
         // Return results
         return json_decode(json_encode(array('count' => $this->conn->dbh->getNum_Rows(), 'results' => json_decode(json_encode($userResults)), FALSE)), FALSE);
       }
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Get basic list of users
+   * For use with assigning scripts
+   *
+   * @param array $params Multiple parameters as required
+   *
+   * @return object Return object with list of users
+   */
+  public function listUsersBasic()
+  {
+
+    // Run query to find users
+    $usersResults = $this->conn->dbh->selecting(
+      DB_PREFIX . "users",
+      "user_id,
+      user_first_name,
+      user_last_name,
+      CONCAT(user_first_name, ' ', user_last_name) AS users_name,
+      user_email"
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($usersResults)) {
+
+      // Return result
+      return $usersResults;
     } // No results. Return FALSE.
 
     // Return FALSE

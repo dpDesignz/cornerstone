@@ -508,7 +508,7 @@ class Users extends Controller
       }
 
       // Allowed sort fields
-      $this->canSortBy = array('username' => 'user_login', 'name' => 'user_first_name', 'email' => 'user_email', 'role' => 'role_name', 'login' => 'login_dtm');
+      $this->canSortBy = array('username' => 'user_login', 'name' => 'users_name', 'email' => 'user_email', 'role' => 'role_name', 'login' => 'login_dtm');
 
       // Check for sort
       $sortOrder = get_sort_order($this->canSortBy, array('sort' => 'user_login', 'order' => 'ASC'), ...$params);
@@ -582,7 +582,7 @@ class Users extends Controller
           // Set row output
           $dataListOut .= '<tr>
               <td>' . $data->user_login . '</td>
-              <td><strong class="item--title">' . $data->user_first_name . ' ' . $data->user_last_name . '</strong></td>
+              <td><strong class="item--title">' . $data->users_name . '</strong></td>
               <td><a href="mailto:' . $data->user_email . '">' . $data->user_email . '</a></td>
               <td>' . $outputRole . '</td>
               <td>' . $userLastLogin . '</td>
