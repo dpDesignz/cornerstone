@@ -95,24 +95,32 @@ require(get_theme_path('layout.php', 'admin')); ?>
     const searchValue = (this.value) ? this.value : '';
     // Search the array
     const matchArray = findMatches(searchValue, permissionList);
-    // Set the HTML
-    const html = matchArray
-      .map(permission => { // Highlight matches
-        const regexName = new RegExp(searchValue, 'gi');
-        const regexKey = new RegExp(searchValue.replace(/\s+/g, "_"), 'gi');
-        const nameOutput = permission.name.replace(
-          regexName,
-          `<span class="hl">${searchValue}</span>`
-        );
-        const keyOutput = permission.key.replace(
-          regexKey,
-          `<span class="hl">${searchValue.replace(/\s+/g, "_")}</span>`
-        );
-        // Return output
-        return `<p class="csc-col csc-col6">${nameOutput}</p>
+    // Init HTML
+    let html = '';
+    // Check for results
+    if (matchArray.length > 0) {
+      // Set the HTML
+      html = matchArray
+        .map(permission => { // Highlight matches
+          const regexName = new RegExp(searchValue, 'gi');
+          const regexKey = new RegExp(searchValue.replace(/\s+/g, "_"), 'gi');
+          const nameOutput = permission.name.replace(
+            regexName,
+            `<span class="hl">${searchValue}</span>`
+          );
+          const keyOutput = permission.key.replace(
+            regexKey,
+            `<span class="hl">${searchValue.replace(/\s+/g, "_")}</span>`
+          );
+          // Return output
+          return `<p class="csc-col csc-col6">${nameOutput}</p>
         <p class="csc-col csc-col6 cs-text-right">${keyOutput}</p>`;
-      })
-      .join('');
+        })
+        .join('');
+    } else {
+      // Set the HTML
+      html = `<p class="csc-col csc-col12 cs-body2">Sorry, there are no results for <strong>${searchValue}</strong>.</p>`;
+    }
     // Update HTML
     permissions.innerHTML = html;
   }

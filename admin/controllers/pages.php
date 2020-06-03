@@ -143,7 +143,7 @@ class Pages extends Controller
         $sectionName = (empty($data->section_name)) ? 'Main Site' : $data->section_name;
 
         // Set fallback for section directory
-        $sectionDirectory = (empty($data->section_directory_name)) ? '' : $data->section_directory_name . '/';
+        $sectionDirectory = (empty($data->section_location_name)) ? '' : $data->section_location_name . '/';
 
         // Set fallback for view link
         $viewLink = (!empty($data->content_slug)) ? ' | <a href="' . get_site_url($sectionDirectory . $data->content_slug) . '" target="_blank">View</a>' : '';
@@ -235,6 +235,13 @@ class Pages extends Controller
    */
   public function index(...$params)
   {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('view_page')) {
+      // Redirect user with error
+      flashMsg('admin_dashboard', '<strong>Error</strong> Sorry, you are not allowed to view pages. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin');
+      exit;
+    }
 
     // Check for search and rebuild URL
     if (isset($this->request->get['search'])) {
@@ -323,6 +330,13 @@ class Pages extends Controller
    */
   public function add()
   {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('add_page')) {
+      // Redirect user with error
+      flashMsg('admin_dashboard', '<strong>Error</strong> Sorry, you are not allowed to add pages. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/pages');
+      exit;
+    }
 
     // Process "add"
 
@@ -380,6 +394,9 @@ class Pages extends Controller
 
           // Get section data
           $this->data['section_id'] = htmlspecialchars(stripslashes(trim($_POST['section_id'])));
+
+          // Get show_updated data
+          $this->data['show_updated'] = (isset($_POST['show_updated']) && !empty($_POST['show_updated'])) ? TRUE : FALSE;
         } catch (Exception $e) {
 
           // Log error if any and set flash message
@@ -396,17 +413,31 @@ class Pages extends Controller
         // Validated
 
         // Add new page
-        if ($contentID = $this->contentModel->addPage($this->data['title'], $this->data['content'], (int) $this->data['status'], (int) $this->data['section_id'])) {
+        if ($contentID = $this->contentModel->addPage(
+          $this->data['title'],
+          $this->data['content'],
+          (int) $this->data['status'],
+          (int) $this->data['section_id'],
+          (int) $this->data['show_updated']
+        )) {
           // Added
 
           // Add page meta data
-          $this->contentModel->addPageMetaData((int) $contentID, $this->data['meta_title'], $this->data['meta_description']);
+          $this->contentModel->addPageMetaData(
+            (int) $contentID,
+            $this->data['meta_title'],
+            $this->data['meta_description']
+          );
 
           // Load the Cornerstone Core model
           $this->cornerstoneCoreModel = $this->load->model('common/cornerstonecore');
 
           // Set SEO URL
-          $this->cornerstoneCoreModel->checkSEOURL((int) 0, (int) $contentID, $this->data['title']);
+          $this->cornerstoneCoreModel->checkSEOURL(
+            (int) 0,
+            (int) $contentID,
+            $this->data['title']
+          );
 
           // Set success message
           flashMsg('admin_pages', '<strong>Success</strong> The "' . $this->data['title'] . '" page was added successfully');
@@ -508,6 +539,13 @@ class Pages extends Controller
    */
   public function edit(...$params)
   {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('edit_page')) {
+      // Redirect user with error
+      flashMsg('admin_dashboard', '<strong>Error</strong> Sorry, you are not allowed to edit pages. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/pages');
+      exit;
+    }
 
     // Process "edit"
 
@@ -574,6 +612,9 @@ class Pages extends Controller
 
             // Get section data
             $this->data['section_id'] = htmlspecialchars(stripslashes(trim($_POST['section_id'])));
+
+            // Get show_updated data
+            $this->data['show_updated'] = (isset($_POST['show_updated']) && !empty($_POST['show_updated'])) ? TRUE : FALSE;
           } catch (Exception $e) {
 
             // Log error if any and set flash message
@@ -593,11 +634,22 @@ class Pages extends Controller
           $dataID = $this->data['id'];
 
           // Update
-          if ($this->contentModel->editPage((int) $dataID, $this->data['title'], $this->data['content'], (int) $this->data['status'], (int) $this->data['section_id'])) {
+          if ($this->contentModel->editPage(
+            (int) $dataID,
+            $this->data['title'],
+            $this->data['content'],
+            (int) $this->data['status'],
+            (int) $this->data['section_id'],
+            (int) $this->data['show_updated']
+          )) {
             // Updated
 
             // Edit page meta data
-            $this->contentModel->editPageMetaData((int) $dataID, $this->data['meta_title'], $this->data['meta_description']);
+            $this->contentModel->editPageMetaData(
+              (int) $dataID,
+              $this->data['meta_title'],
+              $this->data['meta_description']
+            );
 
             // Set success message
             flashMsg('admin_pages', '<strong>Success</strong> The "' . $this->data['title'] . '" page was updated successfully.');
@@ -644,7 +696,7 @@ class Pages extends Controller
           }
 
           // Set fallback for section directory
-          $sectionDirectory = (empty($this->data['section_directory_name'])) ? '' : $this->data['section_directory_name'] . '/';
+          $sectionDirectory = (empty($this->data['section_location_name'])) ? '' : $this->data['section_location_name'] . '/';
 
           // Set fallback for view link
           $this->data['viewLink'] = (!empty($this->data['slug'])) ? get_site_url($sectionDirectory . $this->data['slug']) : '';

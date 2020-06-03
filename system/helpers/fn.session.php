@@ -192,6 +192,18 @@ function userPageProtect($logout = FALSE)
         // Authenticate user
         $userAuth->authenticateUser();
 
+        // Get global $role
+        global $role;
+
+        // Re-generate role permissions
+        $role->setUserPermissions((int) $userID);
+
+        // Get global $registry
+        global $registry;
+
+        // Set role to registry
+        $registry->set('role', $role);
+
         // Return TRUE
         return TRUE;
       } // Cookie is expired. Delete cookie and return FALSE.

@@ -69,11 +69,27 @@ function removeLabelActive(e) {
     }
   }
 }
+// Add active class listeners
+function addLabelListeners(t) {
+  ['change', 'focus'].forEach(evt =>
+    t.addEventListener(evt, function () {
+      addLabelActive(this);
+    })
+  );
+  t.addEventListener('blur', function () {
+    removeLabelActive(this);
+  });
+  // Add "active" class if input has value or placeholder
+  if (t.value !== '') {
+    addLabelActive(t);
+  }
+}
 
 // Add Jquery Validator Defaults
 if ($.validator !== undefined) {
   // Set default jQuery validator settings
   jQuery.validator.setDefaults({
+    ignore: ':hidden:not(select)',
     errorClass: 'invalid',
     errorElement: 'span',
     errorPlacement(error, element) {

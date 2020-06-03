@@ -17,7 +17,7 @@ $pageMetaType = "website";
 $pageHasForm = TRUE;
 $pageHeadExtras = '';
 $pageFooterExtras = '<script>
-  $("#type, #directory_name").chosen({
+  $("#type, #location_name").chosen({
     width: "100%",
     disable_search: true,
     allow_single_deselect: true
@@ -75,10 +75,10 @@ require(get_theme_path('layout.php', 'admin')); ?>
         </div>
         <div class="csc-row csc-row--no-pad">
           <div class="csc-col csc-col12 csc-input-field">
-            <select name="directory_name" id="directory_name" data-placeholder="Select a section directory" tabindex="3">
-              <?php echo $data->directory_options; ?>
+            <select name="location_name" id="location_name" data-placeholder="Select a section location" tabindex="3">
+              <?php echo $data->location_options; ?>
             </select>
-            <label>Directory</label>
+            <label>Location</label>
           </div>
         </div>
       </fieldset>
@@ -99,7 +99,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
     <h5 class="cs-h5">Form Fields</h5>
     <p class="cs-body2"><strong>Section Name: </strong> The name of the section.</p>
     <p class="cs-body2"><strong>Type: </strong> The type of the section.</p>
-    <p class="cs-body2"><strong>Directory: </strong> <em>(optional)</em> The directory of the section. Leave blank to assign to the main site.</p>
+    <p class="cs-body2"><strong>Location: </strong> <em>(optional)</em> The location of the section. Leave blank to assign to the main site.</p>
     <p class="cs-caption cs-text-grey cs-text-center cs-my-0"><em>*notes a required field</em></p>
   </section>
 </div>

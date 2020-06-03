@@ -558,6 +558,7 @@ class User
     $usersResults = $this->conn->dbh->selecting(
       DB_PREFIX . "users",
       "user_id,
+      user_display_name,
       user_first_name,
       user_last_name,
       CONCAT(user_first_name, ' ', user_last_name) AS users_name,

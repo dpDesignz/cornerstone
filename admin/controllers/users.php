@@ -475,6 +475,13 @@ class Users extends Controller
    */
   public function index(...$params)
   {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('view_user')) {
+      // Redirect user with error
+      flashMsg('admin_dashboard', '<strong>Error</strong> Sorry, you are not allowed to view users. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin');
+      exit;
+    }
 
     // Check if user is logged in
     if (!userPageProtect()) {

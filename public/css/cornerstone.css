@@ -4674,25 +4674,34 @@ body.cs-component__badge .csc-badge--framed {
   background-color: #757575;
   border-radius: 2px;
 }
-body.cs-components .csc-badge--framed-green,
-body.cs-component__badge .csc-badge--framed-green {
+body.cs-components .csc-badge--framed-green, body.cs-components .csc-badge--framed-success,
+body.cs-component__badge .csc-badge--framed-green,
+body.cs-component__badge .csc-badge--framed-success {
   color: #1B5E20 !important;
   background-color: #A5D6A7 !important;
 }
-body.cs-components .csc-badge--framed-red,
-body.cs-component__badge .csc-badge--framed-red {
+body.cs-components .csc-badge--framed-red, body.cs-components .csc-badge--framed-danger,
+body.cs-component__badge .csc-badge--framed-red,
+body.cs-component__badge .csc-badge--framed-danger {
   color: #B71C1C !important;
   background-color: #EF9A9A !important;
 }
-body.cs-components .csc-badge--framed-blue,
-body.cs-component__badge .csc-badge--framed-blue {
+body.cs-components .csc-badge--framed-blue, body.cs-components .csc-badge--framed-info,
+body.cs-component__badge .csc-badge--framed-blue,
+body.cs-component__badge .csc-badge--framed-info {
   color: #0D47A1 !important;
   background-color: #90CAF9 !important;
 }
-body.cs-components .csc-badge--framed-orange,
-body.cs-component__badge .csc-badge--framed-orange {
+body.cs-components .csc-badge--framed-orange, body.cs-components .csc-badge--framed-warning,
+body.cs-component__badge .csc-badge--framed-orange,
+body.cs-component__badge .csc-badge--framed-warning {
   color: #e65100 !important;
   background-color: #ffcc80 !important;
+}
+body.cs-components .csc-badge--framed-light,
+body.cs-component__badge .csc-badge--framed-light {
+  color: #212121 !important;
+  background-color: #e0e0e0 !important;
 }
 body.cs-components .csc-badge--framed-new::after,
 body.cs-component__badge .csc-badge--framed-new::after {
@@ -9265,6 +9274,32 @@ body.cs-component__pagination .cs-pagitem--disabled > a {
   line-height: 16px;
   padding: 8px 10px;
   overflow: hidden;
+}
+
+/* Toastify ~ https://apvarun.github.io/toastify-js/ */
+.toastify-primary {
+  background: linear-gradient(to right, #0d47a1, #42a5f5);
+}
+.toastify-secondary {
+  background: linear-gradient(to right, #212121, #bdbdbd);
+}
+.toastify-success {
+  background: linear-gradient(to right, #00b09b, #96c93d);
+}
+.toastify-warning {
+  background: linear-gradient(to right, #ff6f00, #ffeb3b);
+}
+.toastify-danger {
+  background: linear-gradient(to right, #c40c05, #dd1458);
+}
+.toastify-info {
+  background: linear-gradient(to right, #0091ea, #80d8ff);
+}
+.toastify-light {
+  background: linear-gradient(to right, #757575, #f5f5f5);
+}
+.toastify-dark {
+  background: linear-gradient(to right, #212121, #616161);
 }
 
 /* Tooltipster Styling ~ http://iamceege.github.io/tooltipster/#styling */

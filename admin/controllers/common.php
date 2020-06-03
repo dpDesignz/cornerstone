@@ -3,23 +3,6 @@ class Common extends Controller
 {
 
   /**
-   * Class Constructor
-   */
-  public function __construct($registry)
-  {
-    // Load the controller constructor
-    parent::__construct($registry);
-
-    // Set role if logged in
-    if (isLoggedInUser()) {
-      // $this->role->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
-
-      // echo ($this->role->isMasterUser()) ? 'You are a master' : 'You are not a master';
-      // exit;
-    }
-  }
-
-  /**
    * Index Page
    */
   public function index()
@@ -46,7 +29,49 @@ class Common extends Controller
     } else { // Output dashboard
 
       // Load Dashboard
-      $this->load->view('common/dashboard', '', 'admin');
+      $this->load->view('common/dashboard', $this->data, 'admin');
+    }
+  }
+
+  /**
+   * Progress Page
+   */
+  public function progress()
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('view_progress')) {
+      // Redirect user with error
+      flashMsg('admin_dashboard', '<strong>Error</strong> Sorry, you are not allowed to view the site progress. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin');
+      exit;
+    }
+
+    // Check if user is logged in
+    if (!userPageProtect()) {
+
+      // If user is not logged in, show the login page
+      // Only show error if page isn't direct access
+      if ($_SERVER['REQUEST_URI'] != "/admin/") {
+        flashMsg('admin_login', 'You need to log in first.', 'warning');
+      }
+      $this->load->view('common/login', '', 'admin');
+      exit;
+    } else { // Output dashboard
+
+      // Set Breadcrumbs
+      $this->data['breadcrumbs'] = array(
+        array(
+          'text' => 'Dashboard',
+          'href' => get_site_url('admin')
+        ),
+        array(
+          'text' => 'Progress',
+          'href' => get_site_url('admin/progress')
+        )
+      );
+
+      // Load view
+      $this->load->view('pages/progress', $this->data, 'admin');
     }
   }
 
@@ -100,7 +125,7 @@ class Common extends Controller
 
           // Log error if any and set flash message
           error_log($e->getMessage(), 0);
-          flashMsg('admin_login', '<strong>Error</strong> - There was an error with your login. Please try again', 'warning');
+          flashMsg('admin_login', '<strong>Error</strong> There was an error with your login. Please try again', 'warning');
         }
       } else { // If data not set, set errors
 
@@ -217,14 +242,14 @@ class Common extends Controller
           }
 
           // Result wasn't success ("1") or authorization ("2"). Set error and continue down to loading login view with data
-          flashMsg('admin_login', '<strong>Error</strong> - There was an error logging you in. Please try again.', 'warning');
+          flashMsg('admin_login', '<strong>Error</strong> There was an error logging you in. Please try again.', 'warning');
         } else { // Set failed login and error and continue down to loading login view with data
 
           // Set failed login
           $this->userAuthModel->setLoginLog(0);
 
           // Set error
-          flashMsg('admin_login', '<strong>Error</strong> - There was an error logging you in. Please try again.', 'warning');
+          flashMsg('admin_login', '<strong>Error</strong> There was an error logging you in. Please try again.', 'warning');
         }
       }
 
@@ -430,13 +455,5 @@ class Common extends Controller
       // Errors with authorization. Redirect to login page
       redirectTo('admin/login');
     }
-  }
-
-  /**
-   * Notifications Page
-   */
-  public function notifications(...$params)
-  {
-    // Check if page is posted
   }
 }

@@ -41,9 +41,9 @@ class Page extends Controller
           // Page exists
 
           // Check if directory name is set
-          if (!empty($pageData->section_directory_name)) {
+          if (!empty($pageData->content->section_location_name)) {
             // Directory set. Redirect user to correct page loader
-            redirectTo($pageData->section_directory_name . "/" . $seoData->seo_keyword);
+            redirectTo($pageData->content->section_location_name . "/" . $seoData->seo_keyword);
             exit;
           }
 

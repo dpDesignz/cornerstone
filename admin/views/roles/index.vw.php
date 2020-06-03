@@ -43,7 +43,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
       <h1>Add a Role</h1>
       <p id="no-index-data__tag">Add a user role to define what users can do</p>
       <?php if ($role->canDo('add_user_role')) { ?>
-        <p id="no-index-data__btn"><a class="csc-btn" href="<?php echo get_site_url('admin/roles/add'); ?>" data-tippy-content="Add a user"><i class="material-icons csc-bi-left">add</i> Add user</a></p>
+        <p id="no-index-data__btn"><a class="csc-btn" href="<?php echo get_site_url('admin/roles/add'); ?>" data-tippy-content="Add a user role"><i class="material-icons csc-bi-left">add</i> Add role</a></p>
       <?php } ?>
       <span id="no-index-data__icon"><i class="fas fa-user-lock"></i></span>
     </div>

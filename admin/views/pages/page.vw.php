@@ -118,6 +118,16 @@ require(get_theme_path('layout.php', 'admin')); ?>
           <label>Section (optional)</label>
         </div>
       </div>
+      <div class="csc-row csc-row--no-pad">
+        <div class="csc-col csc-col12 cs-text-center csc-input-field">
+          <p class="cs-my-0">
+            <label>
+              <input type="checkbox" name="show_updated" id="show_updated" tabindex="7" <?php if (!empty($data->show_updated) && $data->show_updated) echo ' checked'; ?>>
+              <span>Show "updated" on page <i class="far fa-question-circle" data-tippy-content="Tick this if you want to display a 'Page update...' message on the bottom of the page."></i></span>
+            </label>
+          </p>
+        </div>
+      </div>
       <?php
       // Output ID if set
       if (!empty($data->viewLink)) { ?>
@@ -125,7 +135,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
       <?php } ?>
       <div class="csc-row csc-row--no-gap">
         <div class="csc-col csc-col12 csc-col--md6 cs-my-1 cs-mb-3"><a href="<?php echo get_site_url('admin/pages/'); ?>" class="csc-btn--flat"><span>Cancel</span></a></div>
-        <div class="csc-col csc-col12 cs-text-right csc-col--md6 cs-my-1 cs-mb-3"><button type="submit" name="action" tabindex="7" value="save" class="csc-btn csc-btn--success">Save <i class="fas fa-save csc-bi-right"></i></button></div>
+        <div class="csc-col csc-col12 cs-text-right csc-col--md6 cs-my-1 cs-mb-3"><button type="submit" name="action" tabindex="8" value="save" class="csc-btn csc-btn--success">Save <i class="fas fa-save csc-bi-right"></i></button></div>
       </div>
       <hr>
       <h4 class="cs-h4">Form Details</h4>

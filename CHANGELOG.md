@@ -1,5 +1,18 @@
 # Cornerstone Change Log
 
+## 0.2.26 - Styling (2020-05-15)
+
+- ➕ Added extra checks to the `userPageProtect()` function to make sure roles were set between sessions
+- ➕ Added the ability to show page updated on page
+- 🧹 Fixed bug where page wouldn't redirect properly if in wrong directory
+- 🖊️ Changed the `section_location_name` column to `section_location_name` in the `cs_content_section` table
+- 🖊️ Changed section "directory" to "location"
+
+## 0.2.25 - Styling (2020-04-27)
+
+- ➕ Added `toastify-xxx` style classes
+- ➕ Added validation for "chosen" fields
+
 ## 0.2.24 - Settings + Role Permissions (2020-04-16)
 
 - 🧹 Fixed bug when viewing the user list and the last login date wasn't populating

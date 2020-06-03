@@ -45,7 +45,7 @@ class Content
         "section_id,
         section_name,
         section_type,
-        section_directory_name",
+        section_location_name",
         where(
           eq('section_id', $sectionID)
         )
@@ -79,6 +79,9 @@ class Content
     // Build query
     $this->sql = array();
     $this->whereArray = array();
+
+    // Set section type not menu
+    $this->whereArray[] = neq("section_type", "5", _AND);
 
     // Check for search
     if (!empty($params['search'])) {
@@ -122,7 +125,7 @@ class Content
         "section_id,
         section_name,
         section_type,
-        section_directory_name",
+        section_location_name",
         ...$this->sql
       );
     }
@@ -143,11 +146,11 @@ class Content
    *
    * @param string $name Name of the section
    * @param int $type Type of section
-   * @param string $directoryName `[optional]` Directory of the section. Defaults to "null"
+   * @param string $locationName `[optional]` Location of the section. Defaults to "null"
    *
    * @return bool|int Will return FALSE if failed or true if successful.
    */
-  public function addSection(string $name, int $type, string $directoryName = null)
+  public function addSection(string $name, int $type, string $locationName = null)
   {
 
     // Add data into `cs_content_section`
@@ -156,7 +159,7 @@ class Content
       array(
         'section_name' => $name,
         'section_type' => $type,
-        'section_directory_name' => $directoryName,
+        'section_location_name' => $locationName,
         'section_added_id' => $_SESSION['_cs']['user']['uid'],
         'section_added_dtm' => date('Y-m-d H:i:s')
       )
@@ -179,11 +182,11 @@ class Content
    * @param int $sectionID ID of the section
    * @param string $name Name of the section
    * @param int $type Type of section
-   * @param string $directoryName `[optional]` Directory of the section. Defaults to "null"
+   * @param string $locationName `[optional]` Location of the section. Defaults to "null"
    *
    * @return int Will return FALSE if failed or TRUE if successful.
    */
-  public function editSection(int $sectionID, string $name, int $type, string $directoryName = null)
+  public function editSection(int $sectionID, string $name, int $type, string $locationName = null)
   {
 
     // Make sure the ID is a number
@@ -195,7 +198,7 @@ class Content
         array(
           'section_name' => $name,
           'section_type' => $type,
-          'section_directory_name' => $directoryName,
+          'section_location_name' => $locationName,
           'section_edited_id' => $_SESSION['_cs']['user']['uid'],
           'section_edited_dtm' => date('Y-m-d H:i:s')
         ),
@@ -237,8 +240,9 @@ class Content
         c.content_title,
         c.content_content,
         c.content_status,
+        c.content_show_updated,
         cs.section_id,
-        cs.section_directory_name,
+        cs.section_location_name,
         (SELECT seo_keyword FROM cs_seo_url WHERE seo_type_id = c.content_id AND seo_type = '0' ORDER BY seo_id DESC LIMIT 1) AS content_slug",
         leftJoin("c", DB_PREFIX . "content_section", "content_section_id", "section_id", "cs"),
         where(
@@ -362,7 +366,7 @@ class Content
         c.content_edited_dtm,
         cs.section_id,
         cs.section_name,
-        cs.section_directory_name,
+        cs.section_location_name,
         CONCAT(ua.user_first_name, ' ', ua.user_last_name) AS added_by,
         CONCAT(ue.user_first_name, ' ', ue.user_last_name) AS edited_by,
         (SELECT seo_keyword FROM cs_seo_url WHERE seo_type_id = c.content_id AND seo_type = '0' ORDER BY seo_id DESC LIMIT 1) AS content_slug",
@@ -420,10 +424,11 @@ class Content
    * @param string $content Content of the page
    * @param int $status Status of the page
    * @param int $sectionID `[optional]` Section ID of the page. Defaults to "0"
+   * @param int $showUpdated `[optional]` If page is mean to show updated message. Defaults to "0"
    *
    * @return bool|int Will return FALSE if failed or inserted ID if successful.
    */
-  public function addPage(string $title, string $content, int $status, int $sectionID = 0)
+  public function addPage(string $title, string $content, int $status, int $sectionID = 0, int $showUpdated = 0)
   {
 
     // Add data into `cs_content`
@@ -435,6 +440,7 @@ class Content
         'content_status' => $status,
         'content_type' => '0',
         'content_section_id' => $sectionID,
+        'content_show_updated' => $showUpdated,
         'content_added_id' => $_SESSION['_cs']['user']['uid'],
         'content_added_dtm' => date('Y-m-d H:i:s')
       )
@@ -524,10 +530,11 @@ class Content
    * @param string $content Content of the page
    * @param int $status Status of the page
    * @param int $sectionID `[optional]` Section ID of the page. Defaults to "0"
+   * @param int $showUpdated `[optional]` If page is mean to show updated message. Defaults to "0"
    *
    * @return int Will return FALSE if failed or TRUE if successful.
    */
-  public function editPage(int $pageID, string $title, string $content, int $status, int $sectionID = 0)
+  public function editPage(int $pageID, string $title, string $content, int $status, int $sectionID = 0, int $showUpdated = 0)
   {
 
     // Make sure the ID is a number
@@ -541,6 +548,7 @@ class Content
           'content_content' => $content,
           'content_status' => $status,
           'content_section_id' => $sectionID,
+          'content_show_updated' => $showUpdated,
           'content_edited_id' => $_SESSION['_cs']['user']['uid'],
           'content_edited_dtm' => date('Y-m-d H:i:s')
         ),

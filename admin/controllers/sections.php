@@ -73,7 +73,7 @@ class Sections extends Controller
     ############################
 
     // Allowed sort fields
-    $this->canSortBy = array('name' => 'section_name', 'directory' => 'section_directory_name', 'type' => 'section_type');
+    $this->canSortBy = array('name' => 'section_name', 'location' => 'section_location_name', 'type' => 'section_type');
 
     // Check for sort
     $sortOrder = get_sort_order($this->canSortBy, array('sort' => 'section_name', 'order' => 'ASC'), ...$params);
@@ -129,8 +129,8 @@ class Sections extends Controller
       // Loop through data
       foreach ($dataList->results as $data) {
 
-        // Set fallback for section directory
-        $sectionDirectory = (empty($data->section_directory_name)) ? 'Main Site' : $data->section_directory_name . '/';
+        // Set fallback for section location
+        $sectionLocation = (empty($data->section_location_name)) ? 'Main Site' : $data->section_location_name . '/';
 
         // Set section type
         switch ((int) $data->section_type) {
@@ -147,8 +147,9 @@ class Sections extends Controller
         $dataListOut .= '<tr class="has-hover-item">
             <td>
               <strong class="item--title"><a href="' . get_site_url('admin/sections/edit/' . $data->section_id) . '" data-tippy-content="Edit ' . htmlspecialchars_decode($data->section_name) . '">' . htmlspecialchars_decode($data->section_name) . ' <span class="hover-item"><i class="fas fa-edit"></i></span></a></strong>
+
             </td>
-            <td>' . $sectionDirectory . '</td>
+            <td>' . $sectionLocation . '</td>
             <td>' . $sectionType . '</td>
           </tr>';
       }
@@ -194,6 +195,13 @@ class Sections extends Controller
    */
   public function index(...$params)
   {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('view_section')) {
+      // Redirect user with error
+      flashMsg('admin_dashboard', '<strong>Error</strong> Sorry, you are not allowed to view sections. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin');
+      exit;
+    }
 
     // Check for search and rebuild URL
     if (isset($this->request->get['search'])) {
@@ -213,9 +221,9 @@ class Sections extends Controller
    * Set Add Page Data
    *
    * @param int $setType `[optional]` Type of section. Defaults to page.
-   * @param string $setDirectory `[optional]` Directory of section. Defaults to null (Main).
+   * @param string $setLocation `[optional]` Location of section. Defaults to null (Main).
    */
-  protected function setAddData(int $setType = 0, string $setDirectory = null)
+  protected function setAddData(int $setType = 0, string $setLocation = null)
   {
 
     // Page Type
@@ -251,29 +259,29 @@ class Sections extends Controller
     // Set type list options to data
     $this->data['type_options'] = $typeOptions;
 
-    ###########################
-    ####    DIRECTORIES    ####
-    ###########################
+    #########################
+    ####    LOCATIONS    ####
+    #########################
 
-    // Init directory options
-    $directoryOptions = '<option></option>';
+    // Init location options
+    $locationOptions = '<option></option>';
     // Get list of types for assigning
-    foreach (ALLOWED_SUBFOLDERS as $directory => $defaults) {
+    foreach (ALLOWED_SUBFOLDERS as $location => $defaults) {
 
       // Skip Admin folder
-      if (strtolower($directory) !== 'admin') {
+      if (strtolower($location) !== 'admin') {
 
         // Set selected if chosen type
-        $selected = (!empty($setDirectory) && $setDirectory == $directory) ? ' selected' : '';
+        $selected = (!empty($setLocation) && $setLocation == $location) ? ' selected' : '';
 
         // Set to output
-        $directoryOptions .= '<option value="' . strtolower($directory) . '"' . $selected . '>' . ucwords($directory) . '</option>';
+        $locationOptions .= '<option value="' . strtolower($location) . '"' . $selected . '>' . ucwords($location) . '</option>';
       }
     }
     // Set blank fallback
-    $directoryOptions = ($directoryOptions !== '<option></option>') ? $directoryOptions : $directoryOptions . '<option disabled>There are currently no directories available to assign this section to.</option>';
-    // Set directory list options to data
-    $this->data['directory_options'] = $directoryOptions;
+    $locationOptions = ($locationOptions !== '<option></option>') ? $locationOptions : $locationOptions . '<option disabled>There are currently no directories available to assign this section to.</option>';
+    // Set location list options to data
+    $this->data['location_options'] = $locationOptions;
   }
 
   /**
@@ -281,6 +289,13 @@ class Sections extends Controller
    */
   public function add()
   {
+    // Check user is allowed to add_section this
+    if (!$this->role->canDo('view_section')) {
+      // Redirect user with error
+      flashMsg('admin_sections', '<strong>Error</strong> Sorry, you are not allowed to add sections. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/sections');
+      exit;
+    }
 
     // Process "add"
 
@@ -313,8 +328,8 @@ class Sections extends Controller
             $this->data['err']['type'] = 'Please select a valid section type';
           }
 
-          // Get directory data
-          $this->data['directory_name'] = htmlspecialchars(stripslashes(trim($_POST['directory_name'])));
+          // Get location data
+          $this->data['location_name'] = htmlspecialchars(stripslashes(trim($_POST['location_name'])));
         } catch (Exception $e) {
 
           // Log error if any and set flash message
@@ -331,7 +346,7 @@ class Sections extends Controller
         // Validated
 
         // Add new section
-        if ($this->contentModel->addSection($this->data['name'], (int) $this->data['type'], $this->data['directory_name'])) {
+        if ($this->contentModel->addSection($this->data['name'], (int) $this->data['type'], $this->data['location_name'])) {
           // Added
 
           // Set success message
@@ -349,7 +364,7 @@ class Sections extends Controller
       // If it's made it this far there were errors. Load add view with submitted data
 
       // Set Add Data
-      $this->setAddData((int) $this->data['type'], $this->data['directory_name']);
+      $this->setAddData((int) $this->data['type'], $this->data['location_name']);
     } else { // Page wasn't posted. Load view.
 
       // Set Add Data
@@ -365,9 +380,9 @@ class Sections extends Controller
    * Set Edit Page Data
    *
    * @param int $setType Type of section.
-   * @param string $setDirectory `[optional]` Directory of section. Defaults to null (Main).
+   * @param string $setLocation `[optional]` Location of section. Defaults to null (Main).
    */
-  protected function setEditData(int $setType, string $setDirectory = null)
+  protected function setEditData(int $setType, string $setLocation = null)
   {
 
     // Page Type
@@ -403,29 +418,29 @@ class Sections extends Controller
     // Set type list options to data
     $this->data['type_options'] = $typeOptions;
 
-    ###########################
-    ####    DIRECTORIES    ####
-    ###########################
+    #########################
+    ####    LOCATIONS    ####
+    #########################
 
-    // Init directory options
-    $directoryOptions = '<option></option>';
+    // Init location options
+    $locationOptions = '<option></option>';
     // Get list of types for assigning
-    foreach (ALLOWED_SUBFOLDERS as $directory => $defaults) {
+    foreach (ALLOWED_SUBFOLDERS as $location => $defaults) {
 
       // Skip Admin folder
-      if (strtolower($directory) !== 'admin') {
+      if (strtolower($location) !== 'admin') {
 
         // Set selected if chosen type
-        $selected = (!empty($setDirectory) && $setDirectory == $directory) ? ' selected' : '';
+        $selected = (!empty($setLocation) && $setLocation == $location) ? ' selected' : '';
 
         // Set to output
-        $directoryOptions .= '<option value="' . strtolower($directory) . '"' . $selected . '>' . ucwords($directory) . '</option>';
+        $locationOptions .= '<option value="' . strtolower($location) . '"' . $selected . '>' . ucwords($location) . '</option>';
       }
     }
     // Set blank fallback
-    $directoryOptions = ($directoryOptions !== '<option></option>') ? $directoryOptions : $directoryOptions . '<option disabled>There are currently no directories available to assign this section to.</option>';
-    // Set directory list options to data
-    $this->data['directory_options'] = $directoryOptions;
+    $locationOptions = ($locationOptions !== '<option></option>') ? $locationOptions : $locationOptions . '<option disabled>There are currently no directories available to assign this section to.</option>';
+    // Set location list options to data
+    $this->data['location_options'] = $locationOptions;
   }
 
   /**
@@ -433,6 +448,13 @@ class Sections extends Controller
    */
   public function edit(...$params)
   {
+    // Check user is allowed to add_section this
+    if (!$this->role->canDo('edit_section')) {
+      // Redirect user with error
+      flashMsg('admin_sections', '<strong>Error</strong> Sorry, you are not allowed to edit sections. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/sections');
+      exit;
+    }
 
     // Process "edit"
 
@@ -474,8 +496,8 @@ class Sections extends Controller
               $this->data['err']['type'] = 'Please select a valid section type';
             }
 
-            // Get directory data
-            $this->data['directory_name'] = htmlspecialchars(stripslashes(trim($_POST['directory_name'])));
+            // Get location data
+            $this->data['location_name'] = htmlspecialchars(stripslashes(trim($_POST['location_name'])));
           } catch (Exception $e) {
 
             // Log error if any and set flash message
@@ -495,7 +517,7 @@ class Sections extends Controller
           $dataID = $this->data['id'];
 
           // Update
-          if ($this->contentModel->editSection((int) $dataID, $this->data['name'], (int) $this->data['type'], $this->data['directory_name'])) {
+          if ($this->contentModel->editSection((int) $dataID, $this->data['name'], (int) $this->data['type'], $this->data['location_name'])) {
             // Updated
 
             // Set success message
@@ -514,7 +536,7 @@ class Sections extends Controller
         // If it's made it this far there were errors. Load edit view with data
 
         // Set edit data
-        $this->setEditData((int) $this->data['type'], $this->data['directory_name']);
+        $this->setEditData((int) $this->data['type'], $this->data['location_name']);
 
         // Load view
         $this->load->view('sections/section', $this->data, 'admin');
@@ -540,7 +562,7 @@ class Sections extends Controller
           }
 
           // Set Edit Data
-          $this->setEditData((int) $this->data['type'], $this->data['directory_name']);
+          $this->setEditData((int) $this->data['type'], $this->data['location_name']);
 
           // Load view
           $this->load->view('sections/section', $this->data, 'admin');

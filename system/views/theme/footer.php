@@ -13,6 +13,12 @@
 <!-- Tippy ~ https://atomiks.github.io/tippyjs/ -->
 <script src="https://unpkg.com/@popperjs/core@2"></script>
 <script src="https://unpkg.com/tippy.js@6"></script>
+<!-- Toastify ~ https://apvarun.github.io/toastify-js/ -->
+<script src="//cdn.jsdelivr.net/npm/toastify-js"></script>
+<!-- lazysizes ~ https://github.com/aFarkas/lazysizes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async=""></script>
+<!-- Sweet Alert ~ https://sweetalert.js.org/ -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <?php if (!empty($pageHasForm) && $pageHasForm === TRUE) : ?>
   <!-- Validation ~ https://github.com/jquery-validation/jquery-validation -->
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js" integrity="sha256-sPB0F50YUDK0otDnsfNHawYmA5M0pjjUf4TvRJkGFrI=" crossorigin="anonymous"></script>
@@ -31,10 +37,6 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.6.4/compressed/picker.js" integrity="sha256-Ir/Txs2EGYQz5HcltQCu06WpUQRhmU4tgHHYbNV0+Cs=" crossorigin="anonymous"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.6.4/compressed/picker.date.js" integrity="sha256-WpEr1Ovyxho8DRYP1DyZgjVonSAGF4uDVVZXoe379vw=" crossorigin="anonymous"></script>
 <?php endif; ?>
-<!-- Perfect Scrollbar ~ https://github.com/mdbootstrap/perfect-scrollbar -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.4.0/perfect-scrollbar.min.js" integrity="sha256-pOydVY7re8c1n+fEgg3uoslR/di9NMsOFXJ0Esf2xjQ=" crossorigin="anonymous"></script>
-<!-- lazysizes ~ https://github.com/mdbootstrap/perfect-scrollbar -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async=""></script>
 <!-- Cornerstone Scripts -->
 <script src="<?php echo get_site_url('js/cornerstone.js'); ?>"></script>
 <!-- User Scripts -->

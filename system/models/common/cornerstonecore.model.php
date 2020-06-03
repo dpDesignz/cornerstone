@@ -260,7 +260,7 @@ class CornerstoneCore
         "c.*,
         cs.section_name,
         cs.section_type,
-        cs.section_directory_name",
+        cs.section_location_name",
         leftJoin(
           "c",
           "cs_content_section",
