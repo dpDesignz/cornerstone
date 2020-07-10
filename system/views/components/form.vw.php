@@ -31,8 +31,16 @@ require(get_theme_path('head.php')); ?>
       <legend>Standard Form Elements</legend>
       <div class="csc-row">
         <div class="csc-col csc-col12 csc-input-field">
-          <input type="text" name="demo_text" id="demo_text" autocapitalize="on" tabindex="1" required>
-          <label for="demo_text">Demo Text*</label>
+          <input type="text" name="demo_text_f" id="demo_text_f" autocapitalize="on" tabindex="1" required>
+          <label for="demo_text_f">Demo Text (floating)*</label>
+          <i class="fas fa-question-circle csc-hint" data-tippy-content="This is a hint"></i>
+        </div>
+      </div>
+      <div class="csc-row">
+        <div class="csc-col csc-col12 csc-input-field csc-ifta">
+          <label for="demo_text_ifta">Demo Text (ifta)*</label>
+          <input type="text" name="demo_text_ifta" id="demo_text_ifta" class="csc-ifta__field" autocapitalize="on" tabindex="1" placeholder="Enter your demo text" required>
+          <i class="fas fa-question-circle csc-hint" data-tippy-content="This is a hint"></i>
         </div>
       </div>
       <div class="csc-row">
@@ -88,6 +96,29 @@ require(get_theme_path('head.php')); ?>
 </div>
 <!-- End Main ~#~ Start Footer -->
 
+<script>
+  // Init validation on document ready
+  $(document).ready(function() {
+    let validator = $("#demo-form").validate({
+      rules: {
+        demo_text_f: {
+          required: true
+        },
+        demo_text_ifta: {
+          required: true
+        }
+      },
+      messages: {
+        demo_text_f: {
+          required: "Please select a demo text"
+        },
+        demo_text_ifta: {
+          required: "Please select a demo text"
+        }
+      }
+    });
+  });
+</script>
 <?php
 // Load html footer
 require(get_theme_path('footer.php')); ?>

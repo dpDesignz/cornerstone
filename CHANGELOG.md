@@ -1,5 +1,77 @@
 # Cornerstone Change Log
 
+## 0.3.05 - Sections + FAQ + Menu (2020-07-10)
+
+- ➕ Added the ability to edit FAQ sections
+- ➕ Added the ability to see menu and FAQ section item counts from the section list
+
+## 0.3.04 - Labels + FAQ (2020-07-04)
+
+- 🧹 Fixed bug if jQuery modal failed to load
+- ➕ Added the "Infield Top Aligned" (`.csc-ifa`) input field styling classes
+- ➕ Added the `.csc-hint` class for adding a hint icon to the end of an input field
+- 🧹 Fixed bug when trying to remove an FAQ item from and FAQ section from the FAQ page
+- ➕ Added the scroll to element from hash function in the core `cornerstone.js` file
+- ➕ Added the `addid` option to the page editor
+
+## 0.3.03 - Sections + FAQ + Menu (2020-06-26)
+
+- ➕ Added initial debugging to the core `cornerstone.js` file
+- 🧹 Fixed bug when saving menu items would clear them
+- ➕ Added the ability to set a slug for an FAQ
+- ➕ Added the ability to edit an FAQ
+- ➕ Added the ability to output an FAQ section using the `$contentOP->outputFAQSection()` method
+- ➕ Added the `toggleFAQCollapsible` function to the core `cornerstone.js` file
+- ➕ Added the ability to check for FAQ Section and FAQ items in a page using the `$contentOP->checkStringFAQ()` method
+- ➕ Added the ability to output an FAQ item using the `$contentOP->outputFAQ()` method
+- ➕ Added the `menui_custom_title` column to the `cs_content_menu` table
+- ➕ Added the ability to output a menu using the `$contentOP->outputMenu()` method
+- 🧹 Fixed bug where the `addLabelActive()` and `removeLabelActive()` functions would fail if an input didn't have an ID
+- 🧹 Fixed bug with `csc-btn--light` css class showing the text the same colour as the foreground
+
+## 0.3.02 - Sections + FAQ (2020-06-22)
+
+- ➕ Added the `content_sort_order` column to the `cs_content` table
+- ➕ Added the `cs_content_faq_section` and `cs_content_menu` tables
+- ➕ Added the ability to add a "menu" section type
+- ➕ Added the ability to hide the section "location" if "type" isn't "page"
+- ➕ Added the "menu" type to the sections index list
+- ➕ Added the ability to edit menu items
+- ➕ Added the to assign a page to a menu when creating the page
+- ➕ Added the to assign/un-assign a page to a menu when editing the page
+- ➕ Added the ability to add an FAQ
+- ➕ Added the ability to view the FAQ index list
+
+## 0.3.01 - Collapsible (2020-06-15)
+
+- ➕ Added the collapsible feature
+- Updated ezsql/ezsql (4.0.9 => 4.0.10)
+- Updated phpmailer/phpmailer (v6.1.5 => v6.1.6)
+- Updated html2text/html2text (4.2.1 => 4.3.1)
+- Updated voku/portable-ascii (1.4.10 => 1.5.1)
+- Updated symfony/translation-contracts (v2.0.1 => v2.1.2)
+- Updated symfony/polyfill-mbstring (v1.15.0 => v1.17.0)
+- Updated symfony/polyfill-php80 (v1.17.0)
+- Updated symfony/translation (v5.0.7 => v5.1.1)
+- Updated nesbot/carbon (2.32.2 => 2.35.0)
+- Updated illuminate/contracts (v7.4.0 => v7.15.0)
+- Updated doctrine/inflector (1.3.1 => 2.0.3)
+- Updated illuminate/support (v7.4.0 => v7.15.0)
+- Updated illuminate/cache (v7.4.0 => v7.15.0)
+- Updated symfony/finder (v5.0.7 => v5.1.1)
+- Updated illuminate/filesystem (v7.4.0 => v7.15.0)
+- Updated nikic/php-parser (v4.3.0 => v4.5.0)
+- Updated symfony/polyfill-util (v1.15.0 => v1.17.0)
+- Updated symfony/polyfill-php56 (v1.15.0 => v1.17.0)
+
+## 0.3.00 - Clean Install (2020-06-03)
+
+- 🧹 Fixed bug with loading main style sheet
+- 🖊️ Changed default cornerstone.sql files
+- 🖊️ Changed the `top.php` theme file to `layout.php`
+- 🧹 Fixed bug where the `loadpage` method didn't fire loading the `index` method when requested
+- 🖊️ Changed the Toastify gradients for `-info` and `warning` for better contrast`
+
 ## 0.2.26 - Styling (2020-05-15)
 
 - ➕ Added extra checks to the `userPageProtect()` function to make sure roles were set between sessions
@@ -19,7 +91,7 @@
 - 🧹 Fixed bug where user list has been changed. Added `listUsersBasic()` to fix this
 - ➕ Added styling to input labels with a `data-tippy-content` attribute
 - ➕ Added the ability to view and change core, mail, security, site, and add-on settings
-- ➕ Added the ability to view  a permissions list and search for keys
+- ➕ Added the ability to view a permissions list and search for keys
 
 ## 0.2.23 - User + Roles (2020-04-15)
 
@@ -106,7 +178,7 @@
 - ➕ Added to `getUrl()` function in the core loader to change dashes to underscores
 - ➕ Added styling to allow the use of the [select2](https://select2.org/) script
 - ➕ Added the ability to set an alert as not closable by setting `data-clsoable="false"`
-- Fixed issue where error was being thrown if an  input didn't have a label
+- Fixed issue where error was being thrown if an input didn't have a label
 - Changed the styling for the `.csc-helper-text` class to be positioned so it can "float" rather than shift the page
 
 ## 0.2.14 - Pagination (2019-12-28 to 2020-01-01)

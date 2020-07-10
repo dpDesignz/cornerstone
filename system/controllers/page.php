@@ -82,6 +82,10 @@ class Page extends Controller
             'href' => get_site_url()
           );
 
+          // Check for FAQ data to output
+          $opFAQSection = new OPContent;
+          $this->data['content_content'] = $opFAQSection->checkStringFAQ($this->data['content_content']);
+
           // Load page
           $this->load->view('pages/page', $this->data);
           exit;
@@ -93,7 +97,7 @@ class Page extends Controller
       }
     } else { // Friendly URL doesn't exist. Load index page
       // Load index page
-      $this->index;
+      $this->index();
       exit;
     }
   }

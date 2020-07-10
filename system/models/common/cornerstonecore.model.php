@@ -23,6 +23,10 @@ class CornerstoneCore
     $this->conn = new CornerstoneDBH;
   }
 
+  ###################
+  ####    SEO    ####
+  ###################
+
   /**
    * Get SEO data
    *
@@ -240,6 +244,14 @@ class CornerstoneCore
     //return good words separated by dashes
     return implode($replace, $return);
   }
+
+  #######################
+  ####    SECTION    ####
+  #######################
+
+  #######################
+  ####    CONTENT    ####
+  #######################
 
   /**
    * Get Content data

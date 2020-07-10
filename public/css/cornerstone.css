@@ -390,6 +390,8 @@ html {
   font-size: 1em;
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 1.4;
+  scroll-behavior: smooth;
+  /* https://css-tricks.com/snippets/jquery/smooth-scrolling/ */
 }
 
 /*
@@ -5574,7 +5576,7 @@ body.cs-component__buttons .csc-btn--info.csc-btn--outlined:not(:disabled) {
 }
 body.cs-components .csc-btn--light:not(:disabled),
 body.cs-component__buttons .csc-btn--light:not(:disabled) {
-  color: #FFFFFF !important;
+  color: #000000 !important;
   background-color: #fafafa !important;
 }
 body.cs-components .csc-btn--light.csc-btn--raised:not(:disabled), body.cs-components .csc-btn--light.csc-btn--flat:not(:disabled), body.cs-components .csc-btn--light.csc-btn--flat-large:not(:disabled), body.cs-components .csc-btn--light.csc-btn--flat-small:not(:disabled), body.cs-components .csc-btn--light.csc-btn--flat-tiny:not(:disabled), body.cs-components .csc-btn--light.csc-btn--outlined:not(:disabled),
@@ -5589,6 +5591,7 @@ body.cs-component__buttons .csc-btn--light.csc-btn--outlined:not(:disabled) {
 }
 body.cs-components .csc-btn--light.csc-btn--outlined:not(:disabled),
 body.cs-component__buttons .csc-btn--light.csc-btn--outlined:not(:disabled) {
+  color: #FFFFFF !important;
   border-color: #fafafa !important;
 }
 body.cs-components .csc-btn--dark:not(:disabled),
@@ -6461,6 +6464,68 @@ body.cs-component__chips .csc-chip--shaped {
 body.cs-components .csc-chip--selected .csc-chip__checkmark-path,
 body.cs-component__chips .csc-chip--selected .csc-chip__checkmark-path {
   stroke-dashoffset: 0;
+}
+
+body.cs-components .csc-collapsible,
+body.cs-component__collapsible .csc-collapsible {
+  border: 1px solid #ddd;
+  border-bottom: none;
+  margin: 0.5rem 0 1rem 0;
+}
+body.cs-components .csc-collapsible article .csc-collapsible__header,
+body.cs-components .csc-collapsible dl .csc-collapsible__header,
+body.cs-component__collapsible .csc-collapsible article .csc-collapsible__header,
+body.cs-component__collapsible .csc-collapsible dl .csc-collapsible__header {
+  display: flex;
+  padding: 1rem;
+  line-height: 1.5;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+body.cs-components .csc-collapsible article .csc-collapsible__header:focus,
+body.cs-components .csc-collapsible dl .csc-collapsible__header:focus,
+body.cs-component__collapsible .csc-collapsible article .csc-collapsible__header:focus,
+body.cs-component__collapsible .csc-collapsible dl .csc-collapsible__header:focus {
+  outline: 0;
+}
+body.cs-components .csc-collapsible article .csc-collapsible__header i,
+body.cs-components .csc-collapsible dl .csc-collapsible__header i,
+body.cs-component__collapsible .csc-collapsible article .csc-collapsible__header i,
+body.cs-component__collapsible .csc-collapsible dl .csc-collapsible__header i {
+  display: inline-block;
+  margin-right: 1rem;
+  width: 2rem;
+  font-size: 1.6rem;
+  text-align: center;
+  transition: transform 500ms ease-in-out;
+}
+body.cs-components .csc-collapsible article .csc-collapsible__body,
+body.cs-components .csc-collapsible dl .csc-collapsible__body,
+body.cs-component__collapsible .csc-collapsible article .csc-collapsible__body,
+body.cs-component__collapsible .csc-collapsible dl .csc-collapsible__body {
+  display: none;
+  height: 0;
+  padding: 2rem;
+  border-bottom: 1px solid #ddd;
+  opacity: 0;
+  overflow: hidden;
+  transition: height 350ms ease-in-out, opacity 750ms ease-in-out;
+}
+body.cs-components .csc-collapsible article .csc-collapsible__body.show,
+body.cs-components .csc-collapsible dl .csc-collapsible__body.show,
+body.cs-component__collapsible .csc-collapsible article .csc-collapsible__body.show,
+body.cs-component__collapsible .csc-collapsible dl .csc-collapsible__body.show {
+  display: block;
+  height: auto;
+  opacity: 1;
+}
+body.cs-components .csc-collapsible article.open .csc-collapsible__header .fa-caret-right,
+body.cs-components .csc-collapsible dl.open .csc-collapsible__header .fa-caret-right,
+body.cs-component__collapsible .csc-collapsible article.open .csc-collapsible__header .fa-caret-right,
+body.cs-component__collapsible .csc-collapsible dl.open .csc-collapsible__header .fa-caret-right {
+  transform: rotate(90deg);
 }
 
 body.cs-components .csc-data-table,
@@ -8427,6 +8492,83 @@ body.cs-component__form .csc-form .csc-input-field {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
+body.cs-components .csc-form .csc-input-field .csc-hint,
+body.cs-component__form .csc-form .csc-input-field .csc-hint {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  color: #2196F3;
+  font-size: 20px;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta:focus-within label,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta:focus-within label {
+  color: #03a9f4 !important;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta label,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta label {
+  position: relative;
+  z-index: 1;
+  top: unset;
+  left: unset !important;
+  display: block;
+  margin-bottom: -30px;
+  padding: 0px 10px 0px 20px;
+  color: var(--font-color);
+  font-size: 0.8em;
+  font-weight: 400;
+  pointer-events: none;
+  transform: none;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta label.active,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta label.active {
+  transform: none !important;
+  font-weight: 400 !important;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta input::placeholder,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta input::placeholder {
+  color: #9e9e9e;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta input:focus::placeholder,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta input:focus::placeholder {
+  color: transparent;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta .csc-ifta__field,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta .csc-ifta__field {
+  width: 100%;
+  height: unset;
+  margin: 0 0 20px;
+  padding: 35px 20px 15px;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #ccc;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta .csc-ifta__field.valid,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta .csc-ifta__field.valid {
+  border: none;
+  box-shadow: inset 0 0 0 2px #4CAF50;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta .csc-ifta__field.invalid,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta .csc-ifta__field.invalid {
+  border: none;
+  box-shadow: inset 0 0 0 2px #F44336;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta .csc-ifta__field:focus,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta .csc-ifta__field:focus {
+  outline: none;
+  border: none !important;
+  box-shadow: inset 0 0 0 2px #03a9f4 !important;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta .csc-helper-text,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta .csc-helper-text {
+  margin-top: -18px;
+  padding: 10px;
+  width: 96.7%;
+}
+body.cs-components .csc-form .csc-input-field.csc-ifta .csc-helper-text.invalid,
+body.cs-component__form .csc-form .csc-input-field.csc-ifta .csc-helper-text.invalid {
+  color: #B71C1C;
+  background-color: #FFEBEE;
+}
 body.cs-components .csc-form .csc-input-field.csc-inline,
 body.cs-component__form .csc-form .csc-input-field.csc-inline {
   display: inline-block;
@@ -9287,15 +9429,16 @@ body.cs-component__pagination .cs-pagitem--disabled > a {
   background: linear-gradient(to right, #00b09b, #96c93d);
 }
 .toastify-warning {
-  background: linear-gradient(to right, #ff6f00, #ffeb3b);
+  background: linear-gradient(to right, #ff6f00, #ffa000);
 }
 .toastify-danger {
   background: linear-gradient(to right, #c40c05, #dd1458);
 }
 .toastify-info {
-  background: linear-gradient(to right, #0091ea, #80d8ff);
+  background: linear-gradient(to right, #01579b, #0091ea);
 }
 .toastify-light {
+  color: #212121;
   background: linear-gradient(to right, #757575, #f5f5f5);
 }
 .toastify-dark {
@@ -10718,6 +10861,26 @@ body.cs-page > footer {
   grid-area: cs--body__footer;
   display: grid;
   grid-template-columns: 1fr;
+}
+
+.csc-faq-section h4,
+.csc-faq-item h4 {
+  font-size: 1.5em;
+  text-align: center;
+}
+.csc-faq-section dl,
+.csc-faq-section dd,
+.csc-faq-item dl,
+.csc-faq-item dd {
+  margin: 0;
+}
+.csc-faq-section .faq-item__header,
+.csc-faq-item .faq-item__header {
+  font-size: 1.1em;
+}
+.csc-faq-section .faq-item__header.open .fa-caret-right,
+.csc-faq-item .faq-item__header.open .fa-caret-right {
+  transform: rotate(90deg);
 }
 
 /* ==========================================================================

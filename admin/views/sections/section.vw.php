@@ -73,7 +73,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
             <label>Type*</label>
           </div>
         </div>
-        <div class="csc-row csc-row--no-pad">
+        <div id="location-input" class="csc-row csc-row--no-pad">
           <div class="csc-col csc-col12 csc-input-field">
             <select name="location_name" id="location_name" data-placeholder="Select a section location" tabindex="3">
               <?php echo $data->location_options; ?>
@@ -99,12 +99,29 @@ require(get_theme_path('layout.php', 'admin')); ?>
     <h5 class="cs-h5">Form Fields</h5>
     <p class="cs-body2"><strong>Section Name: </strong> The name of the section.</p>
     <p class="cs-body2"><strong>Type: </strong> The type of the section.</p>
-    <p class="cs-body2"><strong>Location: </strong> <em>(optional)</em> The location of the section. Leave blank to assign to the main site.</p>
+    <p id="location-definition" class="cs-body2"><strong>Location: </strong> <em>(optional)</em> The location of the section. Leave blank to assign to the main site.</p>
     <p class="cs-caption cs-text-grey cs-text-center cs-my-0"><em>*notes a required field</em></p>
   </section>
 </div>
 
+<script>
+  // Hide "location" if type isn't "page"
+  function toggleLocation() {
+    // Get location type
+    const type = document.querySelector('#type');
 
+    // Check if type is page
+    if (type) {
+      // Toggle location visibility
+      document.querySelector('#location-input').style.display = (parseInt(type.value) !== 0) ? 'none' : 'grid';
+      document.querySelector('#location-definition').style.display = (parseInt(type.value) !== 0) ? 'none' : 'block';
+    }
+  }
+
+  // Run toggle location on page load or change
+  document.addEventListener("DOMContentLoaded", toggleLocation);
+  $('#type').on('change', toggleLocation);
+</script>
 <script>
   // Init validation on document ready
   $(document).ready(function() {

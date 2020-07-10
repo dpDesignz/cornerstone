@@ -18,7 +18,7 @@
  */
 
 // Load Composer vendor autoload [https://getcomposer.org/] (This is required for ezSQL, PHPMailer, random_compat, and WhichBrowser)
-require_once(DIR_SYSTEM . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+require_once(DIR_SYSTEM . 'storage' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
 // Autoload Core Libraries
 function cornerstoneAutoLoader($className)

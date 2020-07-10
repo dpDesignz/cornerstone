@@ -46,8 +46,8 @@
   <link href="<?php echo get_site_url('css/cornerstone.css?v=1.0.0'); ?>" rel="stylesheet" type="text/css">
   <?php
   // Output custom main.css file if it exists
-  if (file_exists(get_site_url('css/main.css?v=1.0.0'))) : ?>
-    <link href="<?php echo get_site_url('css/main.css?v=1.0.0'); ?>" rel="stylesheet" type="text/css">
+  if (file_exists(get_public_path('css/main.css'))) : ?>
+    <link href="<?php echo get_site_url('css/main.css?v=' . str_replace(' ', '', trim($option->get('site_version')))); ?>" rel="stylesheet" type="text/css">
   <?php endif; ?>
   <!-- SCRIPTS -->
   <!-- jQuery library -->

@@ -81,7 +81,7 @@ class Content
     $this->whereArray = array();
 
     // Set section type not menu
-    $this->whereArray[] = neq("section_type", "5", _AND);
+    // $this->whereArray[] = neq("section_type", "5", _AND);
 
     // Check for search
     if (!empty($params['search'])) {
@@ -278,7 +278,7 @@ class Content
   /**
    * Get list of pages
    *
-   * @param array $params Multiple paramters as required
+   * @param array $params Multiple parameters as required
    *
    * @return object Return object with list of pages
    */
@@ -292,9 +292,12 @@ class Content
     $this->sql = array();
     $this->whereArray = array();
 
+    // Set type of content
+    $this->whereArray[] = eq("c.content_type", "0");
+
     // Check for search
     if (!empty($params['search'])) {
-      $this->whereArray[] = like("UPPER(c.content_title)", "%" . strtoupper($params['search']) . "%", _AND);
+      $this->whereArray[] = like("UPPER(c.content_title)", "%" . strtoupper($params['search']) . "%");
     }
 
     // Check for status
@@ -321,7 +324,7 @@ class Content
 
       // Filter by status if not null
       if ($statusInt !== null) {
-        $this->whereArray[] = eq("c.content_status", $statusInt, _AND);
+        $this->whereArray[] = eq("c.content_status", $statusInt);
       }
     }
 
@@ -633,6 +636,736 @@ class Content
     return FALSE;
   }
 
+  ###################
+  ####    FAQ    ####
+  ###################
+
+  /**
+   * Get FAQ
+   *
+   * @param int $faqID ID of the faq to retrieve
+   *
+   * @return object Return object with page data
+   */
+  public function getFAQ(int $faqID)
+  {
+
+    // Check data is valid
+    if (!empty($faqID) && is_numeric($faqID)) {
+      $contentData = $this->conn->dbh->selecting(
+        DB_PREFIX . "content AS c",
+        "c.content_id,
+        c.content_title,
+        c.content_content,
+        c.content_status,
+        c.content_show_updated,
+        section_ids",
+        leftJoin(
+          "c",
+          "(SELECT faqs_content_id, GROUP_CONCAT(DISTINCT faqs_section_id) AS section_ids FROM " . DB_PREFIX . "content_faq_section GROUP BY faqs_content_id)",
+          "content_id",
+          "faqs_content_id",
+          "cs"
+        ),
+        where(
+          eq('c.content_id', $faqID)
+        )
+      );
+
+      // Return if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($contentData)) {
+
+        // Return results
+        return $contentData[0];
+      } // No results. Return FALSE.
+    } // Data invalid. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Get list of FAQs
+   *
+   * @param array $params Multiple parameters as required
+   *
+   * @return object Return object with list of FAQs
+   */
+  public function listFAQs($params = array())
+  {
+
+    // Set if counting or not
+    $countResults = (!empty($params['count']) && $params['count'] == TRUE) ? TRUE : FALSE;
+
+    // Build query
+    $this->sql = array();
+    $this->whereArray = array();
+
+    // Set type of content
+    $this->whereArray[] = eq("c.content_type", "1");
+
+    // Check for search
+    if (!empty($params['search'])) {
+      $this->whereArray[] = like("UPPER(c.content_title)", "%" . strtoupper($params['search']) . "%");
+    }
+
+    // Check for status
+    if (!empty($params['filter_status'])) {
+      // Get status
+      switch (trim($params['filter_status'])) {
+        case 'draft':
+          $statusInt = 0;
+          break;
+        case 'published':
+          $statusInt = 1;
+          break;
+        case 'private':
+          $statusInt = 2;
+          break;
+        case 'archived':
+          $statusInt = 3;
+          break;
+
+        default:
+          $statusInt = null;
+          break;
+      }
+
+      // Filter by status if not null
+      if ($statusInt !== null) {
+        $this->whereArray[] = eq("c.content_status", $statusInt);
+      }
+    }
+
+    // Combine where
+    if (!empty($this->whereArray)) {
+      $this->sql[] = where(...$this->whereArray);
+    }
+
+    // Check for sort
+    if (!$countResults && !empty($params['sort']) && !empty($params['order'])) {
+      $this->sql[] = orderBy($params['sort'], $params['order']);
+    }
+
+    // Check for page number/limit
+    if (!$countResults && !empty($params['limit'])) {
+      // Check for page number
+      if (!empty($params['page'])) {
+        $offset = ($params['page'] - 1) * $params['limit'];
+      } else {
+        $offset = 0;
+      }
+      $this->sql[] = limit($params['limit'], $offset);
+    }
+
+    if ($countResults) {
+
+      // Run query to count data
+      $results = $this->conn->dbh->selecting(
+        DB_PREFIX . "content AS c",
+        "COUNT(c.content_id) AS total_results",
+        ...$this->sql
+      );
+    } else {
+
+      // Run query to find data
+      $results = $this->conn->dbh->selecting(
+        DB_PREFIX . "content AS c",
+        "c.content_id,
+        c.content_title,
+        c.content_status,
+        c.content_added_dtm,
+        c.content_edited_dtm,
+        CONCAT(ua.user_first_name, ' ', ua.user_last_name) AS added_by,
+        CONCAT(ue.user_first_name, ' ', ue.user_last_name) AS edited_by",
+        leftJoin("c", DB_PREFIX . "users", "content_added_id", "user_id", "ua"),
+        leftJoin("c", DB_PREFIX . "users", "content_edited_id", "user_id", "ue"),
+        ...$this->sql
+      );
+    }
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0) {
+
+      // Return results
+      return json_decode(json_encode(array('count' => $this->conn->dbh->getNum_Rows(), 'results' => $results)), FALSE);
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Get list of assigned FAQ sections
+   *
+   * @param int $FAQID The ID of the FAQ
+   *
+   * @return object Return object with list of sections
+   */
+  public function listAssignedFAQSections(int $FAQID)
+  {
+
+    // Run query to find data
+    $results = $this->conn->dbh->selecting(
+      DB_PREFIX . "content_faq_section AS fs",
+      "fs.faqs_id,
+      s.section_id,
+      s.section_name",
+      leftJoin(
+        "fs",
+        DB_PREFIX . "content_section",
+        "faqs_section_id",
+        "section_id",
+        "s"
+      ),
+      where(
+        eq("faqs_content_id", $FAQID)
+      ),
+      orderBy("s.section_name", "ASC")
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
+
+      // Return results
+      return $results;
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Get list of assigned FAQ sections faqs
+   *
+   * @param int $FAQsID The ID of the FAQ Section
+   *
+   * @return object Return object with list of faqs
+   */
+  public function listAssignedFAQSectionFAQs(int $FAQsID)
+  {
+
+    // Run query to find data
+    $results = $this->conn->dbh->selecting(
+      DB_PREFIX . "content_faq_section AS fs",
+      "fs.faqs_id,
+      c.content_id,
+      c.content_title,
+      fs.faqs_sort_order",
+      leftJoin(
+        "fs",
+        DB_PREFIX . "content",
+        "faqs_content_id",
+        "content_id",
+        "c"
+      ),
+      where(
+        eq("faqs_section_id", $FAQsID)
+      ),
+      orderBy("c.content_title", "ASC")
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
+
+      // Return results
+      return $results;
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Delete assigned FAQ sections
+   *
+   * @param int $faqSectionID ID of the assignment to delete
+   *
+   * @return bool Will return FALSE if failed or TRUE if successful.
+   */
+  public function deleteAssignedFAQSections(int $faqSectionID)
+  {
+
+    // Check data is valid
+    if (!empty($faqSectionID) && is_numeric($faqSectionID)) {
+
+      // Run query to delete
+      $this->conn->dbh->delete(
+        DB_PREFIX . "content_faq_section",
+        where(
+          eq("faqs_id", $faqSectionID)
+        )
+      );
+
+      // Check if any rows affected
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return TRUE
+        return TRUE;
+      } // No rows affected. Return FALSE.
+
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Get list of faq sections
+   *
+   * @return object Return object with list of sections
+   */
+  public function listFAQSections()
+  {
+
+    // Run query to find data
+    $sectionResults = $this->conn->dbh->selecting(
+      DB_PREFIX . "content_section",
+      "section_id,
+      section_name",
+      where(
+        eq("section_type", "1")
+      )
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($sectionResults)) {
+
+      // Return results
+      return $sectionResults;
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Count faq links
+   *
+   * @param int $faqSectionID ID of the section to count
+   *
+   * @return int Return number of links
+   */
+  public function countFAQLinks(int $faqSectionID)
+  {
+
+    // Check data is valid
+    if (!empty($faqSectionID) && is_numeric($faqSectionID)) {
+
+      // Run query to find products
+      $this->conn->dbh->selecting(
+        DB_PREFIX . "content_faq_section",
+        "faqs_id",
+        where(
+          eq("faqs_section_id", $faqSectionID)
+        )
+      );
+
+      // Return total
+      return $this->conn->dbh->getNum_Rows();
+    } // Data invalid. Return "0"
+    return 0;
+  }
+
+  /**
+   * Add FAQ
+   *
+   * @param string $title Title of the FAQ
+   * @param string $content Content of the FAQ
+   * @param int $status Status of the FAQ
+   * @param int $showUpdated `[optional]` If FAQ is mean to show updated message. Defaults to "0"
+   *
+   * @return bool|int Will return FALSE if failed or inserted ID if successful.
+   */
+  public function addFAQ(string $title, string $content, int $status, int $showUpdated = 0)
+  {
+
+    // Add data
+    $this->conn->dbh->insert(
+      DB_PREFIX . "content",
+      array(
+        'content_title' => $title,
+        'content_content' => $content,
+        'content_status' => $status,
+        'content_type' => '1',
+        'content_show_updated' => $showUpdated,
+        'content_added_id' => $_SESSION['_cs']['user']['uid'],
+        'content_added_dtm' => date('Y-m-d H:i:s')
+      )
+    );
+
+    // Check if added successfully
+    if ($this->conn->dbh->affectedRows() > 0) {
+
+      // Return inserted ID
+      return $this->conn->dbh->getInsert_Id();
+    } // Unable to add. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Add FAQ Link
+   *
+   * @param int $sectionID The ID of the section
+   * @param int $contentID The ID of the content for the section
+   * @param int $sortOrder `[optional]` The sort order of the menu item in the menu. Defaults to "0"
+   *
+   * @return bool|int Will return FALSE if failed or true if successful.
+   */
+  public function addFAQLink(int $sectionID, int $contentID, int $sortOrder = 0)
+  {
+
+    // Check data is valid
+    if (!empty($sectionID) && is_numeric($sectionID)) {
+
+      // Insert data
+      $this->conn->dbh->insert(
+        DB_PREFIX . "content_faq_section",
+        array(
+          'faqs_content_id' => $contentID,
+          'faqs_section_id' => $sectionID,
+          'faqs_sort_order' => $sortOrder
+        )
+      );
+
+      // Check if added successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Data was added. Return TRUE
+        return TRUE;
+      } // Data failed to be added. Return FALSE
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Edit FAQ
+   *
+   * @param int $faqID ID of the FAQ
+   * @param string $title Title of the FAQ
+   * @param string $content Content of the FAQ
+   * @param int $status Status of the FAQ
+   * @param int $showUpdated `[optional]` If FAQ is mean to show updated message. Defaults to "0"
+   *
+   * @return int Will return FALSE if failed or TRUE if successful.
+   */
+  public function editFAQ(int $faqID, string $title, string $content, int $status, int $showUpdated = 0)
+  {
+
+    // Check data is valid
+    if (!empty($faqID) && is_numeric($faqID)) {
+
+      // Update row in `cs_content`
+      $updateResult = $this->conn->dbh->update(
+        DB_PREFIX . "content",
+        array(
+          'content_title' => $title,
+          'content_content' => $content,
+          'content_status' => $status,
+          'content_show_updated' => $showUpdated,
+          'content_edited_id' => $_SESSION['_cs']['user']['uid'],
+          'content_edited_dtm' => date('Y-m-d H:i:s')
+        ),
+        eq("content_id", $faqID)
+      );
+
+      // Check if updated successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return TRUE
+        return TRUE;
+      } // Unable to edit. Return FALSE.
+
+    } // Data invalid. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Edit FAQ Link
+   *
+   * @param int $faqLinkID ID of the faq link
+   * @param int $sortOrder `[optional]` The sort order of the menu item in the menu. Defaults to "0"
+   *
+   * @return bool|int Will return FALSE if failed or true if successful.
+   */
+  public function editFAQLink(int $faqLinkID, int $sortOrder = 0)
+  {
+
+    // Check data is valid
+    if (!empty($faqLinkID) && is_numeric($faqLinkID)) {
+
+      // Set fallback data
+      $sortOrder = (!empty($sortOrder)) ? $sortOrder : 0;
+
+      // Update data
+      $this->conn->dbh->update(
+        DB_PREFIX . "content_faq_section",
+        array(
+          'faqs_sort_order' => $sortOrder
+        ),
+        eq("faqs_id", $faqLinkID)
+      );
+
+      // Check if edited successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Data was edited. Return TRUE
+        return TRUE;
+      } // Data failed to be edited. Return FALSE
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  ####################
+  ####    MENU    ####
+  ####################
+
+  /**
+   * Count menu items
+   *
+   * @param int $menuID ID of the menu to count
+   *
+   * @return int Return number of links
+   */
+  public function countMenuItems(int $menuID)
+  {
+
+    // Check data is valid
+    if (!empty($menuID) && is_numeric($menuID)) {
+
+      // Run query to find products
+      $this->conn->dbh->selecting(
+        DB_PREFIX . "content_menu",
+        "menui_id",
+        where(
+          eq("menui_menu_id", $menuID)
+        )
+      );
+
+      // Return total
+      return $this->conn->dbh->getNum_Rows();
+    } // Data invalid. Return "0"
+    return 0;
+  }
+
+  /**
+   * Get list of menus
+   *
+   * @return object Return object with list of menus
+   */
+  public function listMenus()
+  {
+
+    // Run query to find data
+    $menuResults = $this->conn->dbh->selecting(
+      DB_PREFIX . "content_section",
+      "section_id,
+      section_name",
+      where(
+        eq("section_type", "5")
+      ),
+      orderBy("section_name", "ASC")
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($menuResults)) {
+
+      // Return results
+      return $menuResults;
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Get list of menu items
+   *
+   * @param int $menuID The ID of the menu to retrieve data for
+   *
+   * @return object Return object with list of menu items
+   */
+  public function listMenuItems(int $menuID)
+  {
+
+    // Check data is valid
+    if (!empty($menuID) && is_numeric($menuID)) {
+
+      // Run query to find data
+      $menuItemResults = $this->conn->dbh->selecting(
+        DB_PREFIX . "content_menu AS cm",
+        "cm.menui_id,
+        COALESCE(c.content_type, 0) as content_type,
+        cm.menui_content_id,
+        c.content_title,
+        cm.menui_custom_url,
+        cm.menui_custom_title,
+        cm.menui_sort_order",
+        leftJoin(
+          "cm",
+          DB_PREFIX . "content",
+          "menui_content_id",
+          "content_id",
+          "c"
+        ),
+        where(
+          eq("menui_menu_id", $menuID)
+        ),
+        orderBy("cm.menui_sort_order ASC, c.content_title", "ASC")
+      );
+
+      // Return if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($menuItemResults)) {
+
+        // Return results
+        return $menuItemResults;
+      } // No results. Return FALSE.
+    } // Invalid data. Return FALSE
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Add Menu Item
+   *
+   * @param int $menuID ID of the menu
+   * @param int $contentID `[optional]` The ID of the content for the menu item. Defaults to "null"
+   * @param string $customURL `[optional]` The custom URL of the menu item. Defaults to "null"
+   * @param string $customTitle `[optional]` The custom title of the menu item. Defaults to "null"
+   * @param int $sortOrder `[optional]` The sort order of the menu item in the menu. Defaults to "0"
+   *
+   * @return bool|int Will return FALSE if failed or true if successful.
+   */
+  public function addMenuItem(int $menuID, int $contentID = null, string $customURL = null, string $customTitle = null, int $sortOrder = 0)
+  {
+
+    // Check data is valid
+    if (!empty($menuID) && is_numeric($menuID)) {
+
+      // Set fallback data
+      $contentID = (!empty($contentID)) ? $contentID : null;
+      $customURL = (!empty($customURL)) ? $customURL : null;
+      $customTitle = (!empty($customTitle)) ? $customTitle : null;
+      $sortOrder = (!empty($sortOrder)) ? $sortOrder : 0;
+
+      // Insert data
+      $this->conn->dbh->insert(
+        DB_PREFIX . "content_menu",
+        array(
+          'menui_content_id' => $contentID,
+          'menui_menu_id' => $menuID,
+          'menui_custom_url' => $customURL,
+          'menui_custom_title' => $customTitle,
+          'menui_sort_order' => $sortOrder,
+          'menui_added_id' => $_SESSION['_cs']['user']['uid'],
+          'menui_added_dtm' => date('Y-m-d H:i:s')
+        )
+      );
+
+      // Check if added successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Data was added. Return TRUE
+        return TRUE;
+      } // Data failed to be added. Return FALSE
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Edit Menu Item
+   *
+   * @param int $menuItemID ID of the menu item
+   * @param int $contentID `[optional]` The ID of the content for the menu item. Defaults to "null"
+   * @param string $customURL `[optional]` The custom URL of the menu item. Defaults to "null"
+   * @param string $customTitle `[optional]` The custom title of the menu item. Defaults to "null"
+   * @param int $sortOrder `[optional]` The sort order of the menu item in the menu. Defaults to "0"
+   *
+   * @return bool|int Will return FALSE if failed or true if successful.
+   */
+  public function editMenuItem(int $menuItemID, int $contentID = null, string $customURL = null, string $customTitle = null, int $sortOrder = 0)
+  {
+
+    // Check data is valid
+    if (!empty($menuItemID) && is_numeric($menuItemID)) {
+
+      // Set fallback data
+      $contentID = (!empty($contentID)) ? $contentID : null;
+      $customURL = (!empty($customURL)) ? $customURL : null;
+      $customTitle = (!empty($customTitle)) ? $customTitle : null;
+      $sortOrder = (!empty($sortOrder)) ? $sortOrder : 0;
+
+      // Update data
+      $this->conn->dbh->update(
+        DB_PREFIX . "content_menu",
+        array(
+          'menui_content_id' => $contentID,
+          'menui_custom_url' => $customURL,
+          'menui_custom_title' => $customTitle,
+          'menui_sort_order' => $sortOrder,
+          'menui_edited_id' => $_SESSION['_cs']['user']['uid'],
+          'menui_edited_dtm' => date('Y-m-d H:i:s')
+        ),
+        eq("menui_id", $menuItemID)
+      );
+
+      // Check if edited successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Data was edited. Return TRUE
+        return TRUE;
+      } // Data failed to be edited. Return FALSE
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Delete menu item
+   *
+   * @param int $menuItemID ID of the menu item to delete
+   *
+   * @return bool Will return FALSE if failed or TRUE if successful.
+   */
+  public function deleteMenuItem(int $menuItemID)
+  {
+
+    // Check data is valid
+    if (!empty($menuItemID) && is_numeric($menuItemID)) {
+
+      // Run query to delete
+      $this->conn->dbh->delete(
+        DB_PREFIX . "content_menu",
+        where(
+          eq("menui_id", $menuItemID)
+        )
+      );
+
+      // Check if any rows affected
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return TRUE
+        return TRUE;
+      } // No rows affected. Return FALSE.
+
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
   #######################
   ####    CONTENT    ####
   #######################
@@ -671,5 +1404,76 @@ class Content
 
     // Return FALSE
     return FALSE;
+  }
+
+  /**
+   * Get list of content items
+   *
+   * @return object Return object with list of content items
+   */
+  public function listContentItems()
+  {
+
+    // Run query to find data
+    $contentItemResults = $this->conn->dbh->selecting(
+      DB_PREFIX . "content",
+      "content_id,
+      content_title",
+      orderBy("content_title", "ASC")
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($contentItemResults)) {
+
+      // Return results
+      return $contentItemResults;
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Get list of content menus
+   *
+   * @param int $contentID ID of the content to check for
+   *
+   * @return object Return object with list of menus
+   */
+  public function listContentMenus(int $contentID)
+  {
+
+    // Check data is valid
+    if (!empty($contentID) && is_numeric($contentID)) {
+
+      // Run query to find data
+      $menuResults = $this->conn->dbh->selecting(
+        DB_PREFIX . "content_menu AS m",
+        "m.menui_id,
+        s.section_name,
+        m.menui_menu_id",
+        leftJoin(
+          "m",
+          DB_PREFIX . "content_section",
+          "menui_menu_id",
+          "section_id",
+          "s"
+        ),
+        where(
+          eq("m.menui_content_id", $contentID)
+        ),
+        orderBy("s.section_name", "ASC")
+      );
+
+      // Return if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($menuResults)) {
+
+        // Return results
+        return $menuResults;
+      } // No results. Return FALSE.
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return false;
   }
 }

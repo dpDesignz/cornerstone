@@ -2,19 +2,52 @@
 // The core JS file for running Cornerstone Framework scripts
 */
 
+// Enable JS debugging
+const debug = false;
+
 // Vanilla JS ready function
 const ready = callback => {
   if (document.readyState !== 'loading') callback();
   else document.addEventListener('DOMContentLoaded', callback);
 };
 
-// Hide Banner Notification
-function hideBanner() {
-  $('#csc-banner').removeClass('visible');
-}
-$('[close-banner]').click(function() {
-  hideBanner();
-});
+// Vanilla JS Show/Hide ~ https://gomakethings.com/how-to-a-fade-in-to-vanilla-javascript-show-and-hide-methods/
+
+// Vanilla JS show element
+const jsShow = function(elem) {
+  // Get the natural height of the element
+  const getHeight = function() {
+    elem.style.display = 'block'; // Make it visible
+    const elemHeight = `${elem.scrollHeight}px`; // Get it's height
+    elem.style.display = ''; //  Hide it again
+    return elemHeight;
+  };
+
+  const thisHeight = getHeight(); // Get the natural height
+  elem.classList.add('show'); // Make the element visible
+  elem.style.height = thisHeight; // Update the max-height
+
+  // Once the transition is complete, remove the inline max-height so the content can scale responsively
+  window.setTimeout(function() {
+    elem.style.height = '';
+  }, 350);
+};
+
+// Vanilla JS hide element
+const jsHide = function(elem) {
+  // Give the element a height to change from
+  elem.style.height = `${elem.scrollHeight}px`;
+
+  // Set the height back to 0
+  window.setTimeout(function() {
+    elem.style.height = '0';
+  }, 1);
+
+  // When the transition is complete, hide it
+  window.setTimeout(function() {
+    elem.classList.remove('show');
+  }, 350);
+};
 
 // Hide alerts on click
 document.querySelectorAll('.csc-alert').forEach(alert =>
@@ -29,8 +62,13 @@ document.querySelectorAll('.csc-alert').forEach(alert =>
   })
 );
 
-// Set Choice Chip Selected
-// TODO: Chip actions
+// Hide Banner Notification
+function hideBanner() {
+  $('#csc-banner').removeClass('visible');
+}
+$('[close-banner]').click(function() {
+  hideBanner();
+});
 
 // Change table header direction arrow on sort
 $('.csc-table-header__title').click(function() {
@@ -46,8 +84,88 @@ $('.csc-table-header__title').click(function() {
   }
 });
 
-// Bind buttons with rel="modal:close" to close the modal.
-$(document).on('click.modal', 'button[rel~="modal:close"]', $.modal.close);
+// Set Choice Chip Selected
+// TODO: Chip actions
+
+// Toggle collapsible
+function toggleCollapsible() {
+  // Get collapsible
+  const collapsible = this.parentElement;
+  // Get collapsible body
+  const collapsibleBody = collapsible.querySelector(`.csc-collapsible__body`);
+  // Check if classlist contains show
+  if (collapsible.classList.contains('open')) {
+    // Check for body
+    if (collapsibleBody) {
+      // Remove show class
+      jsHide(collapsibleBody);
+    }
+    // Remove open class
+    collapsible.classList.remove('open');
+    // Change aria-expanded state
+    collapsible.setAttribute('aria-expanded', 'false');
+  } else {
+    // Add open class
+    collapsible.classList.add('open');
+    // Check for body
+    if (collapsibleBody) {
+      // Add show class
+      jsShow(collapsibleBody);
+    }
+    // Change aria-expanded state
+    collapsible.setAttribute('aria-expanded', 'true');
+  }
+}
+
+// Toggle FAQ Collapsible
+function toggleFAQCollapsible() {
+  // Get data list
+  const dlElm = this.parentElement;
+  // Get collapsible header
+  const collapsibleHeader = this;
+  // Get aria-controls
+  const ariaControls = collapsibleHeader.getAttribute('aria-controls');
+  // Get collapsible body
+  const collapsibleBody = dlElm.querySelector(`#${ariaControls}`);
+  // Check if classlist contains show
+  if (collapsibleHeader.classList.contains('open')) {
+    // Check for body
+    if (collapsibleBody) {
+      // Remove show class
+      jsHide(collapsibleBody);
+    }
+    // Remove open class
+    collapsibleHeader.classList.remove('open');
+    // Change aria-expanded state
+    collapsibleHeader.setAttribute('aria-expanded', 'false');
+  } else {
+    // Add open class
+    collapsibleHeader.classList.add('open');
+    // Check for body
+    if (collapsibleBody) {
+      // Add show class
+      jsShow(collapsibleBody);
+    }
+    // Change aria-expanded state
+    collapsibleHeader.setAttribute('aria-expanded', 'true');
+  }
+}
+
+// Scroll to element from hash
+ready(() => {
+  // Check for hash
+  const { hash } = window.location;
+  if (hash) {
+    // Get element
+    const elm = document.querySelector(hash);
+    if (elm) {
+      // Scroll to elements
+      elm.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }
+  }
+});
 
 /*!
 // FORM SCRIPTING
@@ -55,13 +173,13 @@ $(document).on('click.modal', 'button[rel~="modal:close"]', $.modal.close);
 
 // Add active class to label
 function addLabelActive(e) {
-  if (document.querySelector(`label[for=${e.id.trim()}]`)) {
+  if (e.id && document.querySelector(`label[for=${e.id.trim()}]`)) {
     document.querySelector(`label[for=${e.id.trim()}]`).classList.add('active');
   }
 }
 // Remove active class from label
 function removeLabelActive(e) {
-  if (document.querySelector(`label[for=${e.id.trim()}]`)) {
+  if (e.id && document.querySelector(`label[for=${e.id.trim()}]`)) {
     if (e.value.length === 0) {
       document
         .querySelector(`label[for=${e.id.trim()}]`)
@@ -72,11 +190,11 @@ function removeLabelActive(e) {
 // Add active class listeners
 function addLabelListeners(t) {
   ['change', 'focus'].forEach(evt =>
-    t.addEventListener(evt, function () {
+    t.addEventListener(evt, function() {
       addLabelActive(this);
     })
   );
-  t.addEventListener('blur', function () {
+  t.addEventListener('blur', function() {
     removeLabelActive(this);
   });
   // Add "active" class if input has value or placeholder
@@ -139,6 +257,9 @@ if ($.validator !== undefined) {
 // Add Jquery Modal Defaults
 // Hide close and add animation on all modals
 if ($.modal !== undefined) {
+  // Bind buttons with rel="modal:close" to close the modal.
+  $(document).on('click.modal', 'button[rel~="modal:close"]', $.modal.close);
+
   $.modal.defaults = {
     showClose: false,
     fadeDuration: 250,
@@ -380,7 +501,7 @@ $(document).ready(function() {
   // Add "active" class if input has value or placeholder
   document
     .querySelectorAll(
-      'input[type=text]:not(.chosen-search-input), input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea'
+      'input[type=text]:not(.chosen-search-input):not(.swal-content__input), input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea'
     )
     .forEach(function(e) {
       if (e.value !== '' || e.placeholder !== '') {
@@ -396,7 +517,7 @@ $(document).ready(function() {
     $('body').on('mouseenter', '.tooltip:not(.tooltipstered)', function() {
       $(this).tooltipster({ contentAsHTML: true });
     });
-  } else {
+  } else if (debug) {
     console.error(
       'Tooltipster is not loaded. Please load Tooltipster to enable.'
     );
@@ -410,6 +531,7 @@ $(document).ready(function() {
       delay: 200,
     });
   } catch (error) {
-    console.error('Tippy is not loaded. Please load Tippy.js to enable.');
+    if (debug)
+      console.error('Tippy is not loaded. Please load Tippy.js to enable.');
   }
 });

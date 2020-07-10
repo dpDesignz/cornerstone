@@ -27,13 +27,13 @@ $adminSidebarCustomMenu = array(
       array(
         'identifier' => 'media',
         'text' => 'Media Manager',
-        'href' => 'javascript:alert(\'Coming Soon\');'
+        'href' => ''
       ),
       array(
         'permission' => 'view_faq',
         'identifier' => 'faq',
         'text' => 'FAQs',
-        'href' => 'javascript:alert(\'Coming Soon\');'
+        'href' => get_site_url('admin/faq')
       )
     )
   ) // Site Content Section

@@ -1,6 +1,6 @@
 <?php
 
-class Pages extends Controller
+class FAQ extends Controller
 {
 
   /**
@@ -21,7 +21,7 @@ class Pages extends Controller
     } else {
 
       // Define the page type
-      $this->pageType = 'page';
+      $this->pageType = 'faq';
 
       // Load the content model
       $this->contentModel = $this->load->model('sitecontent/content', 'admin');
@@ -37,8 +37,8 @@ class Pages extends Controller
           'href' => ''
         ),
         array(
-          'text' => 'Pages',
-          'href' => get_site_url('admin/pages')
+          'text' => 'FAQ',
+          'href' => get_site_url('admin/faq')
         )
       );
     }
@@ -64,7 +64,7 @@ class Pages extends Controller
       $this->data['search'] = $this->params['search'];
       $this->data['breadcrumbs'][] = array(
         'text' => 'Search: ' . $this->params['search'],
-        'href' => get_site_url('admin/pages/search/' . urlencode($this->params['search']))
+        'href' => get_site_url('admin/faq/search/' . urlencode($this->params['search']))
       );
     }
 
@@ -117,14 +117,14 @@ class Pages extends Controller
       $this->params['limit'] = 25;
     }
 
-    // Output pages list
+    // Output list
 
     // Get pages
-    if ($dataList = $this->contentModel->listPages($this->params)) {
+    if ($dataList = $this->contentModel->listFAQs($this->params)) {
 
       // Count how many items match the results
       $this->params['count'] = TRUE;
-      $this->data['totalResults'] = ($this->contentModel->listPages($this->params))->results[0]->total_results;
+      $this->data['totalResults'] = ($this->contentModel->listFAQs($this->params))->results[0]->total_results;
 
       // Set data list output
       $dataListOut = '';
@@ -139,14 +139,24 @@ class Pages extends Controller
       // Loop through data
       foreach ($dataList->results as $data) {
 
+        // Set edit link
+        $showTitle = ($this->role->canDo('edit_faq')) ? '<a href="' . get_site_url('admin/faq/edit/' . $data->content_id) . '" data-tippy-content="Edit ' . htmlspecialchars_decode($data->content_title) . '">' . htmlspecialchars_decode($data->content_title) . '</a>' : htmlspecialchars_decode($data->content_title);
+        $editLink = ($this->role->canDo('edit_faq')) ? '<a href="' . get_site_url('admin/faq/edit/' . $data->content_id) . '">Edit</a>' : '';
+
+        // Get FAQ assigned sections
+        $sectionName = '';
+        if ($faqSections = $this->contentModel->listAssignedFAQSections((int) $data->content_id)) {
+          // Loop through assigned sections
+          foreach ($faqSections as $sectionData) {
+            $sectionName .= $sectionData->section_name . ', ';
+          }
+
+          // Remove trailing comma
+          $sectionName = rtrim($sectionName, ', ');
+        }
+
         // Set fallback section name
-        $sectionName = (empty($data->section_name)) ? 'Main Site' : $data->section_name;
-
-        // Set fallback for section directory
-        $sectionDirectory = (empty($data->section_location_name)) ? '' : $data->section_location_name . '/';
-
-        // Set fallback for view link
-        $viewLink = (!empty($data->content_slug)) ? ' | <a href="' . get_site_url($sectionDirectory . $data->content_slug) . '" target="_blank">View</a>' : '';
+        $sectionName = (empty($sectionName)) ? '<span class="cs-muted">none set</span>' : $sectionName;
 
         // Set added by
         $addedDtmShort = (empty($data->content_added_dtm)) ? 'n/a' : date_format(date_create($data->content_added_dtm), "M j Y");
@@ -185,8 +195,8 @@ class Pages extends Controller
         // Set row output
         $dataListOut .= '<tr>
             <td class="has-hover-item">
-              <strong class="item--title"><a href="' . get_site_url('admin/pages/edit/' . $data->content_id) . '" data-tippy-content="Edit ' . htmlspecialchars_decode($data->content_title) . '">' . htmlspecialchars_decode($data->content_title) . '</a>' . $statusOutput . '</strong>
-              <span class="hover-item cs-caption cs-muted"><a href="' . get_site_url('admin/pages/edit/' . $data->content_id) . '">Edit</a> ' . $viewLink . '</span>
+              <strong class="item--title">' . $showTitle . $statusOutput . '</strong>
+              <span class="hover-item cs-caption cs-muted">' . $editLink . '</span>
             </td>
             <td>' . $data->added_by . '</td>
             <td>' . $sectionName . '</td>
@@ -236,9 +246,9 @@ class Pages extends Controller
   public function index(...$params)
   {
     // Check user is allowed to view this
-    if (!$this->role->canDo('view_page')) {
+    if (!$this->role->canDo('view_faq')) {
       // Redirect user with error
-      flashMsg('admin_dashboard', '<strong>Error</strong> Sorry, you are not allowed to view pages. Please contact your site administrator for access to this.', 'warning');
+      flashMsg('admin_dashboard', '<strong>Error</strong> Sorry, you are not allowed to view FAQs. Please contact your site administrator for access to this.', 'warning');
       redirectTo('admin');
       exit;
     }
@@ -253,39 +263,39 @@ class Pages extends Controller
     $this->loadIndexTable(...$params);
 
     // Load view
-    $this->load->view('pages/index', $this->data, 'admin');
+    $this->load->view('faq/index', $this->data, 'admin');
     exit;
   }
 
   /**
-   * Set Add Page Data
+   * Set Add Data
    *
-   * @param int $setStatus `[optional]` Status of page. Defaults to published.
-   * @param int $setSection `[optional]` Section of page. Defaults to "0" (Main).
+   * @param int $setStatus `[optional]` Status of faq. Defaults to published.
+   * @param array $setSections `[optional]` Sections of faq. Defaults to empty.
    */
-  protected function setAddData(int $setStatus = 1, int $setSection = 0)
+  protected function setAddData(int $setStatus = 1, array $setSections = array())
   {
 
     // Page Type
     $this->data['page_type'] = 'add';
     // Action URL
-    $this->data['action_url'] = get_site_url('admin/pages/add/');
+    $this->data['action_url'] = get_site_url('admin/faq/add/');
     // H1
-    $this->data['page_title'] = 'Add Page';
+    $this->data['page_title'] = 'Add FAQ';
     // Set Breadcrumbs
     $this->data['breadcrumbs'][] = array(
       'text' => $this->data['page_title'],
       'href' => $this->data['action_url']
     );
     // Instructions
-    $this->data['instructions'] = 'Enter the details for the new page to add it.';
+    $this->data['instructions'] = 'Enter the details for the new FAQ to add it.';
 
     ###########################
     ####    STATUS LIST    ####
     ###########################
 
     // Set status list options
-    $statusOptionsData = array(0 => 'Draft', 1 => 'Published', 2 => 'Private', 3 => 'Archived');
+    $statusOptionsData = array(0 => 'Draft', 1 => 'Published', 3 => 'Archived');
     $statusOptions = '';
     // Get list of status for assigning
     foreach ($statusOptionsData as $value => $label) {
@@ -306,21 +316,21 @@ class Pages extends Controller
     // Init section options
     $sectionOptions = '<option></option>';
     // Get list of sections for assigning
-    if ($sectionsData = $this->contentModel->listPageSections()) {
+    if ($sectionsData = $this->contentModel->listFAQSections()) {
       // Sections data exists
 
       // Loop through sections data
       foreach ($sectionsData as $section) {
 
         // Set selected if chosen type
-        $selected = (!empty($setSection) && $setSection == $section->section_id) ? ' selected' : '';
+        $selected = (!empty($setSection) && in_array($section->section_id, $setSection)) ? ' selected' : '';
 
         // Set to output
         $sectionOptions .= '<option value="' . $section->section_id . '"' . $selected . '>' . $section->section_name . '</option>';
       }
     }
     // Set blank fallback
-    $sectionOptions = ($sectionOptions !== '<option></option>') ? $sectionOptions : $sectionOptions . '<option disabled>There are currently no section available to assign this page to.</option>';
+    $sectionOptions = ($sectionOptions !== '<option></option>') ? $sectionOptions : $sectionOptions . '<option disabled>There are currently no sections available to assign this faq to.</option>';
     // Set section list options to data
     $this->data['section_options'] = $sectionOptions;
 
@@ -349,10 +359,10 @@ class Pages extends Controller
   public function add()
   {
     // Check user is allowed to view this
-    if (!$this->role->canDo('add_page')) {
+    if (!$this->role->canDo('add_faq')) {
       // Redirect user with error
-      flashMsg('admin_pages', '<strong>Error</strong> Sorry, you are not allowed to add pages. Please contact your site administrator for access to this.', 'warning');
-      redirectTo('admin/pages');
+      flashMsg('admin_faq', '<strong>Error</strong> Sorry, you are not allowed to add FAQs. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/faq');
       exit;
     }
 
@@ -367,7 +377,7 @@ class Pages extends Controller
       if (empty($this->data['content'])) {
         // Data not set. Return error.
         $this->data['err']['content'] = 'Please enter some content';
-        flashMsg('pages_page', '<strong>Error</strong> There was an error adding the page. Please enter some content.', 'warning');
+        flashMsg('faq_faq', '<strong>Error</strong> There was an error adding the FAQ. Please enter some content.', 'warning');
       }
 
       // Sanitize POST data
@@ -380,38 +390,24 @@ class Pages extends Controller
         try {
 
           // Get title data
-          $this->data['title'] = htmlspecialchars(trim($_POST['title']));
+          $this->data['title'] = htmlspecialchars(stripslashes(trim($_POST['title'])));
           if (empty($this->data['title'])) {
             // Data not set. Return error.
-            $this->data['err']['title'] = 'Please enter a page title';
+            $this->data['err']['title'] = 'Please enter an FAQ title';
           } else if (strlen($this->data['title']) < 3) {
             // Data is less than 3 characters. Return error.
             $this->data['err']['title'] = 'Please enter at least 3 characters';
           }
 
-          // Get Meta Title
-          $this->data['meta_title'] = htmlspecialchars(trim($_POST['meta_title']));
-          if (strlen($this->data['meta_title']) > 70) {
-            // Data is more than 70 characters. Return error.
-            $this->data['err']['meta_title'] = 'This is limited to 70 characters';
-          }
-
-          // Get Meta Description
-          $this->data['meta_description'] = htmlspecialchars(trim($_POST['meta_description']));
-          if (strlen($this->data['meta_description']) > 168) {
-            // Data is more than 168 characters. Return error.
-            $this->data['err']['meta_description'] = 'This is limited to 168 characters';
-          }
-
           // Get status data
-          $this->data['status'] = htmlspecialchars(trim($_POST['status']));
+          $this->data['status'] = htmlspecialchars(stripslashes(trim($_POST['status'])));
           if (!is_numeric($this->data['status'])) {
             // Data is not a valid type. Return error.
-            $this->data['err']['status'] = 'Please select a valid page status';
+            $this->data['err']['status'] = 'Please select a valid FAQ status';
           }
 
           // Get section data
-          $this->data['section_id'] = htmlspecialchars(trim($_POST['section_id']));
+          $this->data['section_id'] = (!empty($_POST['section_id']) && is_array($_POST['section_id'])) ? $_POST['section_id'] : array();
 
           // Get menu data
           $this->data['menu'] = (!empty($_POST['menu']) && is_array($_POST['menu'])) ? $_POST['menu'] : array();
@@ -422,33 +418,37 @@ class Pages extends Controller
 
           // Log error if any and set flash message
           error_log($e->getMessage(), 0);
-          flashMsg('pages_page', '<strong>Error</strong> There was an error adding the page. Please try again', 'warning');
+          flashMsg('faq_faq', '<strong>Error</strong> There was an error adding the FAQ. Please try again', 'warning');
         }
       } else { // Required data not set. Set Errors.
 
-        $this->data['err']['title'] = 'Please enter a page title';
+        $this->data['err']['title'] = 'Please enter an FAQ title';
       }
 
       // If valid, add new
       if (empty($this->data['err'])) {
         // Validated
 
-        // Add new page
-        if ($contentID = $this->contentModel->addPage(
+        // Add new FAQ
+        if ($contentID = $this->contentModel->addFAQ(
           $this->data['title'],
           $this->data['content'],
           (int) $this->data['status'],
-          (int) $this->data['section_id'],
           (int) $this->data['show_updated']
         )) {
           // Added
 
-          // Add page meta data
-          $this->contentModel->addPageMetaData(
-            (int) $contentID,
-            $this->data['meta_title'],
-            $this->data['meta_description']
-          );
+          // Check for assigned sections
+          if (!empty($this->data['section_id'])) {
+            // Loop through assigned sections
+            foreach ($this->data['section_id'] as $optNo => $sectionLink) {
+              // Add section link
+              $this->contentModel->addFAQLink(
+                (int) trim($sectionLink),
+                (int) $contentID
+              );
+            }
+          }
 
           // Check for assigned menus
           if (!empty($this->data['menu'])) {
@@ -467,51 +467,51 @@ class Pages extends Controller
 
           // Set SEO URL
           $this->cornerstoneCoreModel->checkSEOURL(
-            (int) 0,
+            (int) 1,
             (int) $contentID,
             $this->data['title']
           );
 
           // Set success message
-          flashMsg('admin_pages', '<strong>Success</strong> The "' . $this->data['title'] . '" page was added successfully');
+          flashMsg('admin_faq', '<strong>Success</strong> The "' . $this->data['title'] . '" FAQ was added successfully');
 
           // Return to list
-          redirectTo('admin/pages/');
+          redirectTo('admin/faq');
           exit;
         } // Unable to add. Return error.
 
         // Set error message
-        flashMsg('pages_page', '<strong>Error</strong> There was an error adding the page. Please try again.', 'warning');
+        flashMsg('faq_faq', '<strong>Error</strong> There was an error adding the FAQ. Please try again.', 'warning');
       }
 
       // If it's made it this far there were errors. Load add view with submitted data
 
       // Set Add Data
       $this->setAddData((int) $this->data['status'], $this->data['section_id']);
-    } else { // Page wasn't posted. Load view.
+    } else { // FAQ wasn't posted. Load view.
 
       // Set Add Data
       $this->setAddData();
     }
 
     // Load add view
-    $this->load->view('pages/page', $this->data, 'admin');
+    $this->load->view('faq/faq', $this->data, 'admin');
     exit;
   }
 
   /**
    * Set Edit Page Data
    *
-   * @param int $setStatus Status of page.
-   * @param int $setSection `[optional]` Section of page. Defaults to "0" (Main).
+   * @param int $setStatus Status of faq.
+   * @param array $setSections `[optional]` Sections of faq. Defaults to empty.
    */
-  protected function setEditData(int $setStatus, int $setSection = 0)
+  protected function setEditData(int $setStatus, array $setSections = array())
   {
 
     // Page Type
     $this->data['page_type'] = 'edit';
     // Action URL
-    $this->data['action_url'] = get_site_url('admin/pages/edit/' . $this->data['id']);
+    $this->data['action_url'] = get_site_url('admin/faq/edit/' . $this->data['id']);
     // H1
     $this->data['page_title'] = 'Edit ' . $this->data['title'];
     // Set Breadcrumbs
@@ -527,7 +527,7 @@ class Pages extends Controller
     ###########################
 
     // Set status list options
-    $statusOptionsData = array(0 => 'Draft', 1 => 'Published', 2 => 'Private', 3 => 'Archived');
+    $statusOptionsData = array(0 => 'Draft', 1 => 'Published', 3 => 'Archived');
     $statusOptions = '';
     // Get list of status for assigning
     foreach ($statusOptionsData as $value => $label) {
@@ -548,21 +548,21 @@ class Pages extends Controller
     // Init section options
     $sectionOptions = '<option></option>';
     // Get list of sections for assigning
-    if ($sectionsData = $this->contentModel->listPageSections()) {
+    if ($sectionsData = $this->contentModel->listFAQSections()) {
       // Sections data exists
 
       // Loop through sections data
       foreach ($sectionsData as $section) {
 
         // Set selected if chosen type
-        $selected = (!empty($setSection) && $setSection == $section->section_id) ? ' selected' : '';
+        $selected = (!empty($setSections) && in_array($section->section_id, $setSections)) ? ' selected' : '';
 
         // Set to output
         $sectionOptions .= '<option value="' . $section->section_id . '"' . $selected . '>' . $section->section_name . '</option>';
       }
     }
     // Set blank fallback
-    $sectionOptions = ($sectionOptions !== '<option></option>') ? $sectionOptions : $sectionOptions . '<option disabled>There are currently no section available to assign this page to.</option>';
+    $sectionOptions = ($sectionOptions !== '<option></option>') ? $sectionOptions : $sectionOptions . '<option disabled>There are currently no sections available to assign this faq to.</option>';
     // Set section list options to data
     $this->data['section_options'] = $sectionOptions;
 
@@ -596,9 +596,8 @@ class Pages extends Controller
       }
     }
     // Set blank fallback
-    $this->data['menu_options'] = ($this->data['menu_options'] !== '<option></option>') ? $this->data['menu_options'] : $this->data['menu_options'] . '<option disabled>There are currently no menus available to assign this page to.</option>';
+    $this->data['menu_options'] = ($this->data['menu_options'] !== '<option></option>') ? $this->data['menu_options'] : $this->data['menu_options'] . '<option disabled>There are currently no menus available to assign this faq to.</option>';
   }
-
 
   /**
    * Edit Page
@@ -624,7 +623,7 @@ class Pages extends Controller
       if (empty($this->data['content'])) {
         // Data not set. Return error.
         $this->data['err']['content'] = 'Please enter some content';
-        flashMsg('pages_page', '<strong>Error</strong> There was an error updating the page. Please enter some content.', 'warning');
+        flashMsg('faq_faq', '<strong>Error</strong> There was an error updating the FAQ. Please enter some content.', 'warning');
       }
 
       // Sanitize POST data
@@ -649,35 +648,21 @@ class Pages extends Controller
             $this->data['title'] = htmlspecialchars(stripslashes(trim($_POST['title'])));
             if (empty($this->data['title'])) {
               // Data not set. Return error.
-              $this->data['err']['title'] = 'Please enter a page title';
+              $this->data['err']['title'] = 'Please enter an FAQ title';
             } else if (strlen($this->data['title']) < 3) {
               // Data is less than 3 characters. Return error.
               $this->data['err']['title'] = 'Please enter at least 3 characters';
-            }
-
-            // Get Meta Title
-            $this->data['meta_title'] = htmlspecialchars(stripslashes(trim($_POST['meta_title'])));
-            if (strlen($this->data['meta_title']) > 70) {
-              // Data is more than 70 characters. Return error.
-              $this->data['err']['meta_title'] = 'This is limited to 70 characters';
-            }
-
-            // Get Meta Description
-            $this->data['meta_description'] = htmlspecialchars(stripslashes(trim($_POST['meta_description'])));
-            if (strlen($this->data['meta_description']) > 168) {
-              // Data is more than 168 characters. Return error.
-              $this->data['err']['meta_description'] = 'This is limited to 168 characters';
             }
 
             // Get status data
             $this->data['status'] = htmlspecialchars(stripslashes(trim($_POST['status'])));
             if (!is_numeric($this->data['status'])) {
               // Data is not a valid type. Return error.
-              $this->data['err']['status'] = 'Please select a valid page status';
+              $this->data['err']['status'] = 'Please select a valid FAQ status';
             }
 
             // Get section data
-            $this->data['section_id'] = htmlspecialchars(stripslashes(trim($_POST['section_id'])));
+            $this->data['section_id'] = (!empty($_POST['section_id']) && is_array($_POST['section_id'])) ? $_POST['section_id'] : array();
 
             // Get menu data
             $this->data['menu'] = (!empty($_POST['menu']) && is_array($_POST['menu'])) ? $_POST['menu'] : array();
@@ -688,11 +673,11 @@ class Pages extends Controller
 
             // Log error if any and set flash message
             error_log($e->getMessage(), 0);
-            flashMsg('pages_page', '<strong>Error</strong> There was an error updating the page. Please try again', 'warning');
+            flashMsg('faq_faq', '<strong>Error</strong> There was an error updating the FAQ. Please try again', 'warning');
           }
         } else { // Required data not set. Set Errors.
 
-          $this->data['err']['title'] = 'Please enter a page title';
+          $this->data['err']['title'] = 'Please enter an FAQ title';
         }
 
         // If valid, update
@@ -703,22 +688,47 @@ class Pages extends Controller
           $dataID = $this->data['id'];
 
           // Update
-          if ($this->contentModel->editPage(
+          if ($this->contentModel->editFAQ(
             (int) $dataID,
             $this->data['title'],
             $this->data['content'],
             (int) $this->data['status'],
-            (int) $this->data['section_id'],
             (int) $this->data['show_updated']
           )) {
             // Updated
 
-            // Edit page meta data
-            $this->contentModel->editPageMetaData(
-              (int) $dataID,
-              $this->data['meta_title'],
-              $this->data['meta_description']
-            );
+            // Get existing sections
+            $existingSections = array();
+            if ($existingSectionValues = $this->contentModel->listAssignedFAQSections((int) $dataID)) {
+
+              // Loop through values
+              foreach ($existingSectionValues as $sectionValue) {
+
+                // Check if existing value is one of the posted values
+                if (!in_array($sectionValue->section_id, $this->data['section_id'])) {
+
+                  // Not in array. Delete assigned section
+                  $this->contentModel->deleteAssignedFAQSections((int) $sectionValue->faqs_id);
+                } else {
+                  // Add to existing array
+                  $existingSections[] = $sectionValue->section_id;
+                }
+              }
+            }
+
+            // Loop through posted sections
+            foreach ($this->data['section_id'] as $optNo => $sectionID) {
+
+              // Check if adding item
+              if (!in_array($sectionID, $existingSections)) {
+
+                // Add assigned section
+                $this->contentModel->addFAQLink(
+                  (int) trim($sectionID),
+                  (int) $dataID
+                );
+              }
+            }
 
             // Get existing menu items
             $existingMenus = array();
@@ -739,7 +749,7 @@ class Pages extends Controller
               }
             }
 
-            // Loop through posted items
+            // Loop through posted menu items
             foreach ($this->data['menu'] as $optNo => $menuID) {
 
               // Check if adding item
@@ -754,22 +764,22 @@ class Pages extends Controller
             }
 
             // Set success message
-            flashMsg('admin_pages', '<strong>Success</strong> The "' . $this->data['title'] . '" page was updated successfully.');
+            flashMsg('admin_faq', '<strong>Success</strong> The "' . $this->data['title'] . '" FAQ was updated successfully.');
 
             // Return to list view
-            redirectTo('admin/pages');
+            redirectTo('admin/faq');
             exit;
           } else { // Unable to update. Return error and redirect to edit view.
 
             // Set error message
-            flashMsg('pages_page', '<strong>Error</strong> There was an error updating the page. Please contact your admin to get this fixed.', 'danger');
+            flashMsg('faq_faq', '<strong>Error</strong> There was an error updating the FAQ. Please contact your admin to get this fixed.', 'danger');
           }
         }
 
         // If it's made it this far there were errors. Load edit view with data
 
         // Set edit data
-        $this->setEditData((int) $this->data['status'], (int) $this->data['section_id']);
+        $this->setEditData((int) $this->data['status'], $this->data['section_id']);
 
         // Load view
         $this->load->view('pages/page', $this->data, 'admin');
@@ -787,34 +797,28 @@ class Pages extends Controller
       if (!empty($params) && is_numeric($params[0])) {
 
         // Get data
-        if ($contentData = $this->contentModel->getPage((int) $params[0])) {
+        if ($contentData = $this->contentModel->getFAQ((int) $params[0])) {
 
           // Set data
-          foreach ($contentData->content as $key => $data) {
-            $this->data[str_replace(array('content_'), '', $key)] = $data;
-          }
-          foreach ($contentData->content_meta as $key => $data) {
+          foreach ($contentData as $key => $data) {
             $this->data[str_replace(array('content_'), '', $key)] = $data;
           }
 
-          // Set fallback for section directory
-          $sectionDirectory = (empty($this->data['section_location_name'])) ? '' : $this->data['section_location_name'] . '/';
-
-          // Set fallback for view link
-          $this->data['viewLink'] = (!empty($this->data['slug'])) ? get_site_url($sectionDirectory . $this->data['slug']) : '';
+          // Get section IDs as array
+          $sectionIDs = (!empty($this->data['section_ids'])) ? explode(',', $this->data['section_ids']) : array();
 
           // Set Edit Data
-          $this->setEditData((int) $this->data['status'], (int) $this->data['section_id']);
+          $this->setEditData((int) $this->data['status'], $sectionIDs);
 
           // Load view
-          $this->load->view('pages/page', $this->data, 'admin');
+          $this->load->view('faq/faq', $this->data, 'admin');
           exit;
         } // Error getting the data. Redirect to list.
 
       } // No ID present. Redirect to list.
 
       // Redirect user
-      redirectTo('admin/pages');
+      redirectTo('admin/faq');
       exit;
     }
   }

@@ -30,9 +30,11 @@ require(get_theme_path('head.php')); ?>
   </div>
 </div>
 
-<div style="text-align: center;">
-  <p>Hello <span class="tooltip" title="This is tooltipster">World</span>!</p>
-  <p>Hello <span data-tippy-content="This is tippy">World</span>!</p>
+<div>
+  <section style="text-align: center;">
+    <p>Hello <span class="tooltip" title="This is tooltipster">World</span>!</p>
+    <p>Hello <span data-tippy-content="This is tippy">World</span>!</p>
+  </section>
 </div>
 <!-- End Main ~#~ Start Content -->
 
