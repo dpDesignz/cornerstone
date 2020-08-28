@@ -6,25 +6,44 @@
  * @package Cornerstone
  */
 
-class User
+class User extends ModelBase
 {
 
   // Set the default properties
-  private $conn;
-  private $optn;
   private $uid;
 
   /**
    * Construct the User
    * No parameters required, nothing will be returned
    */
-  public function __construct($option)
+  public function __construct($cdbh, $option)
+  {
+    // Load the model base constructor
+    parent::__construct($cdbh, $option);
+  }
+
+  /**
+   * Set user ID
+   *
+   * @param int $userID ID of the user to set
+   *
+   * @return bool Will return TRUE if ID set, or FALSE if not
+   */
+  public function setUserID(int $userID)
   {
 
-    // Create a database connection
-    $this->conn = new CornerstoneDBH;
-    // Set the options
-    $this->optn = $option;
+    // Check data is valid
+    if (!empty($userID) && is_numeric($userID)) {
+
+      // Set user ID
+      $this->uid = $userID;
+
+      // Return TRUE
+      return TRUE;
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
   }
 
   /**
@@ -570,6 +589,93 @@ class User
 
       // Return result
       return $usersResults;
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Add User
+   *
+   * @param string $login The username of the user
+   * @param string $displayName The display name of the user
+   * @param string $password The users generated password
+   * @param string $passwordKey The users generated password key
+   * @param string $email The email of the user
+   * @param string $firstName The first name of the user
+   * @param string $lastName The last name of the user
+   * @param int $roleID The ID of the role the user is assigned to
+   * @param int $authRqd Set if the user is required to use 2FA
+   *
+   * @return bool|int Will return FALSE if failed or inserted ID if successful.
+   */
+  public function addUser(
+    string $login,
+    string $displayName,
+    string $password,
+    string $passwordKey,
+    string $email,
+    string $firstName,
+    string $lastName,
+    int $roleID,
+    int $authRqd
+  ) {
+
+    // Add data
+    $this->conn->dbh->insert(
+      DB_PREFIX . "users",
+      array(
+        'user_login' => $login,
+        'user_display_name' => $displayName,
+        'user_password' => $password,
+        'user_password_key' => $passwordKey,
+        'user_email ' => $email,
+        'user_first_name' => $firstName,
+        'user_last_name' => $lastName,
+        'user_role_id' => $roleID,
+        'user_auth_rqd' => $authRqd,
+        'user_status' => '1',
+        'user_created_dtm' => date('Y-m-d H:i:s')
+      )
+    );
+
+    // Check if added successfully
+    if ($this->conn->dbh->affectedRows() > 0) {
+
+      // Return new ID
+      return $this->conn->dbh->getInsert_Id();
+    } // Unable to add. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  #####################
+  ####    ROLES    ####
+  #####################
+
+  /**
+   * Get list of user roles
+   *
+   * @return object Return object with list of user roles
+   */
+  public function listUserRoles()
+  {
+
+    // Run query to find data
+    $roleResults = $this->conn->dbh->selecting(
+      DB_PREFIX . "roles",
+      "role_id,
+      role_name",
+      orderBy("role_name", "ASC")
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($roleResults)) {
+
+      // Return result
+      return $roleResults;
     } // No results. Return FALSE.
 
     // Return FALSE

@@ -6,24 +6,19 @@
  * @package Cornerstone
  */
 
-class Setting
+class Setting extends ModelBase
 {
 
   // Set the default properties
-  private $conn;
-  private $optn;
 
   /**
    * Construct the User
    * No parameters required, nothing will be returned
    */
-  public function __construct($option)
+  public function __construct($cdbh, $option)
   {
-
-    // Create a database connection
-    $this->conn = new CornerstoneDBH;
-    // Set the options
-    $this->optn = $option;
+    // Load the model base constructor
+    parent::__construct($cdbh, $option);
   }
 
   /**

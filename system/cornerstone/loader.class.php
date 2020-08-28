@@ -17,6 +17,8 @@ final class Loader
   protected $pageType = 'page';
   // Set the registry
   protected $registry;
+  // Set the database
+  protected $conn;
   // Set the options
   protected $option;
   // Set the role
@@ -28,9 +30,10 @@ final class Loader
    * @param	object	$registry
    * @param	object	$option
    */
-  public function __construct($registry, $option, $role)
+  public function __construct($registry, $cdbh, $option, $role)
   {
     $this->registry = $registry;
+    $this->conn = $cdbh;
     $this->option = $option;
     $this->role = $role;
   }
@@ -68,8 +71,8 @@ final class Loader
       // Get model name
       $model = array_values(array_slice(explode(_DS, $model), -1))[0];
 
-      // Instatiate model
-      return new $model($this->option);
+      // Instantiate model
+      return new $model($this->conn, $this->option);
     } else {
       throw new \Exception('Error: Could not load model ' . $file . '!');
     }
@@ -100,6 +103,11 @@ final class Loader
 
     // Check if logged in
     $this->data['isAdmin'] = (isset($_SESSION['_cs']['user']['uid']) && !empty($_SESSION['_cs']['user']['uid'])) ? TRUE : FALSE;
+
+    // Trim filter data
+    if (!empty($data['filterData'])) {
+      $data['filterData'] = rtrim($data['filterData'], ', ');
+    }
 
     // Convert the data array into an object
     // This code converts multi-dimensional array

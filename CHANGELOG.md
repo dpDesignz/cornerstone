@@ -1,9 +1,30 @@
 # Cornerstone Change Log
 
+## 0.4.00 - Bug Fixes + DRY Fixes (2020-07-27 to)
+
+### This release includes breaking changes
+
+- 🖊️ Changed returned type in definition for the `get_sort_order()` filter function
+- ➕ Added check for cron job running via variable (`$cronFile`) in the `bootstrap.php` file
+- ➕ Added the ability to add a user
+- 🧹 Fixed bug with user login loading incorrect account and refactored login code to use new available functions for loading SQL queries
+- ➕ Added support for the [filp/whoops](http://filp.github.io/whoops/) error handling package
+- ➕ Added error logging for "warning" and "danger" flash messages
+- ➕ Added the "logs" section of the settings to view any logs in the system
+- ➕ Added `$errorsData` as a protected property in the core controller class
+- ➕ Added the `init_list_page` and `get_sort_order` methods to the core controller class
+- ➕ Added trimming the trailing comma off `$data['filterData']` in the view loader
+- 🖊️ Changed the properties for the pagination class to be protected and added the `set_props` method
+- 🖊️ Changed the way that models are loaded to include the database handler as the first parameter so that a new database connection isn't being loaded every new model
+- 🖊️ Changed the way that database connections are loaded in core classes
+- ➕ Added the `ModelBase` core class
+- ➕ Added the `load_child_controller` method to the core controller
+
 ## 0.3.05 - Sections + FAQ + Menu (2020-07-10)
 
 - ➕ Added the ability to edit FAQ sections
 - ➕ Added the ability to see menu and FAQ section item counts from the section list
+- ➕ Added check to skip any line containing the phrase "password" or "pwd" when printing an error page out
 
 ## 0.3.04 - Labels + FAQ (2020-07-04)
 

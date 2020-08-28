@@ -9,14 +9,17 @@
 
 // Load options from `cs_options` table where `autoload` is `true`
 $csOptions = new CornerstoneDBH; // Init db connection
+$row = null;
 foreach ($csOptions->dbh->selecting(DB_PREFIX . 'options', array('option_name', 'option_value'), eq('autoload', '1')) as $row) {
 	define(strtoupper($row->option_name), $row->option_value);
 }
+unset($csOptions);
+unset($row);
 
 /**#@+
  * Cornerstone constants
  */
-\defined('CS_VERSION') or \define('CS_VERSION', '0.3.04'); // Last updated ~ 2020-07-10
+\defined('CS_VERSION') or \define('CS_VERSION', '0.1.00'); // Last updated ~ 2020-08-29
 \defined('_DS') or \define('_DS', \DIRECTORY_SEPARATOR);
 /**#@-*/
 

@@ -7,21 +7,19 @@
  * @subpackage Mission Equine
  */
 
-class Content
+class Content extends ModelBase
 {
 
   // Set the default properties
-  private $conn;
 
   /**
    * Construct the User
    * No parameters required, nothing will be returned
    */
-  public function __construct()
+  public function __construct($cdbh, $option)
   {
-
-    // Create a database connection
-    $this->conn = new CornerstoneDBH;
+    // Load the model base constructor
+    parent::__construct($cdbh, $option);
   }
 
   ########################

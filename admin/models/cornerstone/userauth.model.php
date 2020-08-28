@@ -6,12 +6,10 @@
  * @package Cornerstone
  */
 
-class UserAuth
+class UserAuth extends ModelBase
 {
 
   // Set the default properties
-  private $conn;
-  private $optn;
   private $uid;
   public $remember;
 
@@ -19,13 +17,10 @@ class UserAuth
    * Construct the User
    * No parameters required, nothing will be returned
    */
-  public function __construct($option)
+  public function __construct($cdbh, $option)
   {
-
-    // Create a database connection
-    $this->conn = new CornerstoneDBH;
-    // Set the options
-    $this->optn = $option;
+    // Load the model base constructor
+    parent::__construct($cdbh, $option);
   }
 
   /**
@@ -39,22 +34,35 @@ class UserAuth
   public function findUserByEmail(string $udata, int $active = 1)
   {
 
-    // Create array of objects to bind
-    $bind = [];
-    $bind[':udata'] = $udata; // Bind udata
-    // If active, check
+    // Build query
+    $this->sql = array();
+    $this->whereArray = array();
+
+    // Set where login
+    $this->whereArray[] = grouping(
+      eq("user_login", $udata, _OR),
+      eq("user_email", $udata)
+    );
+
+    // Check for showing inactive
     if ($active) {
-      $bind[':status'] = $active;
-      $addToSql = ' AND user_status=:status';
-    } else {
-      $addToSql = '';
+      $this->whereArray[] = eq("user_status", "1");
+    }
+
+    // Combine where
+    if (!empty($this->whereArray)) {
+      $this->sql[] = where(...$this->whereArray);
     }
 
     // Run query to find active user
-    $this->conn->dbh->query_prepared("SELECT * FROM " . DB_PREFIX . "users WHERE (user_login=:udata  OR user_email=:udata)" . $addToSql, $bind);
+    $userData = $this->conn->dbh->selecting(
+      DB_PREFIX . "users",
+      "user_id",
+      ...$this->sql
+    );
 
     // Return if results
-    if ($this->conn->dbh->getNum_Rows() > 0) {
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userData)) {
 
       // Return True
       return TRUE;
@@ -119,14 +127,24 @@ class UserAuth
   public function loginUser(string $userData, string $userPassword)
   {
 
-    // Escape data
-    $userData = $this->conn->dbh->escape($userData);
-
     // Try get user data
     try {
 
       // Get user data
-      $userData = $this->conn->dbh->query_prepared("SELECT user_id, user_password, user_password_key, user_auth_rqd FROM cs_users WHERE (user_login=:userData  OR user_email=:userData) AND user_status=:userStatus", [":userData" => $userData, ":userStatus" => 1]);
+      $userData = $this->conn->dbh->selecting(
+        DB_PREFIX . "users",
+        "user_id,
+        user_password,
+        user_password_key,
+        user_auth_rqd",
+        where(
+          grouping(
+            eq("user_login", $userData, _OR),
+            eq("user_email", $userData)
+          ),
+          eq("user_status", "1")
+        )
+      );
     } catch (\PDOException $ex) {
 
       // Log error if any
@@ -137,10 +155,10 @@ class UserAuth
     }
 
     // If results returned, continue
-    if ($this->conn->dbh->getNum_Rows() > 0) {
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userData)) {
 
       // Get the data
-      $userData = $this->conn->dbh->get_row(NULL);
+      $userData = $userData[0];
 
       // Set user ID to allow other methods to work
       $this->uid = $userData->user_id;
@@ -156,7 +174,7 @@ class UserAuth
 
             // Return "2"
             return 2;
-          } else { // Else return "1"
+          } else { // Authorization required. Return "1"
 
             // Return success
             return 1;
@@ -199,9 +217,9 @@ class UserAuth
         DB_PREFIX . "login_log",
         "login_id",
         where(
-          gt("login_dtm", $max_time_check->format('Y-m-d H:i:s'), _AND),
-          eq("login_status", "3", _AND),
-          eq("login_user_id", $this->uid, _AND),
+          gt("login_dtm", $max_time_check->format('Y-m-d H:i:s')),
+          eq("login_status", "3"),
+          eq("login_user_id", $this->uid),
           eq("login_user_type", "1")
         )
       );
@@ -214,9 +232,9 @@ class UserAuth
           DB_PREFIX . "login_log",
           "login_id",
           where(
-            gt("login_dtm", $max_time_check->format('Y-m-d H:i:s'), _AND),
-            neq("login_status", "1", _AND),
-            eq("login_user_id", $this->uid, _AND),
+            gt("login_dtm", $max_time_check->format('Y-m-d H:i:s')),
+            neq("login_status", "1"),
+            eq("login_user_id", $this->uid),
             eq("login_user_type", "1")
           )
         );
@@ -257,8 +275,8 @@ class UserAuth
         DB_PREFIX . "login_log",
         "login_dtm",
         where(
-          eq("login_status", "3", _AND),
-          eq("login_user_id", $this->uid, _AND),
+          eq("login_status", "3"),
+          eq("login_user_id", $this->uid),
           eq("login_user_type", "1")
         ),
         orderBy("login_dtm", "DESC"),
@@ -430,8 +448,8 @@ class UserAuth
             'auth_dtm'
           ),
           where(
-            eq('auth_id', $authInfo[0], _AND),
-            eq('auth_selector', $authSelector, _AND),
+            eq('auth_id', $authInfo[0]),
+            eq('auth_selector', $authSelector),
             eq('auth_user_id', $authInfo[1])
           )
         );
@@ -551,12 +569,11 @@ class UserAuth
       // Get the user information
       $userResult = $this->conn->dbh->selecting(
         DB_PREFIX . 'users',
-        'user_login,
+        'user_id,
         user_email,
-        user_first_name,
-        user_last_name',
+        user_display_name',
         where(
-          eq('user_id', $this->uid, _AND),
+          eq('user_id', $this->uid),
           neq('user_status', '0')
         )
       );
@@ -574,13 +591,11 @@ class UserAuth
         // Set the user array
         $_SESSION['_cs']['user'] = array();
         // Set user ID
-        $_SESSION['_cs']['user']['uid'] = $this->uid;
+        $_SESSION['_cs']['user']['uid'] = $result->user_id;
         // Set user email address
         $_SESSION['_cs']['user']['email'] = $result->user_email;
-        // Set user login name
-        $_SESSION['_cs']['user']['login'] = $result->user_login;
-        // Set user full name
-        $_SESSION['_cs']['user']['name'] = $result->user_first_name . ' ' . $result->user_last_name;
+        // Set user display name
+        $_SESSION['_cs']['user']['name'] = ucwords($result->user_display_name);
 
         /**
          * Get the "ext.userauth.php" file and run `setCustomAuth()` function

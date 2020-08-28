@@ -20,10 +20,11 @@ class Option
   /**
    * Class Constructor
    */
-  public function __construct()
+  public function __construct($cdbh)
   {
-    // Create a database connection
-    $this->conn = new CornerstoneDBH;
+
+    // Set the database connection
+    $this->conn = $cdbh;
 
     // Load option data
     foreach ($this->conn->dbh->selecting(DB_PREFIX . 'options', array('option_name', 'option_value'), eq('autoload', '1')) as $option) {

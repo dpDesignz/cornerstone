@@ -55,62 +55,19 @@ class Roles extends Controller
 
     // Output user roles index page
 
-    // Check for search and rebuild URL
-    if (isset($this->request->get['search'])) {
-      redirectTo('admin/roles/search/' . urlencode($this->request->get['search']));
-      exit;
-    }
+    // Init list page
+    $this->init_list_page('admin/roles', ...$params);
 
-    // Set parameters
-    $this->request->set_params($params);
-    $this->params = array();
-    $this->data['showFilter'] = FALSE;
-    $this->data['filterData'] = '';
-
-    // Check for a search term
-    if (isset($this->request->params['search']) && !empty($this->request->params['search'])) {
-      $this->params['search'] = $this->request->params['search'];
-      $this->data['search'] = $this->params['search'];
-      $this->data['breadcrumbs'][] = array(
-        'text' => 'Search: ' . $this->params['search'],
-        'href' => get_site_url('admin/roles/search/' . urlencode($this->params['search']))
-      );
-    }
-
-    // Allowed sort fields
-    $this->canSortBy = array('name' => 'role_name');
+    ############################
+    #########  FILTERING #######
+    ############################
 
     // Check for sort
-    $sortOrder = get_sort_order($this->canSortBy, array('sort' => 'role_name', 'order' => 'ASC'), ...$params);
-
-    // Set sort to params
-    foreach ($sortOrder as $key => $value) {
-      $this->params[$key] = $value;
-    }
-
-    // Set the default sort item
-    $this->data['defaultSort'] = 'name';
-
-    // Set show filter
-    if (!empty($this->params['showFilter'])) {
-      $this->data['showFilter'] = $this->params['showFilter'];
-      $this->data['filterData'] .= 'Sort by = ' . $this->params['sortFilter'] . ', ';
-    }
-
-    // Check for page number
-    if (isset($this->request->params['page']) && !empty($this->request->params['page'])) {
-      // Set page number
-      $this->params['page'] = (int) $this->request->params['page'];
-    } else { // No page number. Set page number
-      $this->params['page'] = 1;
-    }
-
-    // Check for a page limit
-    if (isset($this->request->params['limit']) && !empty($this->request->params['limit'])) {
-      $this->params['limit'] = (int) $this->request->params['limit'];
-    } else { // No page limit. Set page limit
-      $this->params['limit'] = 25;
-    }
+    $this->get_sort_order(
+      array('name' => 'role_name'), // Allowed sort fields
+      array('sort' => 'role_name', 'order' => 'ASC'), // Fallback
+      ...$params
+    );
 
     // Output roles list
 
@@ -126,9 +83,7 @@ class Roles extends Controller
 
       // Set the pagination
       $pagination = new Pagination;
-      $pagination->total_records = (int) $this->data['totalResults'];
-      $pagination->current_page = (int) $this->params['page'];
-      $pagination->items_per_page = (int) $this->params['limit'];
+      $pagination->set_props((int) $this->data['totalResults'], (int) $this->params['page'], (int) $this->params['limit']);
       $this->data['pagination'] = $pagination->render();
 
       // Count total permissions
@@ -172,10 +127,10 @@ class Roles extends Controller
       // Set dataListOut to message
       if ($this->data['showFilter']) {
         // No filter results. Output message.
-        $outputMessage = '<p class="csc-body1">Sorry, there were no results that matched your filter.</p>';
+        $outputMessage = $this->data['no_filter_results_msg'];
       } else if (!empty($this->data['search'])) {
         // No search results. Output message
-        $outputMessage = '<p class="csc-body1">Sorry, there were no results that matched your search for <em>"' . $this->data['search'] . '"</em>.</p><p class="csc-body2"><a href="' . get_site_url('admin/roles') . '" title="Clear search results">Clear search results</a></p>';
+        $outputMessage = $this->data['no_results_msg'];
       } else {
         // No results. Output default.
         $this->data['noData'] = TRUE;

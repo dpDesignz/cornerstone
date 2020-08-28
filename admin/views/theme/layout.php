@@ -38,15 +38,9 @@
           'icon' => 'fas fa-users',
           'children' => array(
             array(
-              'identifier' => 'index',
+              'identifier' => 'users',
               'text' => 'All Users',
               'href' => get_site_url('admin/users')
-            ),
-            array(
-              'permission' => 'add_user',
-              'identifier' => 'add',
-              'text' => 'Add New',
-              'href' => ''
             ),
             array(
               'permission' => 'view_user_role',

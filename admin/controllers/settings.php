@@ -896,6 +896,96 @@ class Settings extends Controller
   }
 
   /**
+   * Logs Page
+   *
+   * @param mixed $params Mixed params where required
+   */
+  public function logs(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('view_log_settings')) {
+      // Redirect user with error
+      flashMsg('admin_settings', '<strong>Error</strong> Sorry, you are not allowed to view the log settings. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/settings');
+      exit;
+    }
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => 'Logs',
+      'href' => get_site_url('admin/settings/logs')
+    );
+
+    // Set the log directory
+    $logDirectory = DIR_SYSTEM . "storage" . _DS . "logs" . _DS;
+
+    // Check if any params set
+    if (!empty($params[0]) && $params[0] == 'delete' && !empty($params[1])) {
+
+      // Set the file
+      $fileNameToDelete = htmlspecialchars(trim($params[1]));
+
+      // Check the file exists
+      if (file_exists($logDirectory . $fileNameToDelete . '.log')) {
+        // Remove the file
+        if (file_put_contents($logDirectory . $fileNameToDelete . '.log', '') !== FALSE) {
+          // Set message
+          flashMsg('settings_logs', '<strong>Success</strong> The ' . $fileNameToDelete . ' log was emptied.');
+        } else { // Couldn't delete the file. Set error
+          // Set error
+          flashMsg('settings_logs', '<strong>Error</strong> There was an error deleting the emptying log ' . $fileNameToDelete, 'danger');
+        }
+      } else { // File doesn't exist. Set error
+        // Set error
+        flashMsg('settings_logs', '<strong>Error</strong> There was an error finding the requested log ' . $fileNameToDelete, 'danger');
+      }
+      redirectTo('admin/settings/logs');
+      exit;
+    }
+
+    // Get the directory files
+    $fileList = array_diff(scandir(
+      $logDirectory
+    ), array('..', '.'));
+
+    // Init log output
+    $this->data['log_output'] = '';
+
+    // Check if there are any files
+    if (!empty($fileList)) {
+      // Loop through file list
+      foreach ($fileList as $file) {
+        // Double check the file is a valid log file
+        if (strpos($file, ".log") !== FALSE && file_exists($logDirectory . $file) && !is_dir($logDirectory . $file)) {
+          // Set the file name
+          $fileName = str_replace('.log', '', $file);
+          // Get the file contents to output
+          $fileContents = file_get_contents($logDirectory . $file);
+          // Check the contents aren't empty
+          if (!empty($fileContents)) {
+            // Output contents
+            $this->data['log_output'] .= '<section class="csc-container cs-mb-3 cs-p-3">
+            <h2>' . ucwords($fileName) . ' Log <small><i class="fas fa-trash-alt"></i> <a href="' . get_site_url('admin/settings/logs/delete/' . $fileName) . '">empty the ' . $fileName . ' log</a></small></h2>
+            <div class="csc-row">
+              <div class="csc-col csc-col12 csc-input-field">
+                <textarea disabled>' . $fileContents . '</textarea>
+              </div>
+            </div>
+          </section>';
+          }
+        }
+      }
+    }
+
+    // Check if the output is empty
+    $this->data['log_output'] = (empty($this->data['log_output'])) ? '<section class="csc-container cs-mb-3 cs-p-3" style="min-height: 0;"><p class="cs-body2">There are no logs to display</p></section>' : $this->data['log_output'];
+
+    // Load view
+    $this->load->view('settings/logs', $this->data, 'admin');
+    exit;
+  }
+
+  /**
    * PHP Info Page
    */
   public function php_info()

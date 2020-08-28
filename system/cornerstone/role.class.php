@@ -24,10 +24,11 @@ class Role
   /**
    * Constructor
    */
-  public function __construct()
+  public function __construct($cdbh)
   {
-    // Create a database connection
-    $this->conn = new CornerstoneDBH;
+
+    // Set the database connection
+    $this->conn = $cdbh;
     // Create array in $permissions property
     $this->permissions = array();
     // Set master user to false

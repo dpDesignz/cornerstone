@@ -14,11 +14,29 @@
 class Pagination
 {
   // Define public properties
-  public $total_records = 0;
-  public $current_page = 1;
-  public $items_per_page = 20;
-  public $pages_per_direction = 3;
-  public $request_uri = '';
+  protected $total_records = 0;
+  protected $current_page = 1;
+  protected $items_per_page = 20;
+  protected $pages_per_direction = 3;
+  protected $request_uri = '';
+
+  /**
+   * Set the options for the pagination
+   *
+   * @param int $set_total_records `[optional]` The total amount of records available
+   * @param int $set_current_page `[optional]` The current page (offset)
+   * @param int $set_items_per_page `[optional]` The total amount of items to display (limit)
+   * @param int $set_pages_per_direction `[optional]` The total amount of pages to display either side of the current page
+   *
+   */
+  public function set_props(int $set_total_records = null, int $set_current_page = null, $set_items_per_page = null, $set_pages_per_direction = null)
+  {
+    // Set the property
+    $this->total_records = (!empty($set_total_records)) ? $set_total_records : $this->total_records;
+    $this->current_page = (!empty($set_current_page)) ? $set_current_page : $this->current_page;
+    $this->items_per_page = (!empty($set_items_per_page)) ? $set_items_per_page : $this->items_per_page;
+    $this->pages_per_direction = (!empty($set_pages_per_direction)) ? $set_pages_per_direction : $this->pages_per_direction;
+  }
 
   /**
    * Output pagination for datatable footers

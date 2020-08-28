@@ -5011,6 +5011,22 @@ body.cs-component__buttons .csc-btn--flat-large {
   justify-content: center;
   -webkit-tap-highlight-color: transparent;
 }
+body.cs-components .csc-btn.csc-btn--text-normal, body.cs-components .csc-btn--text-normal.csc-btn--tiny, body.cs-components .csc-btn--text-normal.csc-btn--small, body.cs-components .csc-btn--text-normal.csc-btn--large, body.cs-components .csc-btn--text-normal.csc-btn--outlined,
+body.cs-components .csc-btn--flat.csc-btn--text-normal,
+body.cs-components .csc-btn--text-normal.csc-btn--flat-tiny,
+body.cs-components .csc-btn--text-normal.csc-btn--flat-small,
+body.cs-components .csc-btn--text-normal.csc-btn--flat-large,
+body.cs-component__buttons .csc-btn.csc-btn--text-normal,
+body.cs-component__buttons .csc-btn--text-normal.csc-btn--tiny,
+body.cs-component__buttons .csc-btn--text-normal.csc-btn--small,
+body.cs-component__buttons .csc-btn--text-normal.csc-btn--large,
+body.cs-component__buttons .csc-btn--text-normal.csc-btn--outlined,
+body.cs-component__buttons .csc-btn--flat.csc-btn--text-normal,
+body.cs-component__buttons .csc-btn--text-normal.csc-btn--flat-tiny,
+body.cs-component__buttons .csc-btn--text-normal.csc-btn--flat-small,
+body.cs-component__buttons .csc-btn--text-normal.csc-btn--flat-large {
+  text-transform: initial;
+}
 body.cs-components .csc-btn.disabled, body.cs-components .disabled.csc-btn--tiny,
 body.cs-components .csc-btn--floating.disabled,
 body.cs-components .csc-btn--large.disabled,
@@ -6968,6 +6984,14 @@ body.cs-component__dialogs .csc-modal--scrollable .csc-modal__content {
 body.cs-components .csc-modal--scrollable .csc-modal__actions,
 body.cs-component__dialogs .csc-modal--scrollable .csc-modal__actions {
   border-color: rgba(0, 0, 0, 0.12);
+}
+body.cs-components .csc-modal--flowable,
+body.cs-component__dialogs .csc-modal--flowable {
+  overflow: visible;
+}
+body.cs-components .csc-modal--flowable .csc-modal__content,
+body.cs-component__dialogs .csc-modal--flowable .csc-modal__content {
+  overflow: visible;
 }
 @-webkit-keyframes sk-stretchdelay {
   0%, 40%, 100% {

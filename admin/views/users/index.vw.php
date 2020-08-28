@@ -4,7 +4,7 @@
  * The Admin Users Index File
  *
  * @package Cornerstone
- * @subpackage Core Cornerstone Admin Theme
+ * @subpackage Core Cornerstone Admin
  */
 
 // Set the meta/og information for the page

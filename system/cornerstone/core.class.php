@@ -137,6 +137,7 @@ class Core
       // $this->url = filter_var($this->url, FILTER_SANITIZE_URL); // Sanitize the data so it only passes url safe data
       // $this->url = str_replace('-', '_', $this->url); // Replace any dashes with underscores
       $this->url = explode('/', $this->url); // Explode the url into an array and return
+      unset($_GET['url']); // Unset the GET url
     }
   }
 }

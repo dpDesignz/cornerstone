@@ -19,6 +19,7 @@
     "icanboogie/inflector": "^2.0",
     "html2text/html2text": "^4.2",
     "intervention/image": "^2.5",
-    "intervention/imagecache": "^2.4"
+    "intervention/imagecache": "^2.4",
+    "filp/whoops": "^2.7"
   }
 }

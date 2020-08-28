@@ -85,17 +85,25 @@ function log_exception($e)
 				print '<tr><td style="padding-right: 10px;">' . $key . '</td><td>' . $value . '</td></tr>' . PHP_EOL;
 			}
 			foreach ($_REQUEST as $key => $value) {
-				print '<tr><td style="padding-right: 10px;">' . $key . '</td><td>' . $value . '</td></tr>' . PHP_EOL;
+				// Skip line if data contains the phrase "password" or "pwd"
+				if (strpos($key, "password") === FALSE && strpos($key, "pwd") === FALSE) {
+					print '<tr><td style="padding-right: 10px;">' . $key . '</td><td>' . $value . '</td></tr>' . PHP_EOL;
+				}
 			}
 			print '</table>' . PHP_EOL;
 			print '<p style="text-align: center; color: #95a5a6; font-size: 0.7em; font-style: italic;">&copy; ' . date('Y') . ' Cornerstone</p>' . PHP_EOL;
 			print '</div>' . PHP_EOL;
 			print '</body></html>';
 			break;
-		default: // Log error in file and redirect the user
-			$message = "Type: " . get_class($e) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};";
-			file_put_contents(ABSPATH . "/tmp/logs/exceptions.log", $message . PHP_EOL, FILE_APPEND);
-			header('Refresh:0; url=/', true, 303);
+		default: // Log error in file and die with error
+			$dateTimeNow = new DateTime();
+			// Check if user information is available
+			$userDetails = (!empty($_SESSION['_cs']['user']['uid']) && !empty($_SESSION['_cs']['user']['name'])) ? ' User: ' . $_SESSION['_cs']['user']['uid'] . '::' . $_SESSION['_cs']['user']['name'] . ';' : '';
+			$message = $dateTimeNow->format("U") . " [" . $dateTimeNow->format("d-M-Y H:i:s e") . "] Type: " . get_class($e) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};" . $userDetails;
+			file_put_contents(DIR_SYSTEM . "storage" . _DS . "logs" . _DS . "error.log", $message . PHP_EOL, FILE_APPEND);
+			http_response_code(500);
+			die('Whoops, sorry, it looks like there was an error.<br><br><strong>Please let your developer know the code "' . $dateTimeNow->format("U") . '" for debugging.</strong><br><br>Press the back button to go back to where you were.');
+			// header('Refresh:0; url=/', true, 303);
 			break;
 	}
 	exit();
@@ -111,22 +119,35 @@ function check_for_fatal()
 		log_error($error["type"], $error["message"], $error["file"], $error["line"]);
 }
 
-// Register a function for execution on shutdown
-// http://php.net/manual/en/function.register-shutdown-function.php
-register_shutdown_function("check_for_fatal");
+/**
+ * Checks how errors are to be handled
+ */
+if (isset($useFilpWhoops) && $useFilpWhoops) {
 
-// Sets a user-defined error handler function
-// http://php.net/manual/en/function.set-error-handler.php
-set_error_handler("log_error");
+	// Use filp/whoops package for error handling if is set
+	// http://filp.github.io/whoops/
+	$whoops = new \Whoops\Run;
+	$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+	$whoops->register();
+} else {
 
-// Sets a user-defined exception handler function
-// http://php.net/manual/en/function.set-exception-handler.php
-set_exception_handler("log_exception");
+	// Register a function for execution on shutdown
+	// http://php.net/manual/en/function.register-shutdown-function.php
+	register_shutdown_function("check_for_fatal");
 
-// This determines whether errors should be printed to the screen
-// as part of the output or if they should be hidden from the user.
-// http://php.net/manual/en/errorfunc.configuration.php#ini.display-errors
-ini_set("display_errors", "off");
+	// Sets a user-defined error handler function
+	// http://php.net/manual/en/function.set-error-handler.php
+	set_error_handler("log_error");
+
+	// Sets a user-defined exception handler function
+	// http://php.net/manual/en/function.set-exception-handler.php
+	set_exception_handler("log_exception");
+
+	// This determines whether errors should be printed to the screen
+	// as part of the output or if they should be hidden from the user.
+	// http://php.net/manual/en/errorfunc.configuration.php#ini.display-errors
+	ini_set("display_errors", "off");
+}
 
 // Set which PHP errors are reported
 // http://php.net/manual/en/function.error-reporting.php

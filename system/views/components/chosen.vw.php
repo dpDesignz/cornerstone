@@ -58,6 +58,17 @@ require(get_theme_path('head.php')); ?>
         <label>Status*</label>
       </div>
     </div>
+    <div class="csc-row csc-row--no-pad">
+      <div class="csc-col csc-col12 csc-input-field">
+        <select name="status" class="chosen-data" tabindex="2" data-placeholder="Select a status">
+          <option></option>
+          <option value="0">Archived</option>
+          <option value="1">Active</option>
+          <option value="2">Hidden</option>
+        </select>
+        <label>Status*</label>
+      </div>
+    </div>
   </form>
 </div>
 <!-- End Main ~#~ Start Footer -->

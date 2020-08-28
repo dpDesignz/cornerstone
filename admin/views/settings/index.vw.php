@@ -131,6 +131,15 @@ require(get_theme_path('layout.php', 'admin')); ?>
       </a>
     </article>
   <?php }
+  if ($role->canDo('view_log_settings')) { ?>
+    <article class="csc-col csc-col12 csc-col--md6 csc-col--lg3 csc-container">
+      <a href="<?php echo get_site_url('admin/settings/logs'); ?>">
+        <i class="fas fa-clipboard-list"></i>
+        <h3>Logs</h3>
+        <p>Error, Warning, and Danger logs</p>
+      </a>
+    </article>
+  <?php }
   if ($role->canDo('view_php_info')) { ?>
     <article class="csc-col csc-col12 csc-col--md6 csc-col--lg3 csc-container red" data-tippy-content="DANGER: Only click this if you know what you're doing!">
       <a href="<?php echo get_site_url('admin/settings/php_info'); ?>">

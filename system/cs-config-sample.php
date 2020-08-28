@@ -31,5 +31,9 @@ defined('DB_CHARSET') or define('DB_CHARSET', 'utf8mb4'); // Database Charset
 defined('DB_PREFIX') or define('DB_PREFIX', 'cs_'); // Database Prefix
 defined('EZSQL_TYPE') or define('EZSQL_TYPE', 'pdo'); // ezSQL Engine Type (mysqli, pgsql, sqlsrv, sqlite3, or pdo)
 
+// Uncomment if wanting to use the filp/whoops error logging over the cornerstone error logging
+// NOTE: This requires the filp/whoops package to be installed to use
+// $useFilpWhoops = TRUE;
+
 // Set up the Cornerstone Framework.
 require_once(DIR_SYSTEM . 'bootstrap.php');

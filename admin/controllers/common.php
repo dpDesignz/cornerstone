@@ -97,7 +97,7 @@ class Common extends Controller
         try {
 
           // Get user data
-          $this->data['udata'] = htmlspecialchars(stripslashes(trim($_POST['udata'])));
+          $this->data['udata'] = htmlspecialchars(trim($_POST['udata']));
           if (empty($this->data['udata'])) {
             // If user name or email not set, return error
             $this->data['err']['udata'] = 'Please enter your username or email address';

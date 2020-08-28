@@ -99,8 +99,25 @@ function flashMsg($name, $message = '', $class = 'success', int $icon = 1)
     // Get the icon class if it's set, else return empty
     $icon = (!empty($_SESSION['_cs']['msg_' . $name . '_icon']) && $_SESSION['_cs']['msg_' . $name . '_icon']) ? ' csc-alert--icon' : '';
 
+    // Init logged ID
+    $loggedID = '';
+
+    // Check if the message was a warning or danger for logging
+    if ((strtolower($class) == 'warning' || strtolower($class) == 'danger') && strpos(strtolower($_SESSION['_cs']['msg_' . $name]), "you need to log in first") === FALSE) {
+      // Set datetime now
+      $dateTimeNow = new DateTime();
+      // Check if user information is available
+      $userDetails = (!empty($_SESSION['_cs']['user']['uid']) && !empty($_SESSION['_cs']['user']['name'])) ? ' User: ' . $_SESSION['_cs']['user']['uid'] . '::' . $_SESSION['_cs']['user']['name'] . ';' : '';
+      // Set message
+      $logMsg = $dateTimeNow->format("U") . " [" . $dateTimeNow->format("d-M-Y H:i:s e") . "] Message: {$_SESSION['_cs']['msg_' .$name]}; URI: {$_SERVER['REQUEST_URI']};" . $userDetails;
+      // Log the information
+      file_put_contents(DIR_SYSTEM . "storage" . _DS . "logs" . _DS . strtolower($class) . ".log", $logMsg . PHP_EOL, FILE_APPEND);
+      // Append to logged ID if admin user
+      $loggedID = (!empty($_SESSION['_cs']['user']['uid'])) ? '<br><small class="cs-caption cs-muted"><em>Logged ID: ' . $dateTimeNow->format("U") . '</em></small>' : '';
+    }
+
     // Echo out the message
-    echo '<div class="csc-alert csc-alert--' . $class . $icon . '">' . $_SESSION['_cs']['msg_' . $name] . '</div>';
+    echo '<div class="csc-alert csc-alert--' . $class . $icon . '">' . $_SESSION['_cs']['msg_' . $name] . $loggedID . '</div>';
 
     // Unset the session
     unset($_SESSION['_cs']['msg_' . $name]);

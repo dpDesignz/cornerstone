@@ -47,15 +47,18 @@ require_once(DIR_HELPERS . 'fn.master.php');
 // Load the registry
 $registry = new Registry();
 
+// Create a database connection
+$cdbh = new CornerstoneDBH;
+
 // Options
-$option = new Option();
+$option = new Option($cdbh);
 $registry->set('optn', $option);
 
 // Role
-$role = new Role();
+$role = new Role($cdbh);
 
 // Loader
-$loader = new Loader($registry, $option, $role);
+$loader = new Loader($registry, $cdbh, $option, $role);
 
 // Request
 $registry->set('request', new Request());
@@ -65,13 +68,16 @@ if (!ini_get('date.timezone')) {
   date_default_timezone_set($option->get("site_timezone"));
 }
 
-// Load the session settings file
-require_once(DIR_HELPERS . 'fn.session.php');
+// Check if file running is a cron job
+if (empty($cronFile)) {
+  // Load the session settings file
+  require_once(DIR_HELPERS . 'fn.session.php');
 
-// Set role if user is logged in
-if (isLoggedInUser()) {
-  $role->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
-  $loader->updateRole($role);
+  // Set role if user is logged in
+  if (isLoggedInUser()) {
+    $role->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
+    $loader->updateRole($role);
+  }
 }
 
 // Set role and loader to registry

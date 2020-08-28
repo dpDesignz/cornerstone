@@ -13,7 +13,7 @@
  * @param array $defaultSort An associative array for fall back if the requested sort isn't valid. Format: array('sort' => 'id', 'order' => 'ASC') (the array MUST have a valid `sort` and `order` key).
  * @param mixed $params The params fed from the method to find the sort and order values
  *
- * @return string Will return an array with a `sort` and `order` value, and `showFilter` if matched.
+ * @return array Will return an array with a `sort` and `order` value, and `showFilter` if matched.
  */
 function get_sort_order(array $canSortBy, array $defaultSort, ...$params)
 {
