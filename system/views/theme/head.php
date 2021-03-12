@@ -16,7 +16,7 @@
   <meta property="og:image" content="<?php echo $pageMetaImage; ?>">
   <meta property="og:url" content="<?php echo $pageMetaCanonical; ?>">
   <!-- Add Additional Open Graph / Facebook Info -->
-  <meta property="og:site_name" content="<?php echo SITE_NAME; ?>">
+  <meta property="og:site_name" content="<?php echo $data->site_name; ?>">
   <meta property="og:locale" content="en_NZ">
   <!-- Add Icons -->
   <link rel="apple-touch-icon" sizes="180x180" href="<?php echo get_site_url('apple-touch-icon.png'); ?>">

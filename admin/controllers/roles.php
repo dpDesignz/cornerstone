@@ -10,34 +10,27 @@ class Roles extends Controller
     // Load the controller constructor
     parent::__construct($registry);
 
-    // Check if user is logged in
-    if (!userPageProtect()) {
+    // Check if user is allowed admin access
+    checkAdminAccess();
 
-      // If user is not logged in, show the login page
-      flashMsg('admin_login', 'You need to log in first.', 'warning');
-      $this->load->view('common/login', '', 'admin');
-      exit;
-    } else {
+    // Load the role model
+    $this->roleModel = $this->load->model('cornerstone/userrole', 'admin');
 
-      // Load the role model
-      $this->roleModel = $this->load->model('cornerstone/userrole', 'admin');
-
-      // Set Breadcrumbs
-      $this->data['breadcrumbs'] = array(
-        array(
-          'text' => 'Dashboard',
-          'href' => get_site_url('admin')
-        ),
-        array(
-          'text' => 'Users',
-          'href' => get_site_url('admin/users')
-        ),
-        array(
-          'text' => 'Roles',
-          'href' => get_site_url('admin/roles')
-        )
-      );
-    }
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'] = array(
+      array(
+        'text' => 'Dashboard',
+        'href' => get_site_url('admin')
+      ),
+      array(
+        'text' => 'Users',
+        'href' => get_site_url('admin/users')
+      ),
+      array(
+        'text' => 'Roles',
+        'href' => get_site_url('admin/roles')
+      )
+    );
   }
 
   /**

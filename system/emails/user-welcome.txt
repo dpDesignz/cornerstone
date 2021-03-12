@@ -6,11 +6,11 @@ Welcome to the {{site_name}} website. We've got your login details inside to get
 Welcome, {{first_name}}!\r\n
 ************\r\n\r\n
 
-An admin account has been created for you to login in to the admin end of the {{site_name}} website. We are thrilled to have you on board. Click the set password link to get started with your account.\r\n\r\n
+An account has been created for you to login in to the {{site_name}} website. We are thrilled to have you on board. Click the set password link to get started with your account.\r\n\r\n
 
 Set Password ( {{action_url}} )\r\n\r\n
 
-This set password link is only valid until {{expire_dtm}}. If you need to change your password after this period, head to the admin sign in page and click the "Forgot Password" link there.\r\n\r\n
+This set password link is only valid until {{expire_dtm}}. If you need to change your password after this period, head to the sign in page and click the "Forgot Password" link there.\r\n\r\n
 
 For reference, here's your login information:\r\n\r\n
 
@@ -18,7 +18,7 @@ Sign In Page: {{login_url}}\r\n
 Login: {{user_name}}\r\n
 Email Address: {{email}}\r\n\r\n
 
-If you have any questions, feel free to email our office team ( {{support_email}} ) who will be more than happy to help.
+If you have any questions, feel free to email our office team ( {{support_email}} ) who will be more than happy to help.\r\n\r\n
 
 Thanks,\r\n
 The {{site_name}} Team\r\n\r\n

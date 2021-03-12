@@ -81,7 +81,7 @@
           <li><a href="<?php echo get_site_url(); ?>" data-tippy-content="View Website Front End" target="_blank"><i class="fas fa-home"></i></a></li>
           <li><a href="javascript:alert('Notification system coming soon');" data-tippy-content="Notifications (Coming soon)"><i class="fas fa-bell"></i></a></li>
           <li><a href="javascript:alert('Help desk coming soon');" data-tippy-content="Need help? (Coming soon)"><i class="far fa-question-circle"></i></a></li>
-          <li><a href="<?php echo get_site_url('admin/logout'); ?>" data-tippy-content="Log out" class="logout"><i class="fas fa-power-off"></i></a></li>
+          <li><a href="<?php echo get_site_url('account/logout'); ?>" data-tippy-content="Log out" class="logout"><i class="fas fa-power-off"></i></a></li>
         </ol>
       </nav>
     </section>

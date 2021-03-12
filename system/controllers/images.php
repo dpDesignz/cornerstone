@@ -14,8 +14,9 @@ class Images extends Controller
   {
 
     // create an image manager instance with favored driver
+    // $this->manager = new ImageManager(array('driver' => 'gd'));
     if (!extension_loaded('imagick')) {
-      $this->manager = new ImageManager(array('driver' => 'GD'));
+      $this->manager = new ImageManager(array('driver' => 'gd'));
     } else {
       $this->manager = new ImageManager(array('driver' => 'imagick'));
     }
@@ -130,6 +131,24 @@ class Images extends Controller
         // Check if the file exists
         if (file_exists($imagePath)) {
 
+          // Check if wanting to get the thumb
+          if (!empty($_GET['thumb']) && (strtolower($_GET['thumb']) == "s" || strtolower($_GET['thumb']) == "m")) {
+            // Get image info
+            $img_info = pathinfo($imagePath);
+
+            // Get the thumb type
+            $thumbType = (strtolower($_GET['thumb']) == "m") ? 'm' : '';
+
+            // Patch together path
+            $newImagePath = $img_info['dirname'] . _DS . $img_info['filename'] . '_' . $thumbType . 'thumb.' . $img_info['extension'];
+
+            // Check the file exists
+            if (file_exists($newImagePath)) {
+              // Set new image path
+              $imagePath = $newImagePath;
+            }
+          }
+
           // Create the image
           $cached_image = $this->manager->cache(
             function ($image) use ($imagePath) {
@@ -153,7 +172,7 @@ class Images extends Controller
                   if (empty($_GET['e']) || trim($_GET['e']) !== 'y') {
                     $constraint->upsize();
                   }
-                }, 10, TRUE);
+                });
               } else {
                 // Return the image
                 return $image;

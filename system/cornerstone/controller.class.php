@@ -3,7 +3,7 @@
 /**
  * @package		Cornerstone
  * @author		Damien Peden
- * @copyright	Copyright (c) 2019-2020, dpDesignz (https://www.dpdesignz.co.nz/)
+ * @copyright	Copyright (c) 2019-2021, dpDesignz (https://www.dpdesignz.co.nz/)
  * @link		https://github.com/dpDesignz/cornerstone
  */
 
@@ -20,6 +20,8 @@ abstract class Controller
   protected $data = array();
   // Init $params
   protected $params = array();
+  // Init $prop
+  protected $prop = array();
   // Set the registry
   protected $registry;
 
@@ -170,6 +172,9 @@ abstract class Controller
     if (!empty($this->data['search'])) {
       $this->data['no_results_msg'] = '<p class="csc-body1">Sorry, there were no results that matched your search for <em>"' . $this->data['search'] . '"</em>.</p><p class="csc-body2"><a href="' . get_site_url(rtrim($pageURI, '/')) . '" title="Clear search results">Clear search results</a></p>';
     }
+
+    // Set no filter results message
+    $this->data['no_filter_results_msg'] = '<p class="csc-body1">Sorry, there were no results that matched your filter.</p>';
   }
 
   /**
@@ -200,7 +205,7 @@ abstract class Controller
         $this->params['sort'] = $canSortBy[$sort];
 
         // Check what direction to sort by
-        $order = (!empty($params[$arrayKey + 2])) ? strtoupper(htmlspecialchars(stripslashes(urldecode(trim($params[$arrayKey + 2]))))) : '';
+        $order = (!empty($params[$arrayKey + 2])) ? strtoupper(htmlspecialchars(urldecode(trim($params[$arrayKey + 2])))) : '';
 
         // Set what direction to sort by
         $this->params['order'] = (in_array($order, array("DESC", "ASC"))) ? $order : 'ASC';
@@ -208,7 +213,6 @@ abstract class Controller
         // Set `showFilter` to true
         $this->params['showFilter'] = TRUE;
         $this->params['sortFilter'] = ucwords($sort);
-        $this->data['no_filter_results_msg'] = '<p class="csc-body1">Sorry, there were no results that matched your filter.</p>';
 
         // Set show filter
         if (!empty($this->params['showFilter'])) {

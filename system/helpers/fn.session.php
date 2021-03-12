@@ -176,7 +176,7 @@ function userPageProtect($logout = FALSE)
 
     if ($logout) { // Log out user
 
-      redirectTo('admin/logout');
+      redirectTo('account/logout');
       exit;
     } else { // Return FALSE/
 
@@ -196,8 +196,8 @@ function userPageProtect($logout = FALSE)
       // Get global $loader
       global $loader;
 
-      // Load userauth model
-      $userAuth = $loader->model('cornerstone/userauth', 'admin');
+      // Load accountauth model
+      $userAuth = $loader->model('accountauth', 'account');
 
       // Check if the cookie is expired
       if ($userID = $userAuth->checkAuthCookie()) {
@@ -231,7 +231,7 @@ function userPageProtect($logout = FALSE)
 
     if ($logout) { // Log out user
 
-      redirectTo('admin/logout');
+      redirectTo('account/logout');
       exit;
     } else { // Return FALSE/
 
@@ -242,5 +242,50 @@ function userPageProtect($logout = FALSE)
 
     // Return TRUE
     return TRUE;
+  }
+}
+
+/**
+ * Check user is allowed admin access
+ *
+ * @param int $redirect `[optional]` Set if you want to redirect the user or just return a boolean. Defaults to "1" (redirect user)
+ *
+ * @return mixed bool Returns FALSE if not allowed access OR redirects the user
+ */
+function checkAdminAccess(int $redirect = 1)
+{
+
+  if (!userPageProtect()) {
+    // Check if wanting to redirect
+    if ($redirect) {
+
+      // Get global $loader
+      global $loader;
+
+      // If user is not logged in, show the login page
+      flashMsg('admin_login', 'You need to log in first.', 'warning');
+      $loader->view('common/login', '', 'admin');
+      exit;
+    } else {
+      // Return FALSE
+      return FALSE;
+    }
+  } else {
+    // Get global $role
+    global $role;
+
+    // Check if the user can access the admin area
+    if (!$role->canDo('access_admin')) {
+      // Check if wanting to redirect
+      if ($redirect) {
+        // User isn't allowed admin access
+        flashMsg('account_index', 'Sorry, that section of the website is restricted access.', 'warning');
+        redirectTo('account');
+        exit;
+      } else {
+        // Return FALSE
+        return FALSE;
+      }
+    }
   }
 }

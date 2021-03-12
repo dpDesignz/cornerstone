@@ -11,37 +11,30 @@ class FAQ extends Controller
     // Load the controller constructor
     parent::__construct($registry);
 
-    // Check if user is logged in
-    if (!userPageProtect()) {
+    // Check if user is allowed admin access
+    checkAdminAccess();
 
-      // If user is not logged in, show the login page
-      flashMsg('admin_login', 'You need to log in first.', 'warning');
-      $this->load->view('common/login', '', 'admin');
-      exit;
-    } else {
+    // Define the page type
+    $this->pageType = 'faq';
 
-      // Define the page type
-      $this->pageType = 'faq';
+    // Load the content model
+    $this->contentModel = $this->load->model('sitecontent/content', 'admin');
 
-      // Load the content model
-      $this->contentModel = $this->load->model('sitecontent/content', 'admin');
-
-      // Set Breadcrumbs
-      $this->data['breadcrumbs'] = array(
-        array(
-          'text' => 'Dashboard',
-          'href' => get_site_url('admin')
-        ),
-        array(
-          'text' => 'Site Content',
-          'href' => ''
-        ),
-        array(
-          'text' => 'FAQ',
-          'href' => get_site_url('admin/faq')
-        )
-      );
-    }
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'] = array(
+      array(
+        'text' => 'Dashboard',
+        'href' => get_site_url('admin')
+      ),
+      array(
+        'text' => 'Site Content',
+        'href' => ''
+      ),
+      array(
+        'text' => 'FAQ',
+        'href' => get_site_url('admin/faq')
+      )
+    );
   }
 
   /**

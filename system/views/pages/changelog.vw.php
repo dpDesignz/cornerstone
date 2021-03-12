@@ -8,8 +8,8 @@
  */
 
 // Set the meta/og information for the page
-$pageMetaTitle = SITE_NAME . " changelog";
-$pageMetaDescription = "The changelog for the " . SITE_NAME . " website.";
+$pageMetaTitle = $data->site_name . " changelog";
+$pageMetaDescription = "The changelog for the " . $data->site_name . " website.";
 $pageMetaKeywords = "changelog";
 $pageMetaImage = get_site_url('img/site_ogp_image.png');
 $pageMetaCanonical = get_site_url();
@@ -64,7 +64,7 @@ require(get_theme_path('head.php')); ?>
 </script>
 <!-- End Main ~#~ Start Footer -->
 <footer>
-  <p>&copy; <?php echo date('Y') . ' ' . SITE_NAME; ?> &middot; Built with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone v<?php echo CS_VERSION; ?></a></p>
+  <p>&copy; <?php echo date('Y') . ' ' . $data->site_name; ?> &middot; Built with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone v<?php echo CS_VERSION; ?></a></p>
 </footer>
 </body>
 

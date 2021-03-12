@@ -8,8 +8,8 @@
  */
 
 // Set the meta/og information for the page
-$pageMetaTitle = "Login | " . SITE_NAME . " Admin";
-$pageMetaDescription = SITE_NAME . " Admin login page.";
+$pageMetaTitle = "Login | " . $data->site_name . " Admin";
+$pageMetaDescription = $data->site_name . " Admin login page.";
 $pageMetaImage = get_site_url('img/cornerstone_framework_logo_white.png');
 $pageMetaCanonical = get_site_url('/admin/login');
 $pageMetaType = "website";
@@ -17,37 +17,7 @@ $pageMetaType = "website";
 // Set any page injected values
 $pageHasForm = TRUE;
 $pageHeadExtras = '<link href="' . get_site_url('admin-files/css/user-forms.css?v=' . str_replace(' ', '', trim($option->get('site_version')))) . '" rel="stylesheet" type="text/css">';
-$pageFooterExtras = '<script>
-    $().ready(function() {
-      $("#admin-login-form").validate({
-        rules: {
-          udata: {
-            required: true,
-            minlength: 3
-          },
-          password: {
-            required: true,
-            minlength: 6
-          }
-        },
-        messages: {
-          udata: {
-            required: "Please enter your username or email address",
-            minlength: "Please enter at least 3 characters"
-          },
-          password: {
-            required: "Please enter your password",
-            minlength: "Please enter at least 6 characters"
-          }
-        }
-      })';
-// Output errors if they exist
-if (!empty($data->err)) {
-  // Call the formatting function
-  $pageFooterExtras .= showValidationErrors($data->err);
-}
-$pageFooterExtras .= '});
-  </script>';
+$pageFooterExtras = '';
 
 // Set redirect URL
 // Check if redirect set in query
@@ -76,15 +46,15 @@ require(get_theme_path('head.php', 'admin')); ?>
 <!-- End Header ~#~ Start Main -->
 <main>
   <section id="cs--user-form" class="csc-card center animated animatedFadeInUp fadeInUp">
-    <form action="<?php echo get_site_url('admin/login'); ?>" method="POST" id="admin-login-form" class="csc-form">
+    <form action="<?php echo get_site_url('account/login'); ?>" method="POST" id="admin-login-form" class="csc-form">
       <input type="hidden" name="redirect-to" id="redirect-to" value="<?php echo $redirectURL; ?>">
       <h3 class="cs-h3">Admin</h3>
       <p class="cs-body1">Sign in to your account.</p>
       <?php flashMsg('admin_login'); ?>
       <div class="csc-input-field">
         <i class="material-icons csc-prefix">account_circle</i>
-        <input type="text" name="udata" id="udata" autocapitalize="off" <?php if (!empty($data->udata)) echo ' value="' . $data->udata . '"'; ?> required>
-        <label for="udata">Email/Username</label>
+        <input type="text" name="user" id="user" autocapitalize="off" <?php if (!empty($data->user)) echo ' value="' . $data->user . '"'; ?> required>
+        <label for="user">Email/Username</label>
       </div>
       <div class="csc-input-field cs-mb-1">
         <i class="material-icons csc-prefix">vpn_key</i>
@@ -93,7 +63,7 @@ require(get_theme_path('head.php', 'admin')); ?>
       </div>
       <div class="csc-row csc-row--no-gap">
         <p class="csc-col csc-col12 csc-col--md7 cs-text-left-md cs-my-1 cs-mb-3"><label><input type="checkbox" name="remember" id="remember-me" <?php if (!empty($data->remember) && !$data->remember) echo ' checked'; ?>><span>Remember me</span></label></p>
-        <p class="csc-col csc-col12 csc-col--md5 cs-text-right-md cs-my-1 cs-mb-3 cs-caption"><a href="<?php echo get_site_url('admin/users/forgot-password'); ?>" class="csc-text-grey text-darken-2">Forgot Password?</a></p>
+        <p class="csc-col csc-col12 csc-col--md5 cs-text-right-md cs-my-1 cs-mb-3 cs-caption"><a href="<?php echo get_site_url('account/password/forgot'); ?>" class="csc-text-grey text-darken-2">Forgot Password?</a></p>
       </div>
       <button type="submit" name="action" value="log-in" class="csc-btn csc-btn--wide csc-btn--success">Sign In <i class="material-icons csc-bi-right">exit_to_app</i></button>
     </form>
@@ -101,8 +71,42 @@ require(get_theme_path('head.php', 'admin')); ?>
 </main>
 <!-- End Main ~#~ Start Footer -->
 <footer>
-  <p><span><a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone</a></span><span>Version <?php echo CS_VERSION; ?></span>&copy; <?php echo date('Y') . ' ' . SITE_NAME; ?></p>
+  <p><span><a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone</a></span><span>Version <?php echo CS_VERSION; ?></span>&copy; <?php echo date('Y') . ' ' . $data->site_name; ?></p>
 </footer>
+
+<script>
+  // Init validation on document ready
+  $(document).ready(function() {
+    let validator = $("#admin-login-form").validate({
+      rules: {
+        user: {
+          required: true,
+          minlength: 3
+        },
+        password: {
+          required: true,
+          minlength: 6
+        }
+      },
+      messages: {
+        user: {
+          required: "Please enter your username or email address",
+          minlength: "Please enter at least 3 characters"
+        },
+        password: {
+          required: "Please enter your password",
+          minlength: "Please enter at least 6 characters"
+        }
+      }
+    });
+    <?php
+    // Output errors if they exist
+    if (!empty($data->err)) {
+      // Call the formatting function
+      echo 'validator' . showValidationErrors($data->err);
+    } ?>
+  });
+</script>
 
 <?php
 // Load html footer

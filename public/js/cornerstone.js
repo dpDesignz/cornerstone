@@ -1,537 +1,459 @@
+"use strict";
 /*!
 // The core JS file for running Cornerstone Framework scripts
 */
-
-// Enable JS debugging
 const debug = false;
-
-// Vanilla JS ready function
-const ready = callback => {
-  if (document.readyState !== 'loading') callback();
-  else document.addEventListener('DOMContentLoaded', callback);
+const ready = (callback) => {
+    if (document.readyState !== 'loading')
+        callback();
+    else
+        document.addEventListener('DOMContentLoaded', callback);
 };
-
-// Vanilla JS Show/Hide ~ https://gomakethings.com/how-to-a-fade-in-to-vanilla-javascript-show-and-hide-methods/
-
-// Vanilla JS show element
-const jsShow = function(elem) {
-  // Get the natural height of the element
-  const getHeight = function() {
-    elem.style.display = 'block'; // Make it visible
-    const elemHeight = `${elem.scrollHeight}px`; // Get it's height
-    elem.style.display = ''; //  Hide it again
-    return elemHeight;
-  };
-
-  const thisHeight = getHeight(); // Get the natural height
-  elem.classList.add('show'); // Make the element visible
-  elem.style.height = thisHeight; // Update the max-height
-
-  // Once the transition is complete, remove the inline max-height so the content can scale responsively
-  window.setTimeout(function() {
-    elem.style.height = '';
-  }, 350);
-};
-
-// Vanilla JS hide element
-const jsHide = function(elem) {
-  // Give the element a height to change from
-  elem.style.height = `${elem.scrollHeight}px`;
-
-  // Set the height back to 0
-  window.setTimeout(function() {
-    elem.style.height = '0';
-  }, 1);
-
-  // When the transition is complete, hide it
-  window.setTimeout(function() {
-    elem.classList.remove('show');
-  }, 350);
-};
-
-// Hide alerts on click
-document.querySelectorAll('.csc-alert').forEach(alert =>
-  alert.addEventListener('click', function() {
-    // Check if closable
-    if (
-      !this.hasAttribute('data-closable') ||
-      this.dataset.closable === 'true'
-    ) {
-      this.style.display = 'none';
+const getClosest = function (elem, selector) {
+    if (!Element.prototype.matches) {
+        Element.prototype.matches =
+            Element.prototype.matchesSelector ||
+                Element.prototype.mozMatchesSelector ||
+                Element.prototype.msMatchesSelector ||
+                Element.prototype.oMatchesSelector ||
+                Element.prototype.webkitMatchesSelector ||
+                function (s) {
+                    const matches = (document || elem.ownerDocument).querySelectorAll(s);
+                    let i = matches.length;
+                    while (--i >= 0 && matches.item(i) !== elem) { }
+                    return i > -1;
+                };
     }
-  })
-);
-
-// Hide Banner Notification
-function hideBanner() {
-  $('#csc-banner').removeClass('visible');
+    for (; elem && elem !== document; elem = elem.parentNode) {
+        if (elem.matches(selector))
+            return elem;
+    }
+    return null;
+};
+const debounce = (func, wait = 250, immediate) => {
+    let timeout = 0;
+    const debounced = function () {
+        const context = this;
+        const args = arguments;
+        const later = function () {
+            timeout = 0;
+            if (!immediate)
+                func.call(context, ...args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = window.setTimeout(later, wait);
+        if (callNow)
+            func.call(context, ...args);
+    };
+    debounced.cancel = function () {
+        clearTimeout(timeout);
+        timeout = 0;
+    };
+    return debounced;
+};
+const jsShow = function (elem) {
+    const getHeight = function () {
+        elem.style.display = 'block';
+        const elemHeight = `${elem.scrollHeight}px`;
+        elem.style.display = '';
+        return elemHeight;
+    };
+    const thisHeight = getHeight();
+    elem.classList.add('show');
+    elem.style.height = thisHeight;
+    window.setTimeout(function () {
+        elem.style.height = '';
+    }, 350);
+};
+const jsHide = function (elem) {
+    elem.style.height = `${elem.scrollHeight}px`;
+    window.setTimeout(function () {
+        elem.style.height = '0';
+    }, 1);
+    window.setTimeout(function () {
+        elem.classList.remove('show');
+    }, 350);
+};
+const animateElm = function (elem, animation, speed, hide) {
+    if (!elem || !animation)
+        return;
+    elem.removeAttribute('hidden');
+    if (speed && (speed === 'slow' || speed === 'slower' || speed === 'fast' || speed === 'faster')) {
+        elem.classList.add(`animate__${speed}`);
+    }
+    elem.classList.add(`animate__${animation}`);
+    elem.addEventListener('animationend', function endAnimation(event) {
+        elem.classList.remove(`animate__${animation}`);
+        if (speed && (speed === 'slow' || speed === 'slower' || speed === 'fast' || speed === 'faster')) {
+            elem.classList.remove(`animate__${speed}`);
+        }
+        if (hide) {
+            elem.setAttribute('hidden', 'true');
+        }
+        elem.removeEventListener('animationend', endAnimation, false);
+    }, false);
+};
+const siteAlerts = document.querySelectorAll('.csc-alert');
+if (siteAlerts) {
+    siteAlerts.forEach(alert => alert.addEventListener('click', () => {
+        if (!alert.hasAttribute('data-closable') ||
+            alert.dataset.closable === 'true') {
+            alert.style.display = 'none';
+        }
+    }));
 }
-$('[close-banner]').click(function() {
-  hideBanner();
-});
-
-// Change table header direction arrow on sort
-$('.csc-table-header__title').click(function() {
-  if (!$(this).hasClass('csc-table-header__title--active')) {
-    $('.csc-table-header__title')
-      .removeClass('csc-table-header__title--active')
-      .removeClass('csc-table-header__title--desc');
-    $(this).addClass('csc-table-header__title--active');
-  } else if (!$(this).hasClass('csc-table-header__title--desc')) {
-    $(this).addClass('csc-table-header__title--desc');
-  } else {
-    $(this).removeClass('csc-table-header__title--desc');
-  }
-});
-
-// Set Choice Chip Selected
-// TODO: Chip actions
-
-// Toggle collapsible
+const siteBanner = document.querySelector('#csc-banner');
+if (siteBanner) {
+    siteBanner.addEventListener('click', () => {
+        if (siteBanner.classList.contains('visible'))
+            siteBanner.classList.remove('visible');
+    });
+}
+const tableHeaders = document.querySelectorAll('.csc-table-header__title');
+if (tableHeaders) {
+    tableHeaders.forEach(headerItem => headerItem.addEventListener('click', () => {
+        if (!headerItem.classList.contains('csc-table-header__title--active')) {
+            headerItem.classList.remove('csc-table-header__title--active', 'csc-table-header__title--desc');
+        }
+        else if (!headerItem.classList.contains('csc-table-header__title--desc')) {
+            headerItem.classList.add('csc-table-header__title--desc');
+        }
+        else {
+            headerItem.classList.remove('csc-table-header__title--desc');
+        }
+    }));
+}
 function toggleCollapsible() {
-  // Get collapsible
-  const collapsible = this.parentElement;
-  // Get collapsible body
-  const collapsibleBody = collapsible.querySelector(`.csc-collapsible__body`);
-  // Check if classlist contains show
-  if (collapsible.classList.contains('open')) {
-    // Check for body
-    if (collapsibleBody) {
-      // Remove show class
-      jsHide(collapsibleBody);
+    const collapsible = this.parentElement;
+    if (collapsible) {
+        const collapsibleBody = collapsible.querySelector(`.csc-collapsible__body`);
+        if (collapsibleBody) {
+            if (collapsible.classList.contains('open')) {
+                if (collapsibleBody) {
+                    jsHide(collapsibleBody);
+                }
+                collapsible.classList.remove('open');
+                collapsible.setAttribute('aria-expanded', 'false');
+            }
+            else {
+                collapsible.classList.add('open');
+                if (collapsibleBody) {
+                    jsShow(collapsibleBody);
+                }
+                collapsible.setAttribute('aria-expanded', 'true');
+            }
+        }
     }
-    // Remove open class
-    collapsible.classList.remove('open');
-    // Change aria-expanded state
-    collapsible.setAttribute('aria-expanded', 'false');
-  } else {
-    // Add open class
-    collapsible.classList.add('open');
-    // Check for body
-    if (collapsibleBody) {
-      // Add show class
-      jsShow(collapsibleBody);
-    }
-    // Change aria-expanded state
-    collapsible.setAttribute('aria-expanded', 'true');
-  }
 }
-
-// Toggle FAQ Collapsible
 function toggleFAQCollapsible() {
-  // Get data list
-  const dlElm = this.parentElement;
-  // Get collapsible header
-  const collapsibleHeader = this;
-  // Get aria-controls
-  const ariaControls = collapsibleHeader.getAttribute('aria-controls');
-  // Get collapsible body
-  const collapsibleBody = dlElm.querySelector(`#${ariaControls}`);
-  // Check if classlist contains show
-  if (collapsibleHeader.classList.contains('open')) {
-    // Check for body
-    if (collapsibleBody) {
-      // Remove show class
-      jsHide(collapsibleBody);
+    const collapsibleHeader = this;
+    const dlElm = collapsibleHeader.parentElement;
+    if (collapsibleHeader) {
+        const ariaControls = collapsibleHeader.getAttribute('aria-controls');
+        if (ariaControls && dlElm) {
+            const collapsibleBody = dlElm.querySelector(`#${ariaControls}`);
+            if (collapsibleBody) {
+                if (collapsibleHeader.classList.contains('open')) {
+                    if (collapsibleBody) {
+                        jsHide(collapsibleBody);
+                    }
+                    collapsibleHeader.classList.remove('open');
+                    collapsibleHeader.setAttribute('aria-expanded', 'false');
+                }
+                else {
+                    collapsibleHeader.classList.add('open');
+                    if (collapsibleBody) {
+                        jsShow(collapsibleBody);
+                    }
+                    collapsibleHeader.setAttribute('aria-expanded', 'true');
+                }
+            }
+        }
     }
-    // Remove open class
-    collapsibleHeader.classList.remove('open');
-    // Change aria-expanded state
-    collapsibleHeader.setAttribute('aria-expanded', 'false');
-  } else {
-    // Add open class
-    collapsibleHeader.classList.add('open');
-    // Check for body
-    if (collapsibleBody) {
-      // Add show class
-      jsShow(collapsibleBody);
-    }
-    // Change aria-expanded state
-    collapsibleHeader.setAttribute('aria-expanded', 'true');
-  }
 }
-
-// Scroll to element from hash
 ready(() => {
-  // Check for hash
-  const { hash } = window.location;
-  if (hash) {
-    // Get element
-    const elm = document.querySelector(hash);
-    if (elm) {
-      // Scroll to elements
-      elm.scrollIntoView({
-        behavior: 'smooth',
-      });
+    const { hash } = window.location;
+    if (hash) {
+        const elm = document.querySelector(hash);
+        if (elm) {
+            elm.scrollIntoView({
+                behavior: 'smooth',
+            });
+        }
     }
-  }
 });
-
-/*!
-// FORM SCRIPTING
-*/
-
-// Add active class to label
 function addLabelActive(e) {
-  if (e.id && document.querySelector(`label[for=${e.id.trim()}]`)) {
-    document.querySelector(`label[for=${e.id.trim()}]`).classList.add('active');
-  }
+    if (e.id) {
+        const label = document.querySelector(`label[for=${e.id}]`);
+        if (label) {
+            label.classList.add('active');
+        }
+    }
 }
-// Remove active class from label
 function removeLabelActive(e) {
-  if (e.id && document.querySelector(`label[for=${e.id.trim()}]`)) {
-    if (e.value.length === 0) {
-      document
-        .querySelector(`label[for=${e.id.trim()}]`)
-        .classList.remove('active');
+    if (e.id) {
+        const label = document.querySelector(`label[for=${e.id}]`);
+        if (label) {
+            if (e.value.length === 0) {
+                label.classList.remove('active');
+            }
+        }
     }
-  }
 }
-// Add active class listeners
-function addLabelListeners(t) {
-  ['change', 'focus'].forEach(evt =>
-    t.addEventListener(evt, function() {
-      addLabelActive(this);
-    })
-  );
-  t.addEventListener('blur', function() {
-    removeLabelActive(this);
-  });
-  // Add "active" class if input has value or placeholder
-  if (t.value !== '') {
-    addLabelActive(t);
-  }
+function addLabelListeners(input) {
+    if (input) {
+        ['change', 'focus'].forEach(evt => input.addEventListener(evt, () => {
+            addLabelActive(input);
+        }));
+        input.addEventListener('blur', () => {
+            removeLabelActive(input);
+        });
+        if (input.value !== '') {
+            addLabelActive(input);
+        }
+    }
 }
-
-// Add Jquery Validator Defaults
 if ($.validator !== undefined) {
-  // Set default jQuery validator settings
-  jQuery.validator.setDefaults({
-    ignore: ':hidden:not(select)',
-    errorClass: 'invalid',
-    errorElement: 'span',
-    errorPlacement(error, element) {
-      // Add the `csc-helper-text` class to the error element
-      error.addClass('csc-helper-text');
-      if (element.prop('type') === 'checkbox') {
-        error.insertAfter(element.parent('label'));
-      } else {
-        error.insertAfter(element);
-      }
-    },
-    submitHandler(form) {
-      const submit = form
-        .querySelectorAll('button[type=submit]')[0]
-        .querySelector('i.fas');
-      if (submit.classList.contains('fa-save')) {
-        submit.classList.remove('fa-save');
-        submit.classList.add('fa-circle-notch');
-        submit.classList.add('fa-spin');
-      } else {
-        // Add loader
-        $('.cs-page').prepend(
-          '<div class="csc-loader--full-page"><div class="csc-loader"><div class="text">Loading</div><div class="csc-loader--dots"><div></div><div></div><div></div><div></div></div></div></div>'
-        );
-      }
-      // do other things for a valid form
-      form.submit();
-    },
-  });
-
-  // Add custom Validation Methods
-  $.validator.addMethod(
-    'pattern',
-    function(value, element, param) {
-      if (this.optional(element)) {
-        return true;
-      }
-      if (typeof param === 'string') {
-        param = new RegExp(`^(?:${param})$`);
-      }
-      return param.test(value);
-    },
-    'Invalid format.'
-  );
+    $.validator.setDefaults({
+        ignore: ':hidden:not(select)',
+        errorClass: 'invalid',
+        errorElement: 'span',
+        errorPlacement(errorGroup, elementGroup) {
+            Object.keys(errorGroup).forEach((errorKey) => {
+                if (typeof errorGroup[errorKey] === 'object')
+                    errorGroup[errorKey].classList.add('csc-helper-text');
+            });
+            Object.keys(elementGroup).forEach((elmKey) => {
+                if (typeof elementGroup[elmKey] === 'object') {
+                    if (elementGroup[elmKey].type === 'checkbox') {
+                        const label = getClosest(elementGroup[elmKey], 'label');
+                        if (label) {
+                            const parentElement = label.parentNode;
+                            if (parentElement)
+                                parentElement.insertBefore(errorGroup[elmKey], label.nextSibling);
+                        }
+                    }
+                    else {
+                        if (elementGroup[elmKey]) {
+                            const parentElement = elementGroup[elmKey].parentNode;
+                            if (parentElement)
+                                parentElement.insertBefore(errorGroup[elmKey], elementGroup[elmKey].nextSibling);
+                        }
+                    }
+                }
+            });
+        },
+        submitHandler(form) {
+            const submitSaveBtn = form
+                .querySelectorAll('button[type=submit]')[0]
+                .querySelector('i[class^="fa"]');
+            if (submitSaveBtn) {
+                if (submitSaveBtn.classList.contains('fa-save')) {
+                    submitSaveBtn.classList.remove('fa-save');
+                    submitSaveBtn.classList.add('fa-circle-notch', 'fa-spin');
+                }
+            }
+            else {
+                $('.cs-page').prepend('<div class="csc-loader--full-page"><div class="csc-loader"><div class="text">Loading</div><div class="csc-loader--dots"><div></div><div></div><div></div><div></div></div></div></div>');
+            }
+            form.submit();
+        },
+    });
+    $.validator.addMethod('pattern', function (value, element, param) {
+        if (this.optional(element)) {
+            return true;
+        }
+        if (typeof param === 'string') {
+            param = new RegExp(`^(?:${param})$`);
+        }
+        return param.test(value);
+    }, 'Invalid format.');
 }
-
-// Add Jquery Modal Defaults
-// Hide close and add animation on all modals
 if ($.modal !== undefined) {
-  // Bind buttons with rel="modal:close" to close the modal.
-  $(document).on('click.modal', 'button[rel~="modal:close"]', $.modal.close);
-
-  $.modal.defaults = {
-    showClose: false,
-    fadeDuration: 250,
-    showSpinner: true,
-  };
-  // Check height of modal isn't too high, else set scrollable
-  $('.modal').on($.modal.OPEN, function(event, modal) {
-    let maxHeight = $(this).height();
-    if ($(this).find('.csc-modal__header').length) {
-      maxHeight -= $(this)
-        .find('.csc-modal__header')
-        .css('height')
-        .slice(0, -2);
-    }
-    if ($(this).find('.csc-modal__actions').length) {
-      maxHeight -= $(this)
-        .find('.csc-modal__actions')
-        .css('height')
-        .slice(0, -2);
-    }
-    if ($(this).find('.csc-modal__content').length > 0) {
-      if (
-        $(this)
-          .find('.csc-modal__content')
-          .css('height')
-          .slice(0, -2) > maxHeight
-      ) {
-        $(this)
-          .find('.csc-modal__content')
-          .css('max-height', maxHeight);
-        if (!$(this).hasClass('csc-modal--scrollable')) {
-          $(this).addClass('csc-modal--scrollable');
+    $.modal.defaults = {
+        showClose: false,
+        fadeDuration: 250,
+        showSpinner: true,
+    };
+    $('.modal').on($.modal.OPEN, function (event, modal) {
+        const modalElm = event.target;
+        let maxHeight = +modalElm.style.height.slice(0, -2);
+        const modalElmHeader = modalElm.querySelector('.csc-modal__header');
+        if (modalElmHeader) {
+            maxHeight -= +modalElmHeader.style.height.slice(0, -2);
         }
-      } else {
-        $(this)
-          .find('.csc-modal__content')
-          .css('max-height', 'none');
-        if (!$(this).hasClass('csc-modal--scrollable')) {
-          $(this).removeClass('csc-modal--scrollable');
+        const modalElmActions = modalElm.querySelector('.csc-modal__actions');
+        if (modalElmActions) {
+            maxHeight -= +modalElmActions.style.height.slice(0, -2);
         }
-      }
-    }
-  });
-  // Remove manual ajax added modals from DOM
-  $(document).on($.modal.CLOSE, function(event, m) {
-    if (m.elm[0].id === '') {
-      m.elm.remove();
-    }
-  });
+        const modalElmContent = modalElm.querySelector('.csc-modal__content');
+        if (modalElmContent) {
+            const modalElmContentHeight = +modalElmContent.style.height.slice(0, -2);
+            if (modalElmContentHeight > maxHeight) {
+                modalElmContent.style.maxHeight = `${maxHeight}px`;
+                if (!modalElmContent.classList.contains('csc-modal--scrollable'))
+                    modalElmContent.classList.add('csc-modal--scrollable');
+            }
+            else {
+                modalElmContent.style.maxHeight = `none`;
+                if (!modalElmContent.classList.contains('csc-modal--scrollable'))
+                    modalElmContent.classList.remove('csc-modal--scrollable');
+            }
+        }
+    });
+    $(document).on($.modal.CLOSE, function (event, m) {
+        if (m.elm[0].id === '') {
+            m.elm.remove();
+        }
+    });
+    $(document).on('click.modal', 'button[rel~="modal:close"]', $.modal.close);
 }
-
-// Close loader on click
-$(document).on('click', '.csc-loader--full-page', function() {
-  $(this).fadeOut(500, function() {
-    // now that the fade completed
-    $(this).remove();
-  });
+$(document).on('click', '.csc-loader--full-page', function () {
+    $(this).fadeOut(500, function () {
+        $(this).remove();
+    });
 });
-
-// Add "active" class when input focused or changed
-['change', 'focus'].forEach(evt =>
-  document
-    .querySelectorAll(
-      'input[type=text]:not(.chosen-search-input), input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea'
-    )
-    .forEach(elem =>
-      elem.addEventListener(evt, function() {
-        addLabelActive(elem);
-      })
-    )
-);
-// Remove "active" class when input blurred if no value
+['change', 'focus'].forEach(evt => document
+    .querySelectorAll('input[type=text]:not(.chosen-search-input), input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea')
+    .forEach(elem => elem.addEventListener(evt, function () {
+    addLabelActive(elem);
+})));
 document
-  .querySelectorAll(
-    'input[type=text]:not(.chosen-search-input), input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea'
-  )
-  .forEach(elem =>
-    elem.addEventListener('blur', function() {
-      removeLabelActive(elem);
-    })
-  );
-
-// Auto resizing textarea ~ Based on https://stephanwagner.me/auto-resizing-textarea-with-vanilla-javascript
+    .querySelectorAll('input[type=text]:not(.chosen-search-input), input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea')
+    .forEach(elem => elem.addEventListener('blur', function () {
+    removeLabelActive(elem);
+}));
 function addAutoResize() {
-  document.querySelectorAll('[data-autoresize]').forEach(function(element) {
-    element.style.boxSizing = 'border-box';
-    const offset = element.offsetHeight - element.clientHeight;
-    document
-      .getElementById(element.id)
-      .addEventListener('input', function(event) {
-        event.target.style.height = 'auto';
-        event.target.style.height = `${event.target.scrollHeight + offset}px`;
-      });
-    element.removeAttribute('data-autoresize');
-  });
+    document.querySelectorAll('[data-autoresize]').forEach(element => {
+        if (element) {
+            element.style.boxSizing = 'border-box';
+            const offset = element.offsetHeight - element.clientHeight;
+            element.addEventListener('input', (event) => {
+                const targetElm = event.target;
+                if (targetElm) {
+                    targetElm.style.height = 'auto';
+                    targetElm.style.height = `${targetElm.scrollHeight + offset}px`;
+                }
+            });
+            element.removeAttribute('data-autoresize');
+        }
+    });
 }
 addAutoResize();
-
-// Character Counter ~ Based on https://www.jqueryscript.net/form/character-countdown-text-field.html
 function characterCounter() {
-  document.querySelectorAll('[data-counter]').forEach(function(element) {
-    // Get/Set the maxlength
-    let maxlength = element.getAttribute('maxlength');
-    maxlength =
-      typeof maxlength !== typeof undefined &&
-      maxlength !== false &&
-      maxlength !== null
-        ? maxlength
-        : 100;
-
-    // Get/Set the opacity
-    let opacity = element.getAttribute('counter-opacity');
-    opacity =
-      typeof opacity !== typeof undefined &&
-      opacity !== false &&
-      opacity !== null
-        ? opacity
-        : '0.8';
-
-    // Get/Set the colour
-    let color = element.getAttribute('counter-color');
-    color =
-      typeof color !== typeof undefined && color !== false && color !== null
-        ? color
-        : '#363642';
-
-    // Check if textarea
-    const textarea = element.nodeName === 'TEXTAREA';
-
-    // Settings
-    const settings = {
-      max: maxlength,
-      opacity,
-      color,
-      textArea: textarea,
-    };
-
-    // Create elements
-    $(element).wrap('<div class="character-wrap"></div>');
-    $(element).after(
-      '<span class="remaining tooltip" title="Characters remaining"></span>'
-    );
-
-    // This will write the input's value on database
-    const value = $(element).val().length;
-    const result = settings.max - value;
-    $(element)
-      .next('.remaining')
-      .text(result);
-
-    // This is counter
-    $(element).keyup(function() {
-      const value = $(element).val().length;
-      const result = settings.max - value;
-      $(element)
-        .next('.remaining')
-        .text(result);
+    document.querySelectorAll('[data-counter]').forEach(element => {
+        if (element) {
+            let maxLengthValue = element.getAttribute('maxlength');
+            let maxLength = typeof maxLengthValue !== typeof undefined &&
+                maxLengthValue !== null
+                ? +maxLengthValue
+                : 100;
+            let opacityValue = element.getAttribute('counter-opacity');
+            let opacity = typeof opacityValue !== typeof undefined &&
+                opacityValue !== null
+                ? +opacityValue
+                : 0.8;
+            let colorValue = element.getAttribute('counter-color');
+            let color = typeof colorValue !== typeof undefined && colorValue !== null
+                ? colorValue
+                : '#363642';
+            const textarea = element.nodeName === 'TEXTAREA';
+            const settings = {
+                max: maxLength,
+                opacity,
+                color,
+                textArea: textarea,
+            };
+            const characterWrapper = document.createElement('div');
+            characterWrapper.classList.add('character-wrap');
+            const elmParentNode = element.parentNode;
+            if (elmParentNode)
+                elmParentNode.insertBefore(characterWrapper, element);
+            characterWrapper.appendChild(element);
+            characterWrapper.insertAdjacentHTML('beforeend', '<span class="remaining tooltip" title="Characters remaining"></span>');
+            const remainingSpan = characterWrapper.querySelector('.remaining');
+            const updateCountValue = () => {
+                const value = element.value.length;
+                const result = settings.max - value;
+                if (remainingSpan)
+                    remainingSpan.innerText = result.toString();
+            };
+            updateCountValue();
+            element.addEventListener('keyup', updateCountValue);
+            element.style.paddingRight = '35px';
+            characterWrapper.style.position = 'relative';
+            if (remainingSpan) {
+                remainingSpan.style.position = 'absolute';
+                remainingSpan.style.opacity = settings.opacity.toString();
+                remainingSpan.style.color = settings.color.toString();
+                remainingSpan.style.right = '10px';
+            }
+            if (settings.textArea === false) {
+                if (remainingSpan) {
+                    remainingSpan.style.top = '50%';
+                    remainingSpan.style.transform = 'translateY(-50%)';
+                }
+            }
+            else {
+                if (remainingSpan) {
+                    remainingSpan.style.bottom = '10px';
+                }
+            }
+        }
     });
-
-    // Css
-    $(element).css('padding-right', '35px');
-    $(element)
-      .parent('.character-wrap')
-      .css('position', 'relative');
-    $(element)
-      .next('.remaining')
-      .css({
-        position: 'absolute',
-        opacity: settings.opacity,
-        color: settings.color,
-        right: '10px',
-      });
-
-    // textArea
-    if (settings.textArea === false) {
-      $(element)
-        .next('.remaining')
-        .css({
-          top: '50%',
-          transform: 'translateY(-50%)',
-        });
-    } else {
-      $(element)
-        .next('.remaining')
-        .css({
-          bottom: '10px',
-        });
-    }
-  });
 }
 characterCounter();
-
-// Auto Load Trumbowyg Editor ~ https://alex-d.github.io/Trumbowyg/documentation/
 if ($.trumbowyg !== undefined) {
-  $('[data-editor]').trumbowyg({
-    btns: [
-      ['strong', 'em', 'underline'],
-      ['unorderedList', 'orderedList'],
-      ['link'],
-      ['viewHTML'],
-    ],
-    autogrow: true,
-    resetCss: true,
-  });
+    $('[data-editor]').trumbowyg({
+        btns: [
+            ['strong', 'em', 'underline'],
+            ['unorderedList', 'orderedList'],
+            ['link'],
+            ['viewHTML'],
+        ],
+        autogrow: true,
+        resetCss: true,
+    });
 }
-
-// Reload page limit on change in pagination
-document.querySelectorAll('.cs-pagitems').forEach(select =>
-  select.addEventListener('change', function() {
+document.querySelectorAll('.cs-pagitems').forEach(select => select.addEventListener('change', function () {
     window.location.href = select.value;
-  })
-);
-
-$(document).ready(function() {
-  // Show Banner
-  if ($('#csc-banner').length) {
-    $('#csc-banner').addClass('visible');
-  }
-  // Activate Waves
-  Waves.attach('[class^=csc-btn]');
-  Waves.attach('.csc-icon-btn', ['waves-circle']);
-  Waves.attach('.csc-chip');
-  Waves.init();
-
-  // $(".modal").function({
-  //   showClose: false
-  // });
-  // // Lock alert modals
-  // $(".csc-modal--alert").modal({
-  //   escapeClose: false,
-  //   clickClose: false,
-  //   showClose: false
-  // });
-  // // Show close on required modals
-  // $(".csc-modal--close").modal({
-  //   showClose: true
-  // });
-
-  // Add "active" class if input has value or placeholder
-  document
-    .querySelectorAll(
-      'input[type=text]:not(.chosen-search-input):not(.swal-content__input), input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea'
-    )
-    .forEach(function(e) {
-      if (e.value !== '' || e.placeholder !== '') {
-        addLabelActive(e);
-      }
+}));
+$(document).ready(function () {
+    if (siteBanner) {
+        if (!siteBanner.classList.contains('visible'))
+            siteBanner.classList.add('visible');
+    }
+    if (typeof Waves !== typeof undefined) {
+        Waves.attach('[class^=csc-btn]');
+        Waves.attach('.csc-icon-btn', ['waves-circle']);
+        Waves.attach('.csc-chip');
+        Waves.init();
+    }
+    document
+        .querySelectorAll('input[type=text]:not(.chosen-search-input):not(.swal-content__input), input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea')
+        .forEach((e) => {
+        if (e.value !== '' || e.placeholder !== '') {
+            addLabelActive(e);
+        }
     });
-
-  if ($.fn.tooltipster !== undefined) {
-    // Activate Tooltipster
-    $('.tooltip').tooltipster({ contentAsHTML: true });
-
-    // Add Tooltipster to elements dynamically added to the DOM ~ http://iamceege.github.io/tooltipster/#delegation
-    $('body').on('mouseenter', '.tooltip:not(.tooltipstered)', function() {
-      $(this).tooltipster({ contentAsHTML: true });
-    });
-  } else if (debug) {
-    console.error(
-      'Tooltipster is not loaded. Please load Tooltipster to enable.'
-    );
-  }
-
-  // Activate Tippy
-  try {
-    // Activate Tippy
-    tippy('[data-tippy-content]', {
-      allowHTML: true,
-      delay: 200,
-    });
-  } catch (error) {
-    if (debug)
-      console.error('Tippy is not loaded. Please load Tippy.js to enable.');
-  }
+    if ($.fn.tooltipster !== undefined) {
+        $('.tooltip').tooltipster({ contentAsHTML: true });
+        $('body').on('mouseenter', '.tooltip:not(.tooltipstered)', function () {
+            $(this).tooltipster({ contentAsHTML: true });
+        });
+    }
+    else if (debug) {
+        console.error('Tooltipster is not loaded. Please load Tooltipster to enable.');
+    }
+    try {
+        tippy('[data-tippy-content]', {
+            allowHTML: true,
+            delay: 200,
+        });
+    }
+    catch (error) {
+        if (debug)
+            console.error('Tippy is not loaded. Please load Tippy.js to enable.');
+    }
 });

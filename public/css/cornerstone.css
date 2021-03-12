@@ -379,7 +379,7 @@ template {
  * Add the correct display in IE 10.
  */
 [hidden] {
-  display: none;
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -559,6 +559,32 @@ body.cs-component__buttons .csc-btn--outlined:hover {
 /* 24dp elevation */
 .z-depth-5 {
   box-shadow: 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12), 0 11px 15px -7px rgba(0, 0, 0, 0.2);
+}
+
+.csc-even-split,
+.csc-left-split,
+.csc-right-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 20px;
+}
+
+@media screen and (min-width: 768px) {
+  .csc-even-split {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .csc-left-split {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .csc-right-split {
+    grid-template-columns: 2fr 1fr;
+  }
 }
 
 /* Body Layouts */
@@ -7056,6 +7082,7 @@ body.cs-components .csc-form,
 body.cs-component__form .csc-form {
   /* Style Placeholders */
   /* Style Fieldset */
+  /* Style Form Actions */
   /* Text inputs */
   /* Validation Sass Placeholders */
   /* Search Field */
@@ -7089,6 +7116,35 @@ body.cs-component__form .csc-form fieldset legend {
   font-size: 1.25rem;
   font-weight: bolder;
   border-bottom: 1px dotted #bdbdbd;
+}
+body.cs-components .csc-form__actions,
+body.cs-component__form .csc-form__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media screen and (min-width: 768px) {
+  body.cs-components .csc-form__actions,
+body.cs-component__form .csc-form__actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+}
+body.cs-components .csc-form__actions > div,
+body.cs-component__form .csc-form__actions > div {
+  text-align: center;
+}
+@media screen and (min-width: 768px) {
+  body.cs-components .csc-form__actions > div,
+body.cs-component__form .csc-form__actions > div {
+    text-align: left;
+  }
+}
+@media screen and (min-width: 768px) {
+  body.cs-components .csc-form__actions > div:last-child,
+body.cs-component__form .csc-form__actions > div:last-child {
+    text-align: right;
+  }
 }
 body.cs-components .csc-form input:not([type]),
 body.cs-components .csc-form input[type=text]:not(.browser-default),
@@ -9364,14 +9420,36 @@ body.cs-component__pagemenu .csc-pmitem--disabled:hover {
   border-bottom-color: transparent;
 }
 
-body.cs-components ul.cs-pagination,
-body.cs-component__pagination ul.cs-pagination {
+body.cs-components .cs-pagination,
+body.cs-component__pagination .cs-pagination {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 16px;
+  padding: 0 16px;
+}
+@media screen and (min-width: 768px) {
+  body.cs-components .cs-pagination,
+body.cs-component__pagination .cs-pagination {
+    display: inline;
+    padding: 0;
+  }
+}
+body.cs-components .cs-pagination ul,
+body.cs-component__pagination .cs-pagination ul {
+  display: inline-block;
   margin: 0;
   padding-left: 0;
   list-style-type: none;
+  grid-column: span 2;
 }
-body.cs-components ul.cs-pagination > li,
-body.cs-component__pagination ul.cs-pagination > li {
+@media screen and (min-width: 768px) {
+  body.cs-components .cs-pagination ul,
+body.cs-component__pagination .cs-pagination ul {
+    margin-left: 2em;
+  }
+}
+body.cs-components .cs-pagination ul > li,
+body.cs-component__pagination .cs-pagination ul > li {
   display: inline-flex;
   padding: 0 0.15em;
   height: 1.5em;
@@ -9379,20 +9457,22 @@ body.cs-component__pagination ul.cs-pagination > li {
   text-align: center;
   border-radius: 2px;
 }
-body.cs-components ul.cs-pagination > li > a,
-body.cs-component__pagination ul.cs-pagination > li > a {
+body.cs-components .cs-pagination ul > li > a,
+body.cs-component__pagination .cs-pagination ul > li > a {
   padding: 0 0.5em;
   color: inherit;
 }
-body.cs-components ul.cs-pagination > li:hover > a,
-body.cs-component__pagination ul.cs-pagination > li:hover > a {
+body.cs-components .cs-pagination ul > li:hover > a,
+body.cs-component__pagination .cs-pagination ul > li:hover > a {
   border-bottom: 1px solid #039be5;
 }
-body.cs-components .cs-pagitem--items, body.cs-components .cs-pagitem--info, body.cs-components .cs-pagitem--info + li,
+@media screen and (min-width: 768px) {
+  body.cs-components .cs-pagitem--items, body.cs-components .cs-pagitem--info, body.cs-components .cs-pagitem--info + li,
 body.cs-component__pagination .cs-pagitem--items,
 body.cs-component__pagination .cs-pagitem--info,
 body.cs-component__pagination .cs-pagitem--info + li {
-  margin-left: 2em !important;
+    margin-left: 2em !important;
+  }
 }
 body.cs-components .cs-pagitems,
 body.cs-component__pagination .cs-pagitems {
@@ -10905,6 +10985,24 @@ body.cs-page > footer {
 .csc-faq-section .faq-item__header.open .fa-caret-right,
 .csc-faq-item .faq-item__header.open .fa-caret-right {
   transform: rotate(90deg);
+}
+
+#cs__dev__site {
+  position: fixed;
+  bottom: 20px;
+  right: -50px;
+  padding: 8px;
+  width: 200px;
+  color: #FFF;
+  background-color: #bf360c;
+  transform: rotate(-45deg);
+}
+#cs__dev__site p {
+  margin: 0;
+  padding: 10px;
+  line-height: 1;
+  text-align: center;
+  border: 1px solid white;
 }
 
 /* ==========================================================================

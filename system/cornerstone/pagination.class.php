@@ -88,7 +88,7 @@ class Pagination
     // Navigation links - Items Per Page & First/Previous/<steps>/Next/Last
     //-------------------------------------------------------------------
     // Start output
-    $returnOutput = '<ul class="cs-pagination">';
+    $returnOutput = '<span class="cs-pagination">';
     // Items per page
     $LINKS = array();
     $LINKSURI = $request_uri;
@@ -123,16 +123,19 @@ class Pagination
       $LINKS[] = ($step != $items_per_page) ? sprintf('<option value="%s">%d</option>', $linksURL, $step)
         : sprintf('<option value="%s" selected>%d</option>', $linksURL, $step);
     }
-    $returnOutput .= sprintf('<li class="cs-pagitem--items">Items Per Page: <select class="cs-pagitems">%s</select></li>', implode('', $LINKS));
+    $returnOutput .= sprintf('<span class="cs-pagitem--items">Items Per Page: <select class="cs-pagitems">%s</select></span>', implode('', $LINKS));
 
     // Total items
     $pageFrom = ($current_page - 1) * $items_per_page;
     $pageTo = $pageFrom + $items_per_page;
     $pageTo = ($pageTo > $this->total_records) ? $this->total_records : $pageTo;
-    $returnOutput .= '<li class="cs-pagitem--info">' . ($pageFrom + 1) . ' - ' . $pageTo . ' of ' . $this->total_records . '</li>';
+    $returnOutput .= '<span class="cs-pagitem--info">' . ($pageFrom + 1) . ' - ' . $pageTo . ' of ' . $this->total_records . '</span>';
 
     // Page URI
     $PAGESURI = $request_uri;
+
+    // Start pages output
+    $returnOutput .= '<ul>';
 
     // Check if the current page is set
     if (array_search('page', $PAGESURI) === FALSE) {
@@ -244,7 +247,7 @@ class Pagination
     }
 
     // End output
-    $returnOutput .= '</ul>';
+    $returnOutput .= '</ul></span>';
 
     return $returnOutput;
   }

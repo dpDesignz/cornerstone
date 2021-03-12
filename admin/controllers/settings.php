@@ -10,30 +10,23 @@ class Settings extends Controller
     // Load the controller constructor
     parent::__construct($registry);
 
-    // Check if user is logged in
-    if (!userPageProtect()) {
+    // Check if user is allowed admin access
+    checkAdminAccess();
 
-      // If user is not logged in, show the login page
-      flashMsg('admin_login', 'You need to log in first.', 'warning');
-      $this->load->view('common/login', '', 'admin');
-      exit;
-    } else {
+    // Load the settings model
+    $this->settingModel = $this->load->model('cornerstone/setting', 'admin');
 
-      // Load the settings model
-      $this->settingModel = $this->load->model('cornerstone/setting', 'admin');
-
-      // Set Breadcrumbs
-      $this->data['breadcrumbs'] = array(
-        array(
-          'text' => 'Dashboard',
-          'href' => get_site_url('admin')
-        ),
-        array(
-          'text' => 'Settings',
-          'href' => get_site_url('admin/settings')
-        )
-      );
-    }
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'] = array(
+      array(
+        'text' => 'Dashboard',
+        'href' => get_site_url('admin')
+      ),
+      array(
+        'text' => 'Settings',
+        'href' => get_site_url('admin/settings')
+      )
+    );
   }
 
   /**

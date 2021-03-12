@@ -20,7 +20,7 @@ define('DIR_SYSTEM', DIR_ROOT . 'system' . DIRECTORY_SEPARATOR); // Path to the 
 define('DIR_ADMIN', DIR_ROOT . 'admin' . DIRECTORY_SEPARATOR); // Path to the admin folder.
 define('DIR_CS', DIR_SYSTEM . 'cornerstone' . DIRECTORY_SEPARATOR); // Path to the Cornerstone folder.
 define('DIR_HELPERS', DIR_SYSTEM . 'helpers' . DIRECTORY_SEPARATOR); // Path to the Cornerstone "helpers" folder.
-define('ALLOWED_SUBFOLDERS', ['admin' => 'common/index']); // List of allowed sub-folders and their default controllers/methods for the core class
+define('ALLOWED_SUBFOLDERS', ['admin' => 'common/index', 'account' => 'common/index', 'api' => 'connect/interface']); // List of allowed sub-folders and their default controllers/methods for the core class
 
 // ** Database settings - You can obtain this information from your web-host ** //
 defined('DB_HOSTNAME') or define('DB_HOSTNAME', 'localhost'); // Database Host Name
@@ -33,7 +33,7 @@ defined('EZSQL_TYPE') or define('EZSQL_TYPE', 'pdo'); // ezSQL Engine Type (mysq
 
 // Uncomment if wanting to use the filp/whoops error logging over the cornerstone error logging
 // NOTE: This requires the filp/whoops package to be installed to use
-// $useFilpWhoops = TRUE;
+$useFilpWhoops = TRUE;
 
 // Set up the Cornerstone Framework.
 require_once(DIR_SYSTEM . 'bootstrap.php');

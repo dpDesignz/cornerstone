@@ -1,8 +1,13 @@
 <?php if (!isset($hideThemeFooter) || !$hideThemeFooter) : ?>
   <footer>
-    <p>&copy; <?php echo date('Y') . ' ' . SITE_NAME; ?> &middot; Built with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone v<?php echo CS_VERSION; ?></a></p>
+    <p>&copy; <?php echo date('Y') . ' ' . $data->site_name; ?> &middot; Built with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone v<?php echo CS_VERSION; ?></a></p>
   </footer>
 <?php endif; ?>
+<?php if ($option->get('test_site')) { ?>
+  <div id="cs__dev__site">
+    <p>Dev Site</p>
+  </div>
+<?php } ?>
 <!-- End Footer -->
 <!-- Waves ~ http://fian.my.id/Waves/ -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/node-waves/0.7.6/waves.min.js" integrity="sha256-R//ABCk0LbG1/TvQQ4+sbwjzmPxJn9SF5f7FJ2AwJ4o=" crossorigin="anonymous"></script>

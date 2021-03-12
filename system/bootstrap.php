@@ -23,7 +23,7 @@ require_once(DIR_SYSTEM . 'storage' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY
 // Autoload Core Libraries
 function cornerstoneAutoLoader($className)
 {
-  // Fix director seperator
+  // Fix director separator
   $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
   // Set the full path to the classes
   $classesPath = DIR_SYSTEM . 'cornerstone' . DIRECTORY_SEPARATOR . strtolower($className) . '.class.php';
@@ -93,9 +93,6 @@ require_once(DIR_HELPERS . 'fn.output.php'); // Output/Page related functions
 if (file_exists(DIR_HELPERS . 'fn.custom.php')) {
   require_once(DIR_HELPERS . 'fn.custom.php');
 }
-
-// Show message on site if `testSite` is set in `cs_options`
-// if($option->get("test_site")) {$alertArray['info'][] = 'This site is a staging site and the data is NOT live.';}
 
 /**
  * Redirect to "offline" page if site set to `offline` in `cs_options`

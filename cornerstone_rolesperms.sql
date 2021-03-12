@@ -26,7 +26,8 @@ SET time_zone = "+00:00";
 -- Dumping data for table `cs_role_permissions`
 --
 INSERT INTO `cs_role_permissions` (`rp_key`)
-VALUES ('add_faq'),
+VALUES ('access_admin'),
+  ('add_faq'),
   ('add_media'),
   ('add_page'),
   ('add_section'),

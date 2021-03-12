@@ -1,6 +1,56 @@
 # Cornerstone Change Log
 
-## 0.4.00 - Bug Fixes + DRY Fixes (2020-07-27 to)
+## 0.4.2 - Aligning + User Accounts (2020-03-12)
+
+- ➕ Added the 'files' system controller
+- 🖊️ Changed the 'images' system controller to have the thumbnail feature
+- 🖊️ Changed the 'page' system controller to handle a universal menu and admin protect the changelog
+- ❌ Removed jeremeamia/superclosure (2.4.0)
+- ❌ Removed nikic/php-parser (v4.5.0)
+- ❌ Removed symfony/polyfill-php56 (v1.17.0)
+- ❌ Removed symfony/polyfill-util (v1.17.0)
+- 🔄 Updated ezsql/ezsql (4.0.10 => 4.0.12)
+- 🔄 Updated filp/whoops (2.7.3 => 2.9.2)
+- 🔄 Updated guzzlehttp/psr7 (1.6.1 => 1.7.0)
+- 🔄 Updated icanboogie/inflector (v2.0.0 => v2.0.1)
+- 🔄 Updated illuminate/cache (v7.15.0 => v8.32.1)
+- 🔄 Updated illuminate/contracts (v7.15.0 => v8.32.1)
+- 🔄 Updated illuminate/filesystem (v7.15.0 => v8.32.1)
+- 🔄 Updated illuminate/support (v7.15.0 => v8.32.1)
+- 🔄 Updated intervention/imagecache (2.4.1 => 2.5.1)
+- 🔄 Updated nesbot/carbon (2.35.0 => 2.46.0)
+- 🔄 Updated paragonie/random_compat (v9.99.99 => v9.99.100)
+- 🔄 Updated phpmailer/phpmailer (v6.1.6 => v6.3.0)
+- 🔄 Updated psr/container (1.0.0 => 1.1.1)
+- 🔄 Updated symfony/finder (v5.1.1 => v5.2.4)
+- 🔄 Updated symfony/polyfill-mbstring (v1.17.0 => v1.22.1)
+- 🔄 Updated symfony/polyfill-php80 (v1.17.0 => v1.22.1)
+- 🔄 Updated symfony/translation (v5.1.1 => v5.2.5)
+- 🔄 Updated symfony/translation-contracts (v2.1.2 => v2.3.0)
+- 🔄 Updated voku/portable-ascii (1.5.1 => 1.5.6)
+- 🔄 Updated whichbrowser/parser (v2.0.42 => v2.1.1)
+- ❌ Removed symfony/polyfill-util (v1.17.0)
+- ❌ Removed symfony/polyfill-php56 (v1.17.0)
+- ❌ Removed nikic/php-parser (v4.5.0)
+- ❌ Removed jeremeamia/superclosure (2.4.0)
+- ➕ Added the `outputPDF` function to the 'output' helper
+- ➕ Added the 'cron' common system model
+- ❌ Removed the 'users' common system model
+- ❌ Removed `login_user_type` from the `cs_login_log` table
+- ❌ Removed `cookie_user_type` from the `cs_auth_cookie` table
+- ❌ Removed `pwdreset_user_type` from the `cs_password_reset` table
+- ❌ Removed the 'userauth' and 'ext.userauth' admin models
+- ➕ Added the `checkAdminAccess` function to the 'session' helper
+- 🖊️ Changed the user login to be handled through the 'account' section, including admin login
+
+## 0.4.1 - TypeScript (2020-08-30 to 2020-12-31)
+
+- ➕ Added TypeScript `cornerstone.ts` file and re-wrote the core functions to work in typed vanilla JS where possible
+- ➕ Added the `animateElm` function
+- 🖊️ Changed the pagination generation to allow better styling for mobile
+- ➕ Added the [debounce function](https://gist.github.com/nmsdvid/8807205)
+
+## 0.4.00 - Bug Fixes + DRY Fixes (2020-07-27 to 2020-08-29)
 
 ### This release includes breaking changes
 
@@ -66,24 +116,24 @@
 ## 0.3.01 - Collapsible (2020-06-15)
 
 - ➕ Added the collapsible feature
-- Updated ezsql/ezsql (4.0.9 => 4.0.10)
-- Updated phpmailer/phpmailer (v6.1.5 => v6.1.6)
-- Updated html2text/html2text (4.2.1 => 4.3.1)
-- Updated voku/portable-ascii (1.4.10 => 1.5.1)
-- Updated symfony/translation-contracts (v2.0.1 => v2.1.2)
-- Updated symfony/polyfill-mbstring (v1.15.0 => v1.17.0)
-- Updated symfony/polyfill-php80 (v1.17.0)
-- Updated symfony/translation (v5.0.7 => v5.1.1)
-- Updated nesbot/carbon (2.32.2 => 2.35.0)
-- Updated illuminate/contracts (v7.4.0 => v7.15.0)
-- Updated doctrine/inflector (1.3.1 => 2.0.3)
-- Updated illuminate/support (v7.4.0 => v7.15.0)
-- Updated illuminate/cache (v7.4.0 => v7.15.0)
-- Updated symfony/finder (v5.0.7 => v5.1.1)
-- Updated illuminate/filesystem (v7.4.0 => v7.15.0)
-- Updated nikic/php-parser (v4.3.0 => v4.5.0)
-- Updated symfony/polyfill-util (v1.15.0 => v1.17.0)
-- Updated symfony/polyfill-php56 (v1.15.0 => v1.17.0)
+- 🔄 Updated ezsql/ezsql (4.0.9 => 4.0.10)
+- 🔄 Updated phpmailer/phpmailer (v6.1.5 => v6.1.6)
+- 🔄 Updated html2text/html2text (4.2.1 => 4.3.1)
+- 🔄 Updated voku/portable-ascii (1.4.10 => 1.5.1)
+- 🔄 Updated symfony/translation-contracts (v2.0.1 => v2.1.2)
+- 🔄 Updated symfony/polyfill-mbstring (v1.15.0 => v1.17.0)
+- 🔄 Updated symfony/polyfill-php80 (v1.17.0)
+- 🔄 Updated symfony/translation (v5.0.7 => v5.1.1)
+- 🔄 Updated nesbot/carbon (2.32.2 => 2.35.0)
+- 🔄 Updated illuminate/contracts (v7.4.0 => v7.15.0)
+- 🔄 Updated doctrine/inflector (1.3.1 => 2.0.3)
+- 🔄 Updated illuminate/support (v7.4.0 => v7.15.0)
+- 🔄 Updated illuminate/cache (v7.4.0 => v7.15.0)
+- 🔄 Updated symfony/finder (v5.0.7 => v5.1.1)
+- 🔄 Updated illuminate/filesystem (v7.4.0 => v7.15.0)
+- 🔄 Updated nikic/php-parser (v4.3.0 => v4.5.0)
+- 🔄 Updated symfony/polyfill-util (v1.15.0 => v1.17.0)
+- 🔄 Updated symfony/polyfill-php56 (v1.15.0 => v1.17.0)
 
 ## 0.3.00 - Clean Install (2020-06-03)
 

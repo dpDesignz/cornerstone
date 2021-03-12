@@ -152,7 +152,6 @@ CREATE TABLE `cs_options` (
 -- Dumping data for table `cs_options`
 --
 INSERT INTO `cs_options` (
-    `option_id`,
     `option_type`,
     `option_name`,
     `option_value`,
@@ -161,7 +160,6 @@ INSERT INTO `cs_options` (
     `option_edited_dtm`
   )
 VALUES (
-    1,
     'core',
     'site_url',
     'www.cornerstone.local',
@@ -169,252 +167,233 @@ VALUES (
     NULL,
     NULL
   ),
-  (2, 'core', 'site_https', '0', 1, NULL, NULL),
-  (
-    3,
-    'core',
-    'site_name',
-    'Cornerstone PHP Framework',
-    1,
-    NULL,
-    NULL
-  ),
-  (4, 'core', 'test_site', '1', 0, NULL, NULL),
-  (5, 'core', 'site_offline', '0', 0, NULL, NULL),
-  (
-    6,
-    'core',
-    'site_timezone',
-    'Pacific/Auckland',
-    0,
-    NULL,
-    NULL
-  ),
-  (7, 'core', 'phone_locale', '+64', 0, NULL, NULL),
-  (
-    8,
-    'core',
-    'site_version',
-    '0.2.1',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    10,
-    'core',
-    'error_log_type',
-    '1,2',
-    1,
-    NULL,
-    NULL
-  ),
-  (
-    11,
-    'mail',
-    'site_from_email',
-    '',
-    1,
-    NULL,
-    NULL
-  ),
-  (
-    12,
-    'mail',
-    'errors_to_email',
-    '',
-    1,
-    NULL,
-    NULL
-  ),
-  (
-    13,
-    'mail',
-    'enable_phpmailer',
-    '1',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    14,
-    'mail',
-    'smtp_host',
-    '',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    15,
-    'mail',
-    'smtp_username',
-    '',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    16,
-    'mail',
-    'smtp_password',
-    '',
-    0,
-    NULL,
-    NULL
-  ),
-  (17, 'mail', 'smtp_port', '', 0, NULL, NULL),
-  (
-    18,
-    'mail',
-    'smtp_secure',
-    'FALSE',
-    0,
-    NULL,
-    NULL
-  ),
-  (19, 'mail', 'smtp_auth', 'TRUE', 0, NULL, NULL),
-  (
-    20,
-    'security',
-    'crypto_hex_length',
-    '24',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    21,
-    'security',
-    'registration_active',
-    '0',
-    0,
-    NULL,
-    NULL
-  ),
-  (22, 'security', 'max_logins', '6', 0, NULL, NULL),
-  (
-    23,
-    'security',
-    'auth_required',
-    '0',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    24,
-    'security',
-    'auth_expire',
-    '900',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    25,
-    'security',
-    'password_reset_expire',
-    '1800',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    26,
-    'security',
-    'session_expire',
-    '1800',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    27,
-    'security',
-    'cookie_expire',
-    '0,30',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    28,
-    'security',
-    'browser_tracking',
-    '1',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    29,
-    'addon',
-    'texta_hq_active',
-    '0',
-    0,
-    NULL,
-    NULL
-  ),
-  (30, 'addon', 'texta_hq_key', '', 0, NULL, NULL),
-  (
-    31,
-    'addon',
-    'recaptcha_site_key',
-    '',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    32,
-    'addon',
-    'recaptcha_secret_key',
-    '',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    33,
-    'addon',
-    'facebook_secret',
-    '',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    34,
-    'addon',
-    'facebook_login_active',
-    '0',
-    0,
-    NULL,
-    NULL
-  ),
-  (35, 'addon', 'xero_oauth2', '', 0, NULL, NULL),
-  (36, 'addon', 'analytics_code', '', 0, NULL, NULL),
-  (
-    37,
-    'addon',
-    'font_awesome_kit_url',
-    '',
-    0,
-    NULL,
-    NULL
-  ),
-  (
-    38,
-    'site',
-    'tooltip_settings',
-    '',
-    0,
-    NULL,
-    NULL
-  ),
-  (39, 'site', 'docs_private', '0', 0, NULL, NULL),
-  (40, 'site', 'site_notice', ',', 0, NULL, NULL);
+  'core',
+  'site_https',
+  '0',
+  1,
+  NULL,
+  NULL
+),
+(
+  'core',
+  'site_name',
+  'Cornerstone PHP Framework',
+  1,
+  NULL,
+  NULL
+),
+('core', 'test_site', '1', 0, NULL, NULL),
+('core', 'site_offline', '0', 0, NULL, NULL),
+(
+  'core',
+  'site_timezone',
+  'Pacific/Auckland',
+  0,
+  NULL,
+  NULL
+),
+('core', 'phone_locale', '+64', 0, NULL, NULL),
+(
+  'core',
+  'site_version',
+  '0.2.1',
+  0,
+  NULL,
+  NULL
+),
+(
+  'core',
+  'error_log_type',
+  '1,2',
+  1,
+  NULL,
+  NULL
+),
+(
+  'mail',
+  'site_from_email',
+  '',
+  1,
+  NULL,
+  NULL
+),
+(
+  'mail',
+  'errors_to_email',
+  '',
+  1,
+  NULL,
+  NULL
+),
+(
+  'mail',
+  'enable_phpmailer',
+  '1',
+  0,
+  NULL,
+  NULL
+),
+(
+  'mail',
+  'smtp_host',
+  '',
+  0,
+  NULL,
+  NULL
+),
+(
+  'mail',
+  'smtp_username',
+  '',
+  0,
+  NULL,
+  NULL
+),
+(
+  'mail',
+  'smtp_password',
+  '',
+  0,
+  NULL,
+  NULL
+),
+('mail', 'smtp_port', '', 0, NULL, NULL),
+(
+  'mail',
+  'smtp_secure',
+  'FALSE',
+  0,
+  NULL,
+  NULL
+),
+('mail', 'smtp_auth', 'TRUE', 0, NULL, NULL),
+(
+  'security',
+  'crypto_hex_length',
+  '24',
+  0,
+  NULL,
+  NULL
+),
+(
+  'security',
+  'registration_active',
+  '0',
+  0,
+  NULL,
+  NULL
+),
+('security', 'max_logins', '6', 0, NULL, NULL),
+(
+  'security',
+  'auth_required',
+  '0',
+  0,
+  NULL,
+  NULL
+),
+(
+  'security',
+  'auth_expire',
+  '900',
+  0,
+  NULL,
+  NULL
+),
+(
+  'security',
+  'password_reset_expire',
+  '1800',
+  0,
+  NULL,
+  NULL
+),
+(
+  'security',
+  'session_expire',
+  '1800',
+  0,
+  NULL,
+  NULL
+),
+(
+  'security',
+  'cookie_expire',
+  '0,30',
+  0,
+  NULL,
+  NULL
+),
+(
+  'security',
+  'browser_tracking',
+  '1',
+  0,
+  NULL,
+  NULL
+),
+(
+  'addon',
+  'texta_hq_active',
+  '0',
+  0,
+  NULL,
+  NULL
+),
+('addon', 'texta_hq_key', '', 0, NULL, NULL),
+(
+  'addon',
+  'recaptcha_site_key',
+  '',
+  0,
+  NULL,
+  NULL
+),
+(
+  'addon',
+  'recaptcha_secret_key',
+  '',
+  0,
+  NULL,
+  NULL
+),
+(
+  'addon',
+  'facebook_secret',
+  '',
+  0,
+  NULL,
+  NULL
+),
+(
+  'addon',
+  'facebook_login_active',
+  '0',
+  0,
+  NULL,
+  NULL
+),
+('addon', 'xero_oauth2', '', 0, NULL, NULL),
+('addon', 'gua_property', '', 0, NULL, NULL),
+('addon', 'ga4_id', '', 0, NULL, NULL),
+(
+  'addon',
+  'font_awesome_kit_url',
+  '',
+  0,
+  NULL,
+  NULL
+),
+(
+  'site',
+  'tooltip_settings',
+  '',
+  0,
+  NULL,
+  NULL
+),
+('site', 'docs_private', '0', 0, NULL, NULL),
+('site', 'site_notice', ',', 0, NULL, NULL);
 -- --------------------------------------------------------
 --
 -- Table structure for table `cs_password_reset`
@@ -584,28 +563,28 @@ CREATE TABLE `cs_user_meta` (
 --
 ALTER TABLE `cs_authorization`
 ADD PRIMARY KEY (`auth_id`),
-ADD KEY `cs_authorization_ibfk_1` (`auth_user_id`);
+  ADD KEY `cs_authorization_ibfk_1` (`auth_user_id`);
 --
 -- Indexes for table `cs_auth_cookie`
 --
 ALTER TABLE `cs_auth_cookie`
 ADD PRIMARY KEY (`cookie_id`),
-ADD KEY `cookie_user_id` (`cookie_user_id`),
-ADD KEY `cookie_key` (`cookie_key`);
+  ADD KEY `cookie_user_id` (`cookie_user_id`),
+  ADD KEY `cookie_key` (`cookie_key`);
 --
 -- Indexes for table `cs_content`
 --
 ALTER TABLE `cs_content`
 ADD PRIMARY KEY (`content_id`),
-ADD KEY `content_type` (`content_type`),
-ADD KEY `content__id` (`content_id`);
+  ADD KEY `content_type` (`content_type`),
+  ADD KEY `content__id` (`content_id`);
 --
 -- Indexes for table `cs_content_meta`
 --
 ALTER TABLE `cs_content_meta`
 ADD PRIMARY KEY (`cmeta_id`),
-ADD KEY `cmeta_content_id` (`cmeta_content_id`),
-ADD KEY `cmeta_key` (`cmeta_key`);
+  ADD KEY `cmeta_content_id` (`cmeta_content_id`),
+  ADD KEY `cmeta_key` (`cmeta_key`);
 --
 -- Indexes for table `cs_content_section`
 --
@@ -616,13 +595,13 @@ ADD PRIMARY KEY (`section_id`);
 --
 ALTER TABLE `cs_edit_log`
 ADD PRIMARY KEY (`edit_id`),
-ADD KEY `edit_user_id` (`edit_user_id`);
+  ADD KEY `edit_user_id` (`edit_user_id`);
 --
 -- Indexes for table `cs_login_log`
 --
 ALTER TABLE `cs_login_log`
 ADD PRIMARY KEY (`login_id`),
-ADD KEY `login_user_id` (`login_user_id`);
+  ADD KEY `login_user_id` (`login_user_id`);
 --
 -- Indexes for table `cs_notification`
 --
@@ -633,42 +612,42 @@ ADD PRIMARY KEY (`noti_id`);
 --
 ALTER TABLE `cs_options`
 ADD PRIMARY KEY (`option_id`),
-ADD UNIQUE KEY `option_name` (`option_name`),
-ADD KEY `option_edited_id` (`option_edited_id`);
+  ADD UNIQUE KEY `option_name` (`option_name`),
+  ADD KEY `option_edited_id` (`option_edited_id`);
 --
 -- Indexes for table `cs_password_reset`
 --
 ALTER TABLE `cs_password_reset`
 ADD PRIMARY KEY (`pwdreset_id`),
-ADD UNIQUE KEY `pwdreset_token` (`pwdreset_token`),
-ADD KEY `pwdreset_user_id` (`pwdreset_user_id`),
-ADD KEY `pwd_reset_selector` (`pwdreset_selector`);
+  ADD UNIQUE KEY `pwdreset_token` (`pwdreset_token`),
+  ADD KEY `pwdreset_user_id` (`pwdreset_user_id`),
+  ADD KEY `pwd_reset_selector` (`pwdreset_selector`);
 --
 -- Indexes for table `cs_roles`
 --
 ALTER TABLE `cs_roles`
 ADD PRIMARY KEY (`role_id`),
-ADD KEY `role_edited_id` (`role_edited_id`);
+  ADD KEY `role_edited_id` (`role_edited_id`);
 --
 -- Indexes for table `cs_role_permissions`
 --
 ALTER TABLE `cs_role_permissions`
 ADD PRIMARY KEY (`rp_id`),
-ADD UNIQUE KEY `rp_key` (`rp_key`);
+  ADD UNIQUE KEY `rp_key` (`rp_key`);
 --
 -- Indexes for table `cs_role_perms`
 --
 ALTER TABLE `cs_role_perms`
 ADD PRIMARY KEY (`rpl_role_id`, `rpl_rp_id`),
-ADD KEY `cs_role_perms_ibfk_2` (`rpl_rp_id`),
-ADD KEY `rpl_role_id` (`rpl_role_id`, `rpl_rp_id`) USING BTREE;
+  ADD KEY `cs_role_perms_ibfk_2` (`rpl_rp_id`),
+  ADD KEY `rpl_role_id` (`rpl_role_id`, `rpl_rp_id`) USING BTREE;
 --
 -- Indexes for table `cs_seo_url`
 --
 ALTER TABLE `cs_seo_url`
 ADD PRIMARY KEY (`seo_id`),
-ADD UNIQUE KEY `seo_keyword` (`seo_keyword`),
-ADD KEY `seo_type_id` (`seo_type_id`);
+  ADD UNIQUE KEY `seo_keyword` (`seo_keyword`),
+  ADD KEY `seo_type_id` (`seo_type_id`);
 --
 -- Indexes for table `cs_session`
 --
@@ -679,17 +658,17 @@ ADD PRIMARY KEY (`session_id`);
 --
 ALTER TABLE `cs_users`
 ADD PRIMARY KEY (`user_id`),
-ADD UNIQUE KEY `user_username` (`user_login`),
-ADD UNIQUE KEY `user_email` (`user_email`),
-ADD KEY `user_edited_id` (`user_edited_id`),
-ADD KEY `user_role_id` (`user_role_id`) USING BTREE;
+  ADD UNIQUE KEY `user_username` (`user_login`),
+  ADD UNIQUE KEY `user_email` (`user_email`),
+  ADD KEY `user_edited_id` (`user_edited_id`),
+  ADD KEY `user_role_id` (`user_role_id`) USING BTREE;
 --
 -- Indexes for table `cs_user_meta`
 --
 ALTER TABLE `cs_user_meta`
 ADD PRIMARY KEY (`umeta_id`),
-ADD KEY `umeta_userID` (`umeta_user_id`),
-ADD KEY `umeta_editedID` (`umeta_edited_id`);
+  ADD KEY `umeta_userID` (`umeta_user_id`),
+  ADD KEY `umeta_editedID` (`umeta_edited_id`);
 --
 -- AUTO_INCREMENT for dumped tables
 --
@@ -799,19 +778,19 @@ ADD CONSTRAINT `cs_roles_ibfk_1` FOREIGN KEY (`role_edited_id`) REFERENCES `cs_u
 --
 ALTER TABLE `cs_role_perms`
 ADD CONSTRAINT `cs_role_perms_ibfk_1` FOREIGN KEY (`rpl_role_id`) REFERENCES `cs_roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `cs_role_perms_ibfk_2` FOREIGN KEY (`rpl_rp_id`) REFERENCES `cs_role_permissions` (`rp_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `cs_role_perms_ibfk_2` FOREIGN KEY (`rpl_rp_id`) REFERENCES `cs_role_permissions` (`rp_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 --
 -- Constraints for table `cs_users`
 --
 ALTER TABLE `cs_users`
 ADD CONSTRAINT `cs_users_ibfk_1` FOREIGN KEY (`user_role_id`) REFERENCES `cs_roles` (`role_id`),
-ADD CONSTRAINT `cs_users_ibfk_2` FOREIGN KEY (`user_edited_id`) REFERENCES `cs_users` (`user_id`);
+  ADD CONSTRAINT `cs_users_ibfk_2` FOREIGN KEY (`user_edited_id`) REFERENCES `cs_users` (`user_id`);
 --
 -- Constraints for table `cs_user_meta`
 --
 ALTER TABLE `cs_user_meta`
 ADD CONSTRAINT `cs_user_meta_ibfk_1` FOREIGN KEY (`umeta_user_id`) REFERENCES `cs_users` (`user_id`) ON DELETE CASCADE,
-ADD CONSTRAINT `cs_user_meta_ibfk_2` FOREIGN KEY (`umeta_edited_id`) REFERENCES `cs_users` (`user_id`);
+  ADD CONSTRAINT `cs_user_meta_ibfk_2` FOREIGN KEY (`umeta_edited_id`) REFERENCES `cs_users` (`user_id`);
 COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */
 ;

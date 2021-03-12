@@ -181,7 +181,9 @@ function outputBreadcrumbs(object $breadcrumbs)
     $href = (!empty($breadcrumb->href)) ? ' href="' . $breadcrumb->href . '"' : '';
     // Check for title
     $title = (!empty($breadcrumb->title)) ? $breadcrumb->title : $breadcrumb->text;
-    $returnOutput .= '<a' . $href . ' class="csc-breadcrumb" title="' . $title . '">' . $breadcrumb->text . '</a>';
+    // Check for last item
+    $ariaCurrent =  ($breadcrumb === end($breadcrumbs)) ? ' aria-current="page"' : '';
+    $returnOutput .= '<a' . $href . ' class="csc-breadcrumb" title="' . $title . '"' . $ariaCurrent . '>' . $breadcrumb->text . '</a>';
   }
 
   // Return output
@@ -323,4 +325,51 @@ function outputAdminMenu(array $menuItems, string $currentNav = '', string $curr
 
   // Return output
   return (!empty($returnOutput)) ? $returnOutput : '';
+}
+
+/**
+ * Create PDF using template
+ *
+ * @param string $templateFile File name of pdf template to be used
+ * @param array $arrayReplace Array of items to replace in the template in Associative array format ("key"=>"value") (optional, dependant on template)
+ *
+ * @return bool|string Returns FALSE if there was an error, otherwise returns the created pdf template
+ */
+function createPDFTemplate($templateFile, $arrayReplace = array())
+{
+
+  // Set file path
+  $filePath = DIR_SYSTEM . 'pdfs' . _DS . ltrim($templateFile, '/');
+  // Check the file exists
+  if (!empty($templateFile) && file_exists($filePath)) {
+
+    // Get file contents
+    $file = file_get_contents($filePath);
+
+    // Check if the file has contents
+    if (!empty($file)) {
+
+      // Add generic options to array
+      $arrayReplace['site_url'] = get_site_url();
+      $arrayReplace['site_name'] = SITE_NAME;
+      $arrayReplace['current_year'] = date('Y');
+
+      // Loop through and replace items from array
+      foreach ($arrayReplace as $key => $value) {
+        $file = str_replace("{{" . $key . "}}", $value, $file);
+      }
+
+      // Return the created email
+      return $file;
+      exit;
+    } else { // File was empty. Return FALSE
+
+      return FALSE;
+      exit;
+    }
+  } else { // Template doesn't exist. Return FALSE for error
+
+    return FALSE;
+    exit;
+  }
 }

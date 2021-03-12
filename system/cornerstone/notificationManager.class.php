@@ -39,10 +39,18 @@ class NotificationManager
   public function isDoublicate(Notification $notification)
   {
     // Run query to find if notification already exists
-    $this->conn->dbh->selecting("cs_notification", "noti_id", where(eq("noti_type", $notification->type(), _AND), eq("noti_for_id", $notification->recipient(), _AND), eq("noti_type_id", $notification->typeID())));
+    $doublicateResults = $this->conn->dbh->selecting(
+      "cs_notification",
+      "noti_id",
+      where(
+        eq("noti_type", $notification->type()),
+        eq("noti_for_id", $notification->recipient()),
+        eq("noti_type_id", $notification->typeID())
+      )
+    );
 
     // If there are results, return TRUE
-    if ($this->conn->dbh->getNum_Rows() > 0) {
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($doublicateResults)) {
 
       // Return TRUE
       return TRUE;
@@ -70,7 +78,18 @@ class NotificationManager
       // Notification doesn't exist. Insert.
 
       // Insert the notification
-      $this->conn->dbh->insert("cs_notification", array('noti_type' => $notification->type(), 'noti_content' => json_encode($notification->content()), 'noti_status' => "0", 'noti_for_id' => $notification->recipient(), 'noti_for_group' => $notification->group(), 'noti_type_id' => $notification->typeID(), 'noti_created_at' => 'NOW()'));
+      $this->conn->dbh->insert(
+        "cs_notification",
+        array(
+          'noti_type' => $notification->type(),
+          'noti_content' => json_encode($notification->content()),
+          'noti_status' => "0",
+          'noti_for_id' => $notification->recipient(),
+          'noti_for_group' => $notification->group(),
+          'noti_type_id' => $notification->typeID(),
+          'noti_created_at' => 'NOW()'
+        )
+      );
 
       // Check if added successfully
       if ($this->conn->dbh->affectedRows() > 0) {
@@ -84,7 +103,16 @@ class NotificationManager
     } else { // Notification already exists. Set latest notification as unread
 
       // Update row in `cs_notification`
-      $result = $this->conn->dbh->update("cs_notification", array('noti_status' => "0", 'noti_created_at' => 'NOW()'), eq("noti_type", $notification->type(), _AND), eq("noti_for_id", $notification->recipient(), _AND), eq("noti_type_id", $notification->typeID()));
+      $updateResult = $this->conn->dbh->update(
+        "cs_notification",
+        array(
+          'noti_status' => "0",
+          'noti_created_at' => 'NOW()'
+        ),
+        eq("noti_type", $notification->type()),
+        eq("noti_for_id", $notification->recipient()),
+        eq("noti_type_id", $notification->typeID())
+      );
 
       // Check if updated successfully
       if ($this->conn->dbh->affectedRows() > 0) {
@@ -111,7 +139,14 @@ class NotificationManager
   public function countUnread(Notification $notification)
   {
     // Run query to find if notification already exists
-    $this->conn->dbh->selecting("cs_notification", "noti_id", where(eq("noti_for_id", $notification->recipient(), _AND), eq("noti_status", "0")));
+    $this->conn->dbh->selecting(
+      "cs_notification",
+      "noti_id",
+      where(
+        eq("noti_for_id", $notification->recipient()),
+        eq("noti_status", "0")
+      )
+    );
 
     // Return results
     return $this->conn->dbh->getNum_Rows();
@@ -120,24 +155,27 @@ class NotificationManager
   /**
    * Get notifications
    *
-   * @param int $unseen If wanting to only see unseen notifications
-   * @param int $limit Amount of results to retrieve
-   * @param int $offset Amount to offset retrieved results by
+   * @param int $unseen `[optional]` If wanting to only see unseen notifications. Defaults to "0"
+   * @param int $limit `[optional]` Amount of results to retrieve. Defaults to "10"
+   * @param int $offset `[optional]` Amount to offset retrieved results by. Defaults to "0"
    *
    * @return object Will return an object with the retrieved information in it
    */
-  public function get(int $unseen = 0, int $limit = 10, int $offset = 0)
-  {
+  public function get(
+    int $unseen = 0,
+    int $limit = 10,
+    int $offset = 0
+  ) {
     // Build query
     $this->sql = array();
     $this->whereArray = array();
 
     // Set the user ID
-    $this->whereArray[] = eq("noti_for_id", $_SESSION['_cs']['user']['uid'], _AND);
+    $this->whereArray[] = eq("noti_for_id", $_SESSION['_cs']['user']['uid']);
 
     // Check if wanting unseen only
     if ($unseen) {
-      $this->whereArray[] = eq("noti_status", "0", _AND);
+      $this->whereArray[] = eq("noti_status", "0");
     }
 
     // Combine where
@@ -152,13 +190,22 @@ class NotificationManager
     $this->sql[] = limit($limit, $offset);
 
     // Run query to get results
-    $results = $this->conn->dbh->selecting("cs_notification", "noti_id, noti_type, noti_content, noti_status, noti_type_id, noti_created_at", ...$this->sql);
+    $getResults = $this->conn->dbh->selecting(
+      "cs_notification",
+      "noti_id,
+      noti_type,
+      noti_content,
+      noti_status,
+      noti_type_id,
+      noti_created_at",
+      ...$this->sql
+    );
 
     // Return if results
-    if ($this->conn->dbh->getNum_Rows() > 0) {
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($getResults)) {
 
       // Return results
-      return $results;
+      return $getResults;
       exit;
     } // No results. Return FALSE.
 
@@ -176,7 +223,14 @@ class NotificationManager
   public function markStatus(Notification $notification)
   {
     // Update row in `cs_notification`
-    $result = $this->conn->dbh->update("cs_notification", array('noti_status' => $notification->status(), 'noti_read_at' => 'NOW()'), eq("noti_id", $notification->id(), _AND));
+    $updateResult = $this->conn->dbh->update(
+      "cs_notification",
+      array(
+        'noti_status' => $notification->status(),
+        'noti_read_at' => 'NOW()'
+      ),
+      eq("noti_id", $notification->id())
+    );
 
     // Check if updated successfully
     if ($this->conn->dbh->affectedRows() > 0) {
@@ -198,7 +252,15 @@ class NotificationManager
   public function markAllStatus(Notification $notification)
   {
     // Update row in `cs_notification`
-    $result = $this->conn->dbh->update("cs_notification", array('noti_status' => $notification->status(), 'noti_read_at' => 'NOW()'), eq("noti_for_id", $notification->recipient(), _AND), eq("noti_status", "0"));
+    $updateResult = $this->conn->dbh->update(
+      "cs_notification",
+      array(
+        'noti_status' => $notification->status(),
+        'noti_read_at' => 'NOW()'
+      ),
+      eq("noti_for_id", $notification->recipient()),
+      eq("noti_status", "0")
+    );
 
     // Check if updated successfully
     if ($this->conn->dbh->affectedRows() > 0) {

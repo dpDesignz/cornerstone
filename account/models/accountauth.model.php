@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Admin User Authentication Model
+ * Account Authentication Model
  *
  * @package Cornerstone
  */
 
-class UserAuth extends ModelBase
+class AccountAuth extends ModelBase
 {
 
   // Set the default properties
   private $uid;
-  public $remember;
+  private $rememberUser;
 
   /**
    * Construct the User
@@ -24,97 +24,100 @@ class UserAuth extends ModelBase
   }
 
   /**
-   * Find user by username or email
+   * Set user ID
    *
-   * @param string $udata Username or email address to check
-   * @param int $active [optional] Check if user is active. Defaults to 1.
+   * @param int $userID ID of the user to set
+   *
+   * @return bool Will return TRUE if ID set, or FALSE if not
+   */
+  public function setUserID(int $userID)
+  {
+
+    // Check data is valid
+    if (!empty($userID) && is_numeric($userID)) {
+
+      // Set user ID
+      $this->uid = $userID;
+
+      // Return TRUE
+      return TRUE;
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Check Remember User
+   *
+   * (no params)
+   *
+   * @return bool Will return TRUE if set, or FALSE if not
+   */
+  public function checkRememberUser()
+  {
+    // Return rememberUser
+    return $this->rememberUser;
+  }
+
+  /**
+   * Check for user user
+   *
+   * @param string $userData Username or email address to check
+   * @param int $active `[optional]` Check if user is active. Defaults to "1"
    *
    * @return bool Will return TRUE if user found, or FALSE if not found
    */
-  public function findUserByEmail(string $udata, int $active = 1)
-  {
+  public function checkForUserMatch(
+    string $userData,
+    int $active = 1
+  ) {
 
-    // Build query
-    $this->sql = array();
-    $this->whereArray = array();
+    // Check data is valid
+    if (!empty($userData)) {
 
-    // Set where login
-    $this->whereArray[] = grouping(
-      eq("user_login", $udata, _OR),
-      eq("user_email", $udata)
-    );
+      // Build query
+      $this->sql = array();
+      $this->whereArray = array();
 
-    // Check for showing inactive
-    if ($active) {
-      $this->whereArray[] = eq("user_status", "1");
-    }
+      // Check for email
+      $this->whereArray[] = grouping(
+        eq("user_login", $userData, _OR),
+        eq("user_email", $userData)
+      );
 
-    // Combine where
-    if (!empty($this->whereArray)) {
-      $this->sql[] = where(...$this->whereArray);
-    }
+      // Check for active users
+      if ($active) {
+        $this->whereArray[] = eq("user_status", "1");
+      }
 
-    // Run query to find active user
-    $userData = $this->conn->dbh->selecting(
-      DB_PREFIX . "users",
-      "user_id",
-      ...$this->sql
-    );
+      // Combine where
+      if (!empty($this->whereArray)) {
+        $this->sql[] = where(...$this->whereArray);
+      }
 
-    // Return if results
-    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userData)) {
-
-      // Return True
-      return TRUE;
-    } else {
-
-      // Return False
-      return FALSE;
-    }
-  }
-
-  /**
-   * Get user email details
-   *
-   * @return string Return string with user email address
-   */
-  public function getUserEmail()
-  {
-
-    // Make sure data is valid
-    if (!empty($this->uid) && is_numeric($this->uid)) {
-
-      // Run query
-      $emailResult = $this->conn->dbh->selecting(
+      // Run query to find user by email
+      $userResult = $this->conn->dbh->selecting(
         DB_PREFIX . "users",
-        "user_email",
-        where(
-          eq("user_id", $this->uid)
-        )
+        "user_id",
+        ...$this->sql
       );
 
       // Return if results
-      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($emailResult)) {
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userResult)) {
 
-        // Return user email
-        return $emailResult[0]->user_email;
-      } // No results. Return FALSE.
+        // Return True
+        return TRUE;
+      } // No results found. Return FALSE
+    } // Data invalid. Return FALSE
 
-    } // Data invalid. Return FALSE.
-
-    // Return FALSE
-    return false;
+    // Return False
+    return FALSE;
   }
 
-  /**
-   * Set uid
-   *
-   * @param int $id ID of user you want to set
-   */
-  public function setUID(int $id)
-  {
-    $this->uid = $id;
-  }
+  ##############################
+  ####    AUTHENTICATION    ####
+  ##############################
 
   /**
    * Log user in
@@ -193,140 +196,155 @@ class UserAuth extends ModelBase
   }
 
   /**
-   * Check Failed Logins
+   * Authenticate the user
    *
-   * (No params)
+   * (no params)
    *
-   * @return int Will return TRUE if limit isn't reached, or FALSE if limit reached
+   * @return bool
    */
-  public function checkFailedLogins()
-  {
-
-    // Make sure data is valid
-    if (!empty($this->uid) && is_numeric($this->uid)) {
-
-      // Get options from database to reduce calls to database
-      $options = $this->optn->get(array('password_reset_expire', 'max_logins'));
-
-      // Set limit time using 'password_reset_expire' value from the database
-      $max_time_check = new DateTime();
-      $max_time_check->modify('-' . $options->password_reset_expire . ' seconds');
-
-      // Run query to check of locked login set within defined time
-      $this->conn->dbh->selecting(
-        DB_PREFIX . "login_log",
-        "login_id",
-        where(
-          gt("login_dtm", $max_time_check->format('Y-m-d H:i:s')),
-          eq("login_status", "3"),
-          eq("login_user_id", $this->uid),
-          eq("login_user_type", "1")
-        )
-      );
-
-      // Check if locked login set
-      if ($this->conn->dbh->getNum_Rows() < 1) {
-
-        // Run query to find if limit is reached within defined time
-        $this->conn->dbh->selecting(
-          DB_PREFIX . "login_log",
-          "login_id",
-          where(
-            gt("login_dtm", $max_time_check->format('Y-m-d H:i:s')),
-            neq("login_status", "1"),
-            eq("login_user_id", $this->uid),
-            eq("login_user_type", "1")
-          )
-        );
-
-        // Check if more than `max_logins` results
-        if ($this->conn->dbh->getNum_Rows() < $options->max_logins) {
-
-          // Return TRUE
-          return TRUE;
-        } else { // Max attempts reached. Return FALSE.
-
-          // Set login log to "3" for max attempts
-          $this->setLoginLog(3);
-        }
-      } // Locked login set. Return FALSE.
-
-    } // Data invalid. Return FALSE.
-
-    // Return FALSE
-    return FALSE;
-  }
-
-  /**
-   * Get time that login lock will be lifted
-   *
-   * (No params)
-   *
-   * @return string|bool Will return timestamp if found, or FALSE if not
-   */
-  public function getLoginLock()
-  {
-
-    // Make sure data is valid
-    if (!empty($this->uid) && is_numeric($this->uid)) {
-
-      // Run query to find the last locked login_dtm
-      $lockResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "login_log",
-        "login_dtm",
-        where(
-          eq("login_status", "3"),
-          eq("login_user_id", $this->uid),
-          eq("login_user_type", "1")
-        ),
-        orderBy("login_dtm", "DESC"),
-        limit(1)
-      );
-
-      // Check if timestamp exists
-      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($lockResult)) {
-
-        // Return timestamp
-        return $lockResult[0]->login_dtm;
-      } // Unable to find timestamp. Return FALSE.
-
-    } // Data invalid. Return FALSE.
-
-    // Return FALSE
-    return FALSE;
-  }
-
-  /**
-   * Set Login Log
-   *
-   * @param int $status Status of login. 0 = Failed, 1 = Success. Defaults to 0 (Failed).
-   *
-   * @return bool Will return FALSE if failed or TRUE if successful.
-   */
-  public function setLoginLog(int $status = 0)
+  public function authenticateUser()
   {
 
     // Make sure the data is valid
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
-      // Log user login into `cs_login_log`
-      $this->conn->dbh->insert(
-        DB_PREFIX . "login_log",
-        array(
-          'login_user_id' => $this->uid,
-          'login_user_type' => '1',
-          'login_dtm' => date('Y-m-d H:i:s'),
-          'login_ip_address' => $_SERVER['REMOTE_ADDR'],
-          'login_status ' => $status
+      // Check if session set (just in case) and restart if it isn't
+      if (session_id() == '') {
+        session_start();
+      }
+
+      // Regenerate a new session ID
+      session_regenerate_id(true);
+
+      // Get the user information
+      $userResult = $this->conn->dbh->selecting(
+        DB_PREFIX . 'users',
+        'user_id,
+        user_email,
+        user_display_name',
+        where(
+          eq('user_id', $this->uid),
+          neq('user_status', '0')
         )
       );
+      // Check if the user is available
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userResult)) {
 
-      // Check if added to log successfully
-      if ($this->conn->dbh->affectedRows() > 0) {
+        // If it is, set initial $_SESSION info
+        $result = $userResult[0];
 
-        // Return TRUE
+        // Set the Cornerstone array
+        if (empty($_SESSION['_cs']))
+          $_SESSION['_cs'] = array();
+        // Set user agent to check for session hijacking later
+        $_SESSION['_cs']['HTTP_USER_AGENT'] = password_hash($_SERVER['HTTP_USER_AGENT'], PASSWORD_DEFAULT);
+        // Set the user array
+        $_SESSION['_cs']['user'] = array();
+        // Set user ID
+        $_SESSION['_cs']['user']['uid'] = $result->user_id;
+        // Set user email address
+        $_SESSION['_cs']['user']['email'] = $result->user_email;
+        // Set user display name
+        $_SESSION['_cs']['user']['name'] = ucwords($result->user_display_name);
+
+        /**
+         * Get the "ext.accountauth.php" file and run `setCustomAuth()` function
+         * to add any custom set $_SESSION items
+         */
+        require_once(DIR_ROOT . 'account/models/ext.accountauth.php');
+        setCustomAuth($this->uid);
+
+        // Log user login into `cs_login_log`
+        $this->setLoginLog(1);
+
+        // Return true that all data set
         return TRUE;
-      } // Unable to add login to log. Return FALSE.
+      } // User not available. Return FALSE.
+
+    } // Data invalid. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  #############################
+  ####    AUTHORIZATION    ####
+  #############################
+
+  /**
+   * Check the authorization token is valid
+   *
+   * @param string $authSelector Authorization selector to check
+   * @param int $authToken Authorization token to check
+   *
+   * @return bool Will return FALSE if failed, or TRUE if success
+   */
+  public function checkAuthorization(string $authSelector, int $authToken)
+  {
+
+    // Make sure the data is valid
+    if (!empty($authSelector) && !empty($authToken) && is_numeric($authToken)) {
+
+      // Check the token information is in the $_SESSION
+      if (!empty($_SESSION['_cs']['auth_check'])) {
+
+        // Get token information from the $_SESSION
+        $authInfo = explode(':', $_SESSION['_cs']['auth_check']);
+
+        // Get the authorization token from the database
+        $authResult = $this->conn->dbh->selecting(
+          DB_PREFIX . 'authorization',
+          array(
+            'auth_token',
+            'auth_remember',
+            'auth_dtm'
+          ),
+          where(
+            eq('auth_id', $authInfo[0]),
+            eq('auth_selector', $authSelector),
+            eq('auth_user_id', $authInfo[1])
+          )
+        );
+
+        // Check if the token is available
+        if ($this->conn->dbh->getNum_Rows() > 0 && !empty($authResult)) {
+
+          // Return token if available
+          $authResult = $authResult[0];
+
+          // Check token matches
+          if (password_verify($authToken, $authResult->auth_token)) {
+
+            // Get and set authorization expiry value
+            $auth_expiration_time = new DateTime($authResult->auth_dtm);
+            $auth_expiration_time->modify('+' . $this->optn->get('auth_expire') . ' seconds');
+
+            // Check if token is expired
+            if (
+              $auth_expiration_time >= date('Y-m-d H:i:s')
+            ) {
+
+              // Delete all authorization tokens for user from the table
+              $this->deleteAuthorization($authInfo[1], 1);
+
+              // Set uid
+              $this->uid = $authInfo[1];
+
+              // Set remember me
+              $this->rememberUser = $authResult->auth_remember;
+
+              // Return TRUE
+              return TRUE;
+            } else { // Token is expired. Delete from table and return FALSE.
+
+              // Delete the authorization token from the table
+              $this->deleteAuthorization($authInfo[0]);
+            }
+          } // Token doesn't match. Return FALSE.
+
+        } // Token isn't available. Return FALSE.
+
+      } // Token information not in the session. Return FALSE.
 
     } // Data invalid. Return FALSE.
 
@@ -337,9 +355,9 @@ class UserAuth extends ModelBase
   /**
    * Set the authorization token for 2FA if option set in `cs_options` and `user_auth_rqd` set on user
    *
-   * @param bool $remember: Set true if you want to set the Authorization to set the cookie on verification
+   * @param bool $remember Set true if you want to set the Authorization to set the cookie on verification
    *
-   * @return bool|object Will return FALSE if there is an error, else will return an object with the authorization selector, token, user agent, and expiry
+   * @return mixed bool|object Will return FALSE if there is an error, else will return an object with the authorization selector, token, user agent, and expiry
    */
   public function setAuthorization(bool $remember = FALSE)
   {
@@ -394,7 +412,7 @@ class UserAuth extends ModelBase
       );
 
       // Check if token added to the database
-      if ($token_id != false) {
+      if ($this->conn->dbh->affectedRows() > 0) {
 
         // Check if session set and start if it isn't
         if (session_id() == '') {
@@ -412,85 +430,6 @@ class UserAuth extends ModelBase
           'expires' => $expireDtm->format('Y-m-d H:i:s')
         );
       } // There was an issue adding the token to the database. Return FALSE.
-
-    } // Data invalid. Return FALSE.
-
-    // Return FALSE
-    return FALSE;
-  }
-
-  /**
-   * Check the authorization token is valid
-   *
-   * @param string $authSelector Authorization selector to check
-   * @param int $authToken Authorization token to check
-   *
-   * @return bool Will return FALSE if failed, or TRUE if success
-   */
-  public function checkAuthorization(string $authSelector, int $authToken)
-  {
-
-    // Make sure the data is valid
-    if (!empty($authSelector) && !empty($authToken) && is_numeric($authToken)) {
-
-      // Check the token information is in the $_SESSION
-      if (!empty($_SESSION['_cs']['auth_check'])) {
-
-        // Get token information from the $_SESSION
-        $authInfo = explode(':', $_SESSION['_cs']['auth_check']);
-
-        // Get the authorization token from the database
-        $result = $this->conn->dbh->selecting(
-          DB_PREFIX . 'authorization',
-          array(
-            'auth_token',
-            'auth_remember',
-            'auth_dtm'
-          ),
-          where(
-            eq('auth_id', $authInfo[0]),
-            eq('auth_selector', $authSelector),
-            eq('auth_user_id', $authInfo[1])
-          )
-        );
-
-        // Check if the token is available
-        if ($result != false) {
-
-          // Return token if available
-          $result = $result[0];
-
-          // Check token matches
-          if (password_verify($authToken, $result->auth_token)) {
-
-            // Get and set authorization expiry value
-            $auth_expiration_time = new DateTime($result->auth_dtm);
-            $auth_expiration_time->modify('+' . $this->optn->get('auth_expire') . ' seconds');
-
-            // Check if token is expired
-            if ($auth_expiration_time >= date('Y-m-d H:i:s')) {
-
-              // Delete all authorization tokens for user from the table
-              $this->deleteAuthorization($authInfo[1], 1);
-
-              // Set uid
-              $this->uid = $authInfo[1];
-
-              // Set remember me
-              $this->remember = $result->auth_remember;
-
-              // Return TRUE
-              return TRUE;
-            } else { // Token is expired. Delete from table and return FALSE.
-
-              // Delete the authorization token from the table
-              $this->deleteAuthorization($authInfo[0]);
-            }
-          } // Token doesn't match. Return FALSE.
-
-        } // Token isn't available. Return FALSE.
-
-      } // Token information not in the session. Return FALSE.
 
     } // Data invalid. Return FALSE.
 
@@ -530,7 +469,7 @@ class UserAuth extends ModelBase
       }
 
       // Check the delete didn't error
-      if ($delete_status != FALSE) {
+      if ($this->conn->dbh->affectedRows() > 0) {
 
         // Unset the authorization $_SESSION value
         unset($_SESSION['_cs']['auth_check']);
@@ -546,76 +485,184 @@ class UserAuth extends ModelBase
   }
 
   /**
-   * Authenticate the user
+   * Get user email details
    *
-   * (no params)
-   *
-   * @return bool
+   * @return string Return string with user email address
    */
-  public function authenticateUser()
+  public function getUserEmail()
   {
 
-    // Make sure the data is valid
+    // Make sure data is valid
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
-      // Check if session set (just in case) and restart if it isn't
-      if (session_id() == '') {
-        session_start();
-      }
-
-      // Regenerate a new session ID
-      session_regenerate_id(true);
-
-      // Get the user information
-      $userResult = $this->conn->dbh->selecting(
-        DB_PREFIX . 'users',
-        'user_id,
-        user_email,
-        user_display_name',
+      // Run query
+      $emailResult = $this->conn->dbh->selecting(
+        DB_PREFIX . "users",
+        "user_email",
         where(
-          eq('user_id', $this->uid),
-          neq('user_status', '0')
+          eq("user_id", $this->uid)
         )
       );
-      // Check if the user is available
-      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userResult)) {
 
-        // If it is, set initial $_SESSION info
-        $result = $userResult[0];
+      // Return if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($emailResult)) {
 
-        // Set the Cornerstone array
-        if (empty($_SESSION['_cs']))
-          $_SESSION['_cs'] = array();
-        // Set user agent to check for session hijacking later
-        $_SESSION['_cs']['HTTP_USER_AGENT'] = password_hash($_SERVER['HTTP_USER_AGENT'], PASSWORD_DEFAULT);
-        // Set the user array
-        $_SESSION['_cs']['user'] = array();
-        // Set user ID
-        $_SESSION['_cs']['user']['uid'] = $result->user_id;
-        // Set user email address
-        $_SESSION['_cs']['user']['email'] = $result->user_email;
-        // Set user display name
-        $_SESSION['_cs']['user']['name'] = ucwords($result->user_display_name);
+        // Return user email
+        return $emailResult[0]->user_email;
+      } // No results. Return FALSE.
 
-        /**
-         * Get the "ext.userauth.php" file and run `setCustomAuth()` function
-         * to add any custom set $_SESSION items
-         */
-        require_once(DIR_ROOT . 'admin/models/cornerstone/ext.userauth.php');
-        setCustomAuth($this->uid);
+    } // Data invalid. Return FALSE.
 
-        // Log user login into `cs_login_log`
-        $this->setLoginLog(1);
+    // Return FALSE
+    return false;
+  }
 
-        // Return true that all data set
-        return TRUE;
-      } // User not available. Return FALSE.
+  ###################
+  ####    LOG    ####
+  ###################
+
+  /**
+   * Check Failed Logins
+   *
+   * (No params)
+   *
+   * @return int Will return TRUE if limit isn't reached, or FALSE if limit reached
+   */
+  public function checkFailedLogins()
+  {
+
+    // Make sure data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
+
+      // Get options from database to reduce calls to database
+      $options = $this->optn->get(array('password_reset_expire', 'max_logins'));
+
+      // Set limit time using 'password_reset_expire' value from the database
+      $max_time_check = new DateTime();
+      $max_time_check->modify('-' . $options->password_reset_expire . ' seconds');
+
+      // Run query to check of locked login set within defined time
+      $loginLockResults = $this->conn->dbh->selecting(
+        DB_PREFIX . "login_log",
+        "login_id",
+        where(
+          gt("login_dtm", $max_time_check->format('Y-m-d H:i:s')),
+          eq("login_status", "3"),
+          eq("login_user_id", $this->uid)
+        )
+      );
+
+      // Check if locked login set
+      if ($this->conn->dbh->getNum_Rows() < 1) {
+
+        // Run query to find if limit is reached within defined time
+        $loginLimitResults = $this->conn->dbh->selecting(
+          DB_PREFIX . "login_log",
+          "login_id",
+          where(
+            gt("login_dtm", $max_time_check->format('Y-m-d H:i:s')),
+            neq("login_status", "1"),
+            eq("login_user_id", $this->uid),
+            eq("login_user_type", "1")
+          )
+        );
+
+        // Check if more than `max_logins` results
+        if ($this->conn->dbh->getNum_Rows() < $options->max_logins) {
+
+          // Return TRUE
+          return TRUE;
+        } else { // Max attempts reached. Return FALSE.
+
+          // Set login log to "3" for max attempts
+          $this->setLoginLog(3);
+        }
+      } // Locked login set. Return FALSE.
 
     } // Data invalid. Return FALSE.
 
     // Return FALSE
     return FALSE;
   }
+
+  /**
+   * Get time that login lock will be lifted
+   *
+   * (No params)
+   *
+   * @return string|bool Will return timestamp if found, or FALSE if not
+   */
+  public function getLoginLock()
+  {
+
+    // Make sure data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
+
+      // Run query to find the last locked login_dtm
+      $lockResult = $this->conn->dbh->selecting(
+        DB_PREFIX . "login_log",
+        "login_dtm",
+        where(
+          eq("login_status", "3"),
+          eq("login_user_id", $this->uid)
+        ),
+        orderBy("login_dtm", "DESC"),
+        limit(1)
+      );
+
+      // Check if timestamp exists
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($lockResult)) {
+
+        // Return timestamp
+        return $lockResult[0]->login_dtm;
+      } // Unable to find timestamp. Return FALSE.
+
+    } // Data invalid. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Set Login Log
+   *
+   * @param int $status Status of login. 0 = Failed, 1 = Success, 3 = Locked. Defaults to 0 (Failed).
+   *
+   * @return bool Will return FALSE if failed or TRUE if successful.
+   */
+  public function setLoginLog(int $status = 0)
+  {
+
+    // Make sure the data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
+
+      // Log user login into `cs_login_log`
+      $this->conn->dbh->insert(
+        DB_PREFIX . "login_log",
+        array(
+          'login_user_id' => $this->uid,
+          'login_dtm' => date('Y-m-d H:i:s'),
+          'login_ip_address' => $_SERVER['REMOTE_ADDR'],
+          'login_status ' => $status
+        )
+      );
+
+      // Check if added to log successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return TRUE
+        return TRUE;
+      } // Unable to add login to log. Return FALSE.
+
+    } // Data invalid. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  #######################
+  ####    COOKIES    ####
+  #######################
 
   /**
    * Set the authentication $_COOKIE information for user on "Remember Me"
@@ -694,7 +741,6 @@ class UserAuth extends ModelBase
         DB_PREFIX . 'auth_cookie',
         array(
           'cookie_user_id' => $this->uid,
-          'cookie_user_type' => '1',
           'cookie_password_hash' => $random_password_hash,
           'cookie_key' => $random_key,
           'cookie_ip_address' => $_SERVER['REMOTE_ADDR'],
@@ -760,7 +806,7 @@ class UserAuth extends ModelBase
         );
 
         // Check if the token is available
-        if ($this->conn->dbh->getNum_Rows() > 0) {
+        if ($this->conn->dbh->getNum_Rows() > 0 && !empty($cookieToken)) {
 
           // Set 1st token if available
           $cookieToken = $cookieToken[0];
