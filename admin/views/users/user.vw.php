@@ -65,13 +65,11 @@ require(get_theme_path('layout.php', 'admin')); ?>
       <fieldset>
         <legend>User</legend>
         <div class=" csc-row csc-row--no-pad csc-row--no-gap">
-          <div class="csc-col csc-col12 csc-input-field">
+          <div class="csc-col csc-col12 csc-col--md6 csc-input-field">
             <input type="text" name="login" id="login" tabindex="1" autocapitalize="on" value="<?php if (!empty($data->login)) echo $data->login; ?>" data-lpignore="true" required>
             <label for="login">Login (username)*</label>
           </div>
-        </div>
-        <div class=" csc-row csc-row--no-pad csc-row--no-gap">
-          <div class="csc-col csc-col12 csc-input-field">
+          <div class="csc-col csc-col12 csc-col--md6 csc-input-field">
             <input type="text" name="display_name" id="display_name" tabindex="2" autocapitalize="on" value="<?php if (!empty($data->display_name)) echo $data->display_name; ?>" data-lpignore="true" required>
             <label for="display_name">Display Name*</label>
           </div>
@@ -118,11 +116,16 @@ require(get_theme_path('layout.php', 'admin')); ?>
         if ($data->page_type == "edit") {
         ?>
           <div class="csc-row csc-row--no-pad">
-            <div class="csc-col csc-col12 csc-input-field">
-              <select name="status" id="status" data-placeholder="Set user status" tabindex="8">
-                <?php echo $data->status_options; ?>
-              </select>
-              <label>Status*</label>
+            <div class="csc-col csc-col12 csc-input-field cs-text-center">
+              <p class="cs-body1">Account status</p>
+              <div class="csc-switch">
+                <label>
+                  Inactive
+                  <input type="checkbox" name="status" tabindex="8" <?php if (!empty($data->status) && $data->status) echo 'checked'; ?>>
+                  <span class="csc-lever"></span>
+                  Active
+                </label>
+              </div>
             </div>
           </div>
         <?php } ?>

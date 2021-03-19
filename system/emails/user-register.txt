@@ -1,0 +1,29 @@
+Welcome to the {{site_name}} website. We've got your login details inside to get you started.\r\n\r\n
+
+{{site_name}} ( {{site_url}} )\r\n\r\n
+
+************\r\n
+Welcome, {{first_name}}!\r\n
+************\r\n\r\n
+
+Thanks for registering to use the {{site_name}} website. We are thrilled to have you on board. Click the sign in link to get started with your account:\r\n\r\n
+
+Sign in ( {{action_url}} )\r\n\r\n
+
+For reference, here's your login information:\r\n\r\n
+
+Sign In Page: {{action_url}}\r\n
+Email Address: {{email}}\r\n\r\n
+
+Your password is the one you set when registering your account. For security purposes we have not included that here.\r\n\r\n
+
+If you have any questions, feel free to email our team ( {{support_email}} ) who will be more than happy to help.
+
+Thanks,\r\n
+The {{site_name}} Team\r\n\r\n
+
+If you are having trouble with the button above, copy and paste the URL below into your web browser.\r\n\r\n
+
+{{action_url}}\r\n\r\n
+
+© {{current_year}} {{site_name}}. All rights reserved.

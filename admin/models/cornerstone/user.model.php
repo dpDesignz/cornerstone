@@ -47,6 +47,50 @@ class User extends ModelBase
   }
 
   /**
+   * Get user
+   *
+   * @param int $userID ID of the user to retrieve
+   *
+   * @return object Return object with user details
+   */
+  public function getUser(
+    int $userID
+  ) {
+
+    // Check data is valid
+    if (!empty($userID) && is_numeric($userID)) {
+
+      // Run query to find data
+      $userData = $this->conn->dbh->selecting(
+        DB_PREFIX . "users",
+        "user_id,
+        user_login,
+        user_display_name,
+        user_email,
+        user_first_name,
+        user_last_name,
+        user_role_id,
+        user_auth_rqd,
+        user_status",
+        where(
+          eq("user_id", $userID)
+        )
+      );
+
+      // Return if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userData)) {
+
+        // Return results
+        return $userData[0];
+      } // No results. Return FALSE.
+
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
    * Get list of users
    *
    * @param array $params Multiple parameters as required
@@ -235,6 +279,65 @@ class User extends ModelBase
       // Return new ID
       return $this->conn->dbh->getInsert_Id();
     } // Unable to add. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Update User
+   *
+   * @param int $userID The ID of the user
+   * @param string $login The username of the user
+   * @param string $displayName The display name of the user
+   * @param string $email The email of the user
+   * @param string $firstName The first name of the user
+   * @param string $lastName The last name of the user
+   * @param int $roleID The ID of the role the user is assigned to
+   * @param int $authRqd Set if the user is required to use 2FA
+   * @param int $status The status of the user
+   *
+   * @return bool Will return FALSE if failed or TRUE if successful.
+   */
+  public function updateUser(
+    int $userID,
+    string $login,
+    string $displayName,
+    string $email,
+    string $firstName,
+    string $lastName,
+    int $roleID,
+    int $authRqd,
+    int $status
+  ) {
+
+    // Set fallbacks
+    $roleID = (empty($roleID)) ? NULL : $roleID;
+
+    // Add data
+    $this->conn->dbh->update(
+      DB_PREFIX . "users",
+      array(
+        'user_login' => $login,
+        'user_display_name' => $displayName,
+        'user_email ' => $email,
+        'user_first_name' => $firstName,
+        'user_last_name' => $lastName,
+        'user_role_id' => $roleID,
+        'user_auth_rqd' => $authRqd,
+        'user_status' => $status,
+        'user_edited_id' => $_SESSION['_cs']['user']['uid'],
+        'user_edited_dtm' => date('Y-m-d H:i:s')
+      ),
+      eq('user_id', $userID)
+    );
+
+    // Check if updated successfully
+    if ($this->conn->dbh->affectedRows() > 0) {
+
+      // Return TRUE
+      return TRUE;
+    } // Unable to update. Return FALSE.
 
     // Return FALSE
     return FALSE;

@@ -16,7 +16,7 @@ $pageMetaType = "website";
 
 // Set any page injected values
 $pageHasForm = TRUE;
-$pageBodyClassID = 'class="cs-grid cs-components me-account"';
+$pageBodyClassID = 'class="cs-page cs-components cs-account"';
 $pageHeadExtras = '';
 $pageFooterExtras = '';
 
@@ -61,7 +61,7 @@ require(get_theme_path('layout.php')); ?>
       echo outputBreadcrumbs((object) $data->breadcrumbs);
     } ?>
   </nav>
-  <div class="wrapper">
+  <div class="csc-wrapper">
     <?php flashMsg('account_login'); ?>
     <div class="csc-row">
       <main class="csc-col csc-col12 csc-col--md8">

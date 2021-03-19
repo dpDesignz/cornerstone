@@ -15,7 +15,7 @@ $pageMetaCanonical = get_site_url('account');
 $pageMetaType = "website";
 
 // Set any page injected values
-$pageBodyClassID = 'class="cs-grid cs-components me-account"';
+$pageBodyClassID = 'class="cs-page cs-components cs-account"';
 $pageHeadExtras = '';
 $pageFooterExtras = '';
 
@@ -34,7 +34,7 @@ require(get_theme_path('layout.php')); ?>
       echo outputBreadcrumbs((object) $data->breadcrumbs);
     } ?>
   </nav>
-  <div class="wrapper">
+  <div class="csc-wrapper">
     <?php flashMsg('account_index'); ?>
     <header id="account__header">
       <section>
@@ -55,54 +55,19 @@ require(get_theme_path('layout.php')); ?>
               <i class="fas fa-user-tie"></i>
             </div>
             <div>
-              <h3><?php echo (!empty($data->name)) ? $data->name : $data->contact_name; ?></h3>
-              <p><?php echo (!empty($data->email)) ? $data->email : $data->contact_email; ?></p>
-              <p class="cs-body2 cs-muted"><strong>Account Name:</strong> <?php echo (!empty($data->contact_name)) ? $data->contact_name : 'n/a'; ?></p>
+              <h3><?php echo (!empty($_SESSION['_cs']['user']['name'])) ? $_SESSION['_cs']['user']['name'] : '<em>Name not set</em>'; ?></h3>
+              <p><?php echo (!empty($_SESSION['_cs']['user']['email'])) ? $_SESSION['_cs']['user']['email'] : '<em>Email not set</em>'; ?></p>
+              <?php
+              // Check if user can access the admin dashboard
+              if ($data->isAdmin) { ?>
+                <p><a class="csc-btn" href="<?php echo get_site_url('admin'); ?>" target="_blank"><i class="material-icons csc-bi-left">dashboard</i> View Admin Dashboard</a></p>
+              <?php } ?>
             </div>
             <div>
               <a href="<?php echo get_site_url('account/settings'); ?>" data-tippy-content="Edit your account"><i class="fas fa-cog"></i></a>
             </div>
           </header>
-          <div class="cs-p-3">
-            <p class="cs-body2"><strong>Default Location:</strong> <?php echo (!empty($data->assigned_location_name)) ? $data->assigned_location_name : 'n/a'; ?></p>
-            <p class="cs-body2"><strong>Assigned Staff:</strong> <?php echo (!empty($data->assigned_user_name)) ? $data->assigned_user_name : 'n/a'; ?></p>
-            <p class="cs-body2"><strong>Payment Terms:</strong> <?php echo (!empty($data->payment_term_output)) ? $data->payment_term_output : 'n/a'; ?></p>
-          </div>
         </section>
-        <section id="account__overview__recent-orders">
-          <header>
-            <div>
-              <i class="fas fa-bags-shopping"></i>
-            </div>
-            <div>
-              <h3>Recent Orders</h3>
-            </div>
-            <div>
-              <a class="cs-body2" href="<?php echo get_site_url('account/orders'); ?>" data-tippy-content="View your order history"><strong>View all</strong></a>
-            </div>
-          </header>
-          <div id="account__overview__recent-orders__list">
-            <?php echo $data->recent_orders; ?>
-          </div>
-        </section>
-        <?php if (1 === 2) { ?>
-          <section id="account__overview__lists">
-            <header>
-              <div>
-                <i class="fas fa-clipboard-list"></i>
-              </div>
-              <div>
-                <h3>Lists</h3>
-              </div>
-              <div>
-                <a class="cs-body2" href="<?php echo get_site_url('account/lists'); ?>" data-tippy-content="View your lists"><strong>View all</strong></a>
-              </div>
-            </header>
-            <div class="cs-p-3">
-              <p class="cs-body2"><em>You currently don't have any lists available</em></p>
-            </div>
-          </section>
-        <?php } ?>
       </div>
     </main>
   </div>

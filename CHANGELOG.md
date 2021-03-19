@@ -1,5 +1,20 @@
 # Cornerstone Change Log
 
+## 0.4.4 - Install Script
+
+- *Coming soon*
+
+## 0.4.3 - Template + User Accounts (2020-03-19)
+
+- ➕ Added a starter template system
+- ➕ Added the install folder
+- ➕ Added the ability to update your user details from the account section
+- 🖊️ Changed the `user_role_id` to be allowed to be `NULL` for guest users
+- ➕ Added the 'pdfs' system folder
+- ➕ Added the ability to preview email and pdf templates from the admin panel
+- ➕ Added the ability to register for an account if that option is enabled
+- ➕ Added the ability to update a user from the admin panel
+
 ## 0.4.2 - Aligning + User Accounts (2020-03-12)
 
 - ➕ Added the 'files' system controller

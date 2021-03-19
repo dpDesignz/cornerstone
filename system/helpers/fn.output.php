@@ -328,6 +328,108 @@ function outputAdminMenu(array $menuItems, string $currentNav = '', string $curr
 }
 
 /**
+ * Output menu
+ *
+ * @param object $menuItems
+ * @param string $pathMatch
+ *
+ * @return string Will return the menu as a string
+ */
+function base_outputMenu(object $menuItems, string $pathMatch = null)
+{
+  // Init output
+  $returnOutput = '';
+
+  // Init last parent
+  $topParent = 0;
+  $previousLayers = 0;
+
+  // Check if path match is set
+  if ($pathMatch !== null) {
+    // Create path match array
+    $pathMatchArray = explode(",", $pathMatch);
+    // Count how many layers deep the match is
+    $pathMatchCount = count($pathMatchArray);
+  }
+
+  // Output menu
+  foreach ($menuItems as $menuItem) {
+    // Check for href
+    $href = (!empty($menuItem->href)) ? ' href="' . $menuItem->href . '"' : '';
+    // Check for title
+    $title = (!empty($menuItem->title)) ? $menuItem->title : $menuItem->text;
+
+    // Get path info
+    $path = explode(",", $menuItem->path);
+
+    // Get Layers
+    $currentLayers = count($path);
+
+    // Check if has child items or not
+    if (!empty($previousLayers) && $currentLayers > $previousLayers) {
+      // Add chevron and close the link
+      $returnOutput .= ' <i class="fal fa-chevron-down"></i></a><ol>';
+    } else if (!empty($previousLayers)) {
+
+      // Close link
+      $returnOutput .= '</a></li>';
+    }
+
+    // Set top parent
+    $topParent = $path[0];
+
+    // Check if needing to close the layers
+    if (!empty($previousLayers) && $currentLayers == 1 && $previousLayers > 1) {
+      $exitLayers = $previousLayers;
+      while ($exitLayers > 1) {
+        // Close layer
+        $returnOutput .= '</ol></li>';
+        $exitLayers--;
+      }
+    } else if (!empty($previousLayers) && $currentLayers < $previousLayers) {
+      // Close layer
+      $returnOutput .= '</ol></li>';
+    }
+
+    // Define active path as empty
+    $activePath = '';
+    // Check if path match array is set
+    if (isset($pathMatchArray) && is_array($pathMatchArray) && count($pathMatchArray) > 0) {
+      // Check if path match is eligible
+      if ($currentLayers <= $pathMatchCount) {
+        // Check if item is in current path match
+        if (implode(',', array_slice($pathMatchArray, 0, $currentLayers)) == $menuItem->path) {
+          // Set active path
+          $activePath = ' class="nav-active"';
+        }
+      }
+    }
+
+    // Set to output
+    $returnOutput .= '<li><a' . $activePath . $href . ' title="' . $title . '" aria-role="menuItem">' . $menuItem->text;
+
+    // Set the previous layers
+    $previousLayers = $currentLayers;
+  }
+
+  // Close last item
+  $returnOutput .= (empty($returnOutput)) ? '' : '</a></li>';
+
+  // Check if needing to close any layers
+  if (!empty($previousLayers) && $previousLayers > 0) {
+    $exitLayers = $previousLayers;
+    while ($exitLayers > 1) {
+      // Close layer
+      $returnOutput .= '</ol></li>';
+      $exitLayers--;
+    }
+  }
+
+  // Return output
+  return (!empty($returnOutput)) ? $returnOutput : '<li><a>No menu items available</a></li>';
+}
+
+/**
  * Create PDF using template
  *
  * @param string $templateFile File name of pdf template to be used

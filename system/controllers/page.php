@@ -18,11 +18,12 @@ class Page extends Controller
     parent::__construct($registry);
 
     // Set home menu item
-    $this->data['menuitems'] = array();
-    $this->data['menuitems'][] = array(
-      'path' => 0,
-      'text' => 'Home',
-      'href' => get_site_url()
+    $this->data['menuitems'] = array(
+      array(
+        'path' => 0,
+        'text' => 'Home',
+        'href' => get_site_url()
+      )
     );
   }
 
@@ -30,7 +31,7 @@ class Page extends Controller
   public function index(...$params)
   {
 
-    $this->load->view('pages/index', $params);
+    $this->load->view('pages/index', $this->data);
   }
 
   // Load Page

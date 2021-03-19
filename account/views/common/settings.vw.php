@@ -16,7 +16,7 @@ $pageMetaType = "website";
 
 // Set any page injected values
 $pageHasForm = TRUE;
-$pageBodyClassID = 'class="cs-grid cs-components me-account"';
+$pageBodyClassID = 'class="cs-page cs-components cs-account"';
 $pageHeadExtras = '<!-- Chosen ~ https://harvesthq.github.io/chosen/ -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">';
 $pageFooterExtras = '<!-- Chosen ~ https://harvesthq.github.io/chosen/ -->
@@ -46,7 +46,7 @@ require(get_theme_path('layout.php')); ?>
       echo outputBreadcrumbs((object) $data->breadcrumbs);
     } ?>
   </nav>
-  <div class="wrapper">
+  <div class="csc-wrapper">
     <?php flashMsg('account_settings'); ?>
     <header id="account__header">
       <section>
@@ -59,25 +59,23 @@ require(get_theme_path('layout.php')); ?>
     <main>
       <?php
       // Get account menu
-      $pgMenu = 10;
+      $pgMenu = 100;
       require_once(DIR_ROOT . _DS . 'account' . _DS . 'views' . _DS . 'common' . _DS . 'account-menu.php'); ?>
       <form action="<?php echo get_site_url('account/settings'); ?>" method="POST" id="account__settings" class="csc-form paper" autocomplete="off">
         <fieldset id="account__settings__details">
           <legend>Customer Details</legend>
-          <div id="account__settings__customer">
+          <div id="account__settings__user">
             <div class="csc-input-field">
-              <select name="title" id="title" data-placeholder="Select a title" tabindex="1" required>
-                <?php echo $data->title_options; ?>
-              </select>
-              <label>Title*</label>
+              <input type="text" name="first_name" id="first_name" tabindex="2" <?php if (!empty($data->first_name)) echo ' value="' . $data->first_name . '"'; ?>>
+              <label for="first_name">First Name*</label>
             </div>
             <div class="csc-input-field">
-              <input type="text" name="firstname" id="firstname" tabindex="2" <?php if (!empty($data->firstname)) echo ' value="' . $data->firstname . '"'; ?>>
-              <label for="firstname">First Name*</label>
+              <input type="text" name="last_name" id="last_name" tabindex="3" <?php if (!empty($data->last_name)) echo ' value="' . $data->last_name . '"'; ?>>
+              <label for="last_name">Last Name*</label>
             </div>
             <div class="csc-input-field">
-              <input type="text" name="lastname" id="lastname" tabindex="3" <?php if (!empty($data->lastname)) echo ' value="' . $data->lastname . '"'; ?>>
-              <label for="lastname">Last Name*</label>
+              <input type="text" name="display_name" id="display_name" tabindex="4" <?php if (!empty($data->display_name)) echo ' value="' . $data->display_name . '"'; ?>>
+              <label for="display_name" data-tippy-content="Your display name as it will be shown to other users around the website.">Display Name* <i class="fas fa-question-circle"></i></label>
             </div>
           </div>
         </fieldset>
@@ -95,21 +93,6 @@ require(get_theme_path('layout.php')); ?>
           <div class="csc-input-field" id="account__settings__confirm-pwd">
             <input type="password" name="confirm_password" id="confirm_password" autocomplete="off" data-lpignore="true">
             <label for="confirm_password">Confirm Password*</label>
-          </div>
-        </fieldset>
-        <fieldset id="account__settings__details">
-          <legend>Default Details</legend>
-          <div class="csc-input-field">
-            <select name="default_address_id" id="default_address_id" data-placeholder="Select a default address" tabindex="20">
-              <?php echo $data->address_options; ?>
-            </select>
-            <label>Default Delivery Address (optional)</label>
-          </div>
-          <div class="csc-input-field">
-            <select name="default_payment_id" id="default_payment_id" data-placeholder="Select a default payment card" tabindex="21">
-              <?php echo $data->card_options; ?>
-            </select>
-            <label>Default Payment Card (optional)</label>
           </div>
         </fieldset>
         <div class="csc-form__actions">
@@ -155,11 +138,15 @@ require(get_theme_path('layout.php')); ?>
   $(document).ready(function() {
     let validator = $("#account__settings").validate({
       rules: {
-        firstname: {
+        first_name: {
           required: true,
           minlength: 3
         },
-        lastname: {
+        last_name: {
+          required: true,
+          minlength: 3
+        },
+        display_name: {
           required: true,
           minlength: 3
         },
@@ -177,12 +164,16 @@ require(get_theme_path('layout.php')); ?>
         }
       },
       messages: {
-        firstname: {
+        first_name: {
           required: "Please enter your first name",
           minlength: "Please enter at least 3 characters"
         },
-        lastname: {
+        last_name: {
           required: "Please enter your last name",
+          minlength: "Please enter at least 3 characters"
+        },
+        display_name: {
+          required: "Please enter your display name",
           minlength: "Please enter at least 3 characters"
         },
         email: {

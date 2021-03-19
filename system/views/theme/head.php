@@ -43,7 +43,7 @@
   <!-- Chosen ~ https://harvesthq.github.io/chosen/ -->
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
   <!-- Site Styling -->
-  <link href="<?php echo get_site_url('css/cornerstone.css?v=1.0.0'); ?>" rel="stylesheet" type="text/css">
+  <link href="<?php echo get_site_url('css/cornerstone.css?' . trim(CS_VERSION)); ?>" rel="stylesheet" type="text/css">
   <?php
   // Output custom main.css file if it exists
   if (file_exists(get_public_path('css/main.css'))) : ?>

@@ -20,10 +20,13 @@ body.cs-admin {
     "cs--body__footer";
   background-image: linear-gradient(to bottom right, #d13f2d, #da4230, #8e44ad);
 }
-body.cs-admin > header {
+body.cs-admin > header,
+body.cs-admin > #cs-header {
   grid-template-columns: 1fr;
   background-color: transparent;
   padding: 0;
+  height: unset;
+  border-bottom: none;
 }
 body > header > section#cs--header__logo {
   width: 100%; min-width: 100vw;

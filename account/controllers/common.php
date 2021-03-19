@@ -17,6 +17,20 @@ class Common extends Controller
     // Load the account core model
     $this->accountCoreModel = $this->load->model('accountcore', 'account');
 
+    // Set menu items
+    $this->data['menuitems'] = array(
+      array(
+        'path' => 0,
+        'text' => 'Home',
+        'href' => get_site_url()
+      ),
+      array(
+        'path' => 0,
+        'text' => 'Account',
+        'href' => get_site_url('account')
+      )
+    );
+
     // Set Breadcrumbs
     $this->data['breadcrumbs'] = array(
       array(
@@ -49,46 +63,24 @@ class Common extends Controller
       'href' => get_site_url('account')
     );
 
-    echo 'User Account';
+    // Load view
+    $this->load->view('common/index', $this->data, 'account');
     exit;
-
-    // Get account details
-    if ($returnedAccountDetails = $this->accountCoreModel->getAccountDetails()) {
-
-      // Load view
-      $this->load->view('common/index', $this->data, 'account');
-      exit;
-    } // Unable to get account details. Load logout method
-    $this->logout;
   }
 
   /**
    * Create Elements for Settings Page
    *
-   * @param string $setTitle `[optional]` Value for the selected title. Defaults to "Mr."
+   * (no params)
    */
-  private function createSettingsElements(
-    string $setTitle = 'Mr.'
-  ) {
+  private function createSettingsElements()
+  {
 
     // Set Breadcrumbs
     $this->data['breadcrumbs'][] = array(
       'text' => 'Settings',
       'href' => get_site_url('account/settings')
     );
-
-    // Set title list options
-    $titleOptionsData = array('Mr.' => 'Mr.', 'Ms.' => 'Ms.', 'Mrs.' => 'Mrs.', 'Miss' => 'Miss', 'Dr.' => 'Doctor', 'Sir.' => 'Sir.', 'Prof.' => 'Professor');
-    $this->data['title_options'] = '';
-    // Get list of titles for assigning
-    foreach ($titleOptionsData as $titleValue => $titleLabel) {
-
-      // Set selected if chosen title
-      $selected = (!empty($setTitle) && $setTitle == $titleValue) ? ' selected' : '';
-
-      // Set to output
-      $this->data['title_options'] .= '<option value="' . $titleValue . '"' . $selected . '>' . $titleLabel . '</option>';
-    }
   }
 
   /**
@@ -98,7 +90,7 @@ class Common extends Controller
   {
 
     // Check if logged in
-    if (!$this->accountCoreModel->userPageProtect()) {
+    if (!isLoggedInUser()) {
       // Not logged in. Redirect to login page
       redirectTo('account/login');
       exit;
@@ -114,31 +106,34 @@ class Common extends Controller
       // Get information submitted and try validate
       try {
 
-        // Get title data
-        $this->data['title'] = htmlspecialchars(trim($_POST['title']));
-        if (empty($this->data['title'])) {
+        // Get first_name data
+        $this->data['first_name'] = htmlspecialchars(trim($_POST['first_name']));
+        if (empty($this->data['first_name'])) {
           // Data is not set. Return error.
-          $this->data['err']['title'] = 'Please select a title';
+          $this->data['err']['first_name'] = 'Please enter your first name';
+        } else if (!empty($this->data['first_name']) && strlen($this->data['first_name']) < 3) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['first_name'] = 'Please enter at least 3 characters';
         }
 
-        // Get firstname data
-        $this->data['firstname'] = htmlspecialchars(trim($_POST['firstname']));
-        if (empty($this->data['firstname'])) {
+        // Get last_name data
+        $this->data['last_name'] = htmlspecialchars(trim($_POST['last_name']));
+        if (empty($this->data['last_name'])) {
           // Data is not set. Return error.
-          $this->data['err']['firstname'] = 'Please enter your first name';
-        } else if (!empty($this->data['firstname']) && strlen($this->data['firstname']) < 3) {
+          $this->data['err']['last_name'] = 'Please enter your last name';
+        } else if (!empty($this->data['last_name']) && strlen($this->data['last_name']) < 3) {
           // Data is less than 3 characters. Return error.
-          $this->data['err']['firstname'] = 'Please enter at least 3 characters';
+          $this->data['err']['last_name'] = 'Please enter at least 3 characters';
         }
 
-        // Get lastname data
-        $this->data['lastname'] = htmlspecialchars(trim($_POST['lastname']));
-        if (empty($this->data['lastname'])) {
+        // Get display_name data
+        $this->data['display_name'] = htmlspecialchars(trim($_POST['display_name']));
+        if (empty($this->data['display_name'])) {
           // Data is not set. Return error.
-          $this->data['err']['lastname'] = 'Please enter your last name';
-        } else if (!empty($this->data['lastname']) && strlen($this->data['lastname']) < 3) {
+          $this->data['err']['display_name'] = 'Please enter your display name';
+        } else if (!empty($this->data['display_name']) && strlen($this->data['display_name']) < 3) {
           // Data is less than 3 characters. Return error.
-          $this->data['err']['lastname'] = 'Please enter at least 3 characters';
+          $this->data['err']['display_name'] = 'Please enter at least 3 characters';
         }
 
         // Get email data
@@ -187,10 +182,10 @@ class Common extends Controller
         // Validated
 
         // Update customer
-        if ($this->accountCoreModel->editCustomer(
-          $this->data['title'],
-          $this->data['firstname'],
-          $this->data['lastname'],
+        if ($this->accountCoreModel->editUser(
+          $this->data['first_name'],
+          $this->data['last_name'],
+          $this->data['display_name'],
           $this->data['email']
         )) { // Settings updated successfully.
 
@@ -216,6 +211,68 @@ class Common extends Controller
 
               // Set password message
               $passwordMsg = ' and your password was updated successfully';
+
+              // Create the options
+              $actionURL = 'account/login';
+              $currentDtm = new \DateTime();
+              // Get browser info if browser tracking enabled
+              if ($this->optn->get('browser_tracking')) {
+                $browser = new \WhichBrowser\Parser(getallheaders());
+                // Set browser "User Agent"
+                $browserInfo = "For security, you password was reset on a device using " . $browser->toString() . ". ";
+              } else {
+                $browserInfo = "";
+              }
+
+              // Get users email address
+              if ($userEmail = $this->passwordModel->getUserEmail()) {
+
+                // Load SendMail Class
+                $sendMail = new \SendMail();
+
+                // Set the HTML message from the template
+                if ($message = $sendMail->createEmailTemplate(
+                  'new-password.html',
+                  array(
+                    'action_url' => get_site_url($actionURL),
+                    'reset_dtm' => $currentDtm->format('g:ia \o\n l, jS M Y T'),
+                    'browser_security' => $browserInfo
+                  )
+                )) {
+
+                  // Set the plaintext message from the template
+                  if ($plainEmail = $sendMail->createEmailTemplate(
+                    'new-password.txt',
+                    array(
+                      'action_url' => get_site_url($actionURL),
+                      'reset_dtm' => $currentDtm->format('g:ia \o\n l, jS M Y T'),
+                      'browser_security' => $browserInfo
+                    )
+                  )) {
+                    // Unable to set plain text message. Continue on to error
+                    $plainEmail = 'Sorry, there was an error generating a copy of this email in plain text, however, Your password has been updated on the site.\r\n\r\n' . get_site_url();
+                  }
+
+                  // Send user email confirming password change
+                  $emailSubject = "You've successfully reset your " . $this->optn->get('site_name') . " password";
+                  if ($sendMail->sendPHPMail(
+                    $this->optn->get('site_from_email'),
+                    $this->optn->get('site_from_email'),
+                    $this->optn->get('site_name'),
+                    $userEmail,
+                    '',
+                    $emailSubject,
+                    $message,
+                    $plainEmail,
+                    ''
+                  )) { // Email sent
+                    // Set password message
+                    $passwordMsg .= ' + an email was sent to you with this confirmation';
+                  } // Unable to send email.
+
+                } // Unable to set HTML message.
+
+              } // Unable to get user email.
             } else {
               // Set password message
               $passwordMsg = ' but your password was unable to be updated';
@@ -233,9 +290,7 @@ class Common extends Controller
       }
 
       // Create elements
-      $this->createSettingsElements(
-        $_POST['title']
-      );
+      $this->createSettingsElements();
     } else { // Page wasn't posted. Load view.
       // Get account details
       if ($returnedUserDetails = $this->accountCoreModel->getUserDetails()) {
@@ -246,9 +301,7 @@ class Common extends Controller
         }
 
         // Create elements
-        $this->createSettingsElements(
-          $returnedUserDetails->customer_title
-        );
+        $this->createSettingsElements();
       } else { // Unable to get account details. Load logout method
 
         // Load logout method
@@ -283,49 +336,52 @@ class Common extends Controller
       // Sanitize POST data
       $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
-      // Build POST request:
-      $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
-      $recaptcha_secret = $this->optn->get('recaptcha_secret_key');
-      $recaptcha_response = $_POST['recaptcha_response'];
+      if (!empty($this->optn->get('recaptcha_site_key'))) {
 
-      // Make and decode POST request:
-      $recaptcha = file_get_contents($recaptcha_url . '?secret=' . $recaptcha_secret . '&response=' . $recaptcha_response);
-      $recaptcha = json_decode($recaptcha);
+        // Build POST request:
+        $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
+        $recaptcha_secret = $this->optn->get('recaptcha_secret_key');
+        $recaptcha_response = $_POST['recaptcha_response'];
+
+        // Make and decode POST request:
+        $recaptcha = file_get_contents($recaptcha_url . '?secret=' . $recaptcha_secret . '&response=' . $recaptcha_response);
+        $recaptcha = json_decode($recaptcha);
+      }
 
       // Take action based on the score returned:
-      if (!empty($recaptcha->score) && $recaptcha->score >= 0.5) {
+      if (empty($this->optn->get('recaptcha_site_key')) || (!empty($recaptcha->score) && $recaptcha->score >= 0.5)) {
 
         // Get information submitted and validate
-        if (isset($_POST['firstname']) || isset($_POST['lastname']) || isset($_POST['email']) || isset($_POST['password']) || isset($_POST['confirm-password'])) {
+        if (isset($_POST['first_name']) || isset($_POST['last_name']) || isset($_POST['email']) || isset($_POST['password']) || isset($_POST['confirm-password'])) {
 
           // Try validating
           try {
 
-            // Get firstname data
-            $this->data['firstname'] = htmlspecialchars(trim($_POST['firstname']));
-            if (empty($this->data['firstname'])) {
+            // Get first_name data
+            $this->data['first_name'] = htmlspecialchars(trim($_POST['first_name']));
+            if (empty($this->data['first_name'])) {
               // Data is not set. Return error.
-              $this->data['err']['firstname'] = 'Please enter your first name';
-            } else if (strlen($this->data['firstname']) < 3) {
+              $this->data['err']['first_name'] = 'Please enter your first name';
+            } else if (strlen($this->data['first_name']) < 3) {
               // Data is less than 3 characters. Return error.
-              $this->data['err']['firstname'] = 'Please enter at least 3 characters';
+              $this->data['err']['first_name'] = 'Please enter at least 3 characters';
             }
 
-            // Get lastname data
-            $this->data['lastname'] = htmlspecialchars(trim($_POST['lastname']));
-            if (empty($this->data['lastname'])) {
+            // Get last_name data
+            $this->data['last_name'] = htmlspecialchars(trim($_POST['last_name']));
+            if (empty($this->data['last_name'])) {
               // Data is not set. Return error.
-              $this->data['err']['lastname'] = 'Please enter your last name';
-            } else if (strlen($this->data['lastname']) < 3) {
+              $this->data['err']['last_name'] = 'Please enter your last name';
+            } else if (strlen($this->data['last_name']) < 3) {
               // Data is less than 3 characters. Return error.
-              $this->data['err']['lastname'] = 'Please enter at least 3 characters';
+              $this->data['err']['last_name'] = 'Please enter at least 3 characters';
             }
 
             // Get email data
             $this->data['email'] = htmlspecialchars(trim($_POST['email']));
             if (empty($this->data['email'])) {
               // Data is not set. Return error.
-              $this->data['err']['lasemailtname'] = 'Please enter your email address';
+              $this->data['err']['email'] = 'Please enter your email address';
             } else if (!filter_var($this->data['email'], FILTER_VALIDATE_EMAIL)) {
               // Data isn't a valid email address. Return error.
               $this->data['err']['email'] = 'Please enter a valid email address';
@@ -342,6 +398,7 @@ class Common extends Controller
 
             // Get password
             $this->data['password'] = $_POST['password'];
+            unset($_POST['password']);
 
             // Validate password strength
             $uppercase = preg_match('@[A-Z]@', $this->data['password']);
@@ -357,6 +414,7 @@ class Common extends Controller
 
             // Get confirm password
             $this->data['confirm_password'] = $_POST['confirm_password'];
+            unset($_POST['confirm_password']);
 
             // Check password isn't empty
             if (empty($this->data['confirm_password'])) {
@@ -378,8 +436,8 @@ class Common extends Controller
           }
         } else { // If data not set, set errors
 
-          $this->data['err']['firstname'] = 'Please enter your first name';
-          $this->data['err']['lastname'] = 'Please enter your last name';
+          $this->data['err']['first_name'] = 'Please enter your first name';
+          $this->data['err']['last_name'] = 'Please enter your last name';
           $this->data['err']['email'] = 'Please enter your email address';
           $this->data['err']['password'] = 'Please enter your password';
           $this->data['err']['confirm_password'] = 'Please confirm your password';
@@ -390,7 +448,85 @@ class Common extends Controller
         if (empty($this->data['err'])) {
           // Validated
 
+          // Generate password key
+          $pwdKey = get_crypto_key();
+
+          // Hash password with new key
+          $password_encrypted = password_hash($this->data['password'] . $pwdKey, PASSWORD_DEFAULT);
+
           // Add new user
+          if ($userID = $this->registerModel->addUser(
+            $this->data['first_name'],
+            $this->data['last_name'],
+            $this->data['email'],
+            $password_encrypted,
+            $pwdKey
+          )) {
+            // User added
+
+            // Send welcome email
+
+            // Create the options
+            $actionURL = get_site_url('account/login');
+            $supportEmail = $this->optn->get('site_from_email');
+            // Set fail message
+            $emailSent = ' but your login details were unable to be emailed to you';
+
+            // Load SendMail Class
+            $sendMail = new \SendMail();
+
+            // Set the HTML message from the template
+            if ($message = $sendMail->createEmailTemplate(
+              'user-register.html',
+              array(
+                'action_url' => $actionURL,
+                'first_name' => $this->data['first_name'],
+                'email' => $this->data['email'],
+                'support_email' => $supportEmail
+              )
+            )) {
+
+              // Set the plaintext message from the template
+              if (!$plainEmail = $sendMail->createEmailTemplate(
+                'user-register.txt',
+                array(
+                  'action_url' => $actionURL,
+                  'first_name' => $this->data['first_name'],
+                  'email' => $this->data['email'],
+                  'support_email' => $supportEmail
+                )
+              )) {
+                // Set fallback plain text message
+                $plainEmail = 'Sorry, there was an error generating your welcome email :(. The good news is your account has been created on the ' . $this->optn->get('site_name') . ' website! To set your password please head to our website at ' . get_site_url('account/login') . ' and press the "forgot password" button on the login page and you\'ll be able to set your password. Sorry for the inconvenience.';
+              }
+
+              // Send user email confirming password change
+              $emailSubject = "Welcome to the " . $this->optn->get('site_name') . " website!";
+              if ($sendMail->sendPHPMail(
+                $this->optn->get('site_from_email'),
+                $this->optn->get('site_from_email'),
+                $this->optn->get('site_name'),
+                $this->data['email'],
+                $this->data['first_name'] . ' ' . $this->data['last_name'],
+                $emailSubject,
+                $message,
+                $plainEmail,
+                ''
+              )) { // Email sent
+
+                // Set success message
+                $emailSent = ' and your login details have been emailed to you';
+              } // Unable to send email.
+
+            } // Unable to set HTML message.
+
+            // Set success message
+            flashMsg('account_login', '<strong>Success</strong> Your account has been created' . $emailSent . '. Sign in below to get started!');
+
+            // Redirect to login
+            redirectTo('account/login');
+            exit;
+          } // Unable to add user. Return error
 
           // Set error
           flashMsg('account_register', '<strong>Error</strong> Sorry, there was an issue creating your account. Please try again.', 'warning');

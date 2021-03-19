@@ -38,13 +38,13 @@ if (!empty($_GET['redirect'])) {
 require(get_theme_path('head.php', 'admin')); ?>
 
 <!-- Start Header -->
-<header>
+<header id="cs-header">
   <section id="cs--header__logo">
     <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website"><img src="<?php echo get_site_url('img/cornerstone/cornerstone_framework_logo_white.svg'); ?>" alt="Cornerstone PHP Framework"></a>
   </section>
 </header>
 <!-- End Header ~#~ Start Main -->
-<main>
+<main id="cs-main">
   <section id="cs--user-form" class="csc-card center animated animatedFadeInUp fadeInUp">
     <form action="<?php echo get_site_url('account/login'); ?>" method="POST" id="admin-login-form" class="csc-form">
       <input type="hidden" name="redirect-to" id="redirect-to" value="<?php echo $redirectURL; ?>">
@@ -70,7 +70,7 @@ require(get_theme_path('head.php', 'admin')); ?>
   </section>
 </main>
 <!-- End Main ~#~ Start Footer -->
-<footer>
+<footer id="cs-footer">
   <p><span><a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone</a></span><span>Version <?php echo CS_VERSION; ?></span>&copy; <?php echo date('Y') . ' ' . $data->site_name; ?></p>
 </footer>
 

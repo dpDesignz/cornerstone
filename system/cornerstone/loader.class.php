@@ -101,9 +101,6 @@ final class Loader
       $data[strtolower($key)] = $value;
     }
 
-    // Check if logged in
-    $this->data['isAdmin'] = (isset($_SESSION['_cs']['user']['uid']) && !empty($_SESSION['_cs']['user']['uid'])) ? TRUE : FALSE;
-
     // Trim filter data
     if (!empty($data['filterData'])) {
       $data['filterData'] = rtrim($data['filterData'], ', ');
@@ -123,6 +120,9 @@ final class Loader
     // Pass the option and role data onto the view
     $option = $this->option;
     $role = $this->role;
+
+    // Check if user is admin
+    $data->isAdmin = ($role->canDo('access_admin')) ? TRUE : FALSE;
 
     // Check for allowed sub-folders
     $directory =  (!array_key_exists($directory, ALLOWED_SUBFOLDERS)) ? 'system' : $directory;

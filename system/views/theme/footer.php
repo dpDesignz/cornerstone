@@ -1,6 +1,6 @@
 <?php if (!isset($hideThemeFooter) || !$hideThemeFooter) : ?>
-  <footer>
-    <p>&copy; <?php echo date('Y') . ' ' . $data->site_name; ?> &middot; Built with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone v<?php echo CS_VERSION; ?></a></p>
+  <footer id="cs-footer">
+    <p class="cs-caption cs-text-center">&copy; <?php echo date('Y') . ' ' . $data->site_name; ?> &middot; Built with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website">Cornerstone</a></p>
   </footer>
 <?php endif; ?>
 <?php if ($option->get('test_site')) { ?>

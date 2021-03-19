@@ -64,6 +64,12 @@
               'identifier' => 'index',
               'text' => 'Settings',
               'href' => get_site_url('admin/settings')
+            ),
+            array(
+              'permission' => 'view_templates',
+              'identifier' => 'templates',
+              'text' => 'Templates',
+              'href' => get_site_url('admin/templates')
             )
           )
         ));

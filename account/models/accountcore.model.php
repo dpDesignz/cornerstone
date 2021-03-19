@@ -20,6 +20,11 @@ class AccountCore extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+
+    // Set the user ID if available
+    if (!empty($_SESSION['_cs']['user']['uid']) && is_numeric($_SESSION['_cs']['user']['uid'])) {
+      $this->setUserID((int) $_SESSION['_cs']['user']['uid']);
+    }
   }
 
   /**
@@ -95,6 +100,91 @@ class AccountCore extends ModelBase
     } // Data invalid. Return FALSE
 
     // Return False
+    return FALSE;
+  }
+
+  /**
+   * Get user details
+   *
+   * @return bool Will return data if found, or FALSE if not found
+   */
+  public function getUserDetails()
+  {
+
+    // Check if the ID is set
+    if (!empty($this->uid) && is_numeric($this->uid)) {
+
+      // Run query to find data
+      $detailsResults = $this->conn->dbh->selecting(
+        DB_PREFIX . "users",
+        "user_id,
+        user_first_name,
+        user_last_name,
+        user_display_name,
+        CONCAT(user_first_name, ' ', user_last_name) AS users_name,
+        user_login,
+        user_email",
+        where(
+          eq("user_id", $this->uid)
+        )
+      );
+
+      // Check if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($detailsResults)) {
+
+        // Return True
+        return $detailsResults[0];
+      } // No results. Return FALSE
+    } // Data invalid. Return FALSE
+
+    // Return False
+    return FALSE;
+  }
+
+  /**
+   * Edit User
+   *
+   * @param string $firstName The first name of the user
+   * @param string $lastName The last name of the user
+   * @param string $displayName The display name of the user
+   * @param string $email The email address of the user
+   *
+   * @return int Will return FALSE if failed or TRUE if successful.
+   */
+  public function editUser(
+    string $firstName,
+    string $lastName,
+    string $displayName,
+    string $email
+  ) {
+
+    // Check data is valid
+    if (!empty($this->uid) && is_numeric($this->uid)) {
+
+      // Update info in `me_customer`
+      $this->conn->dbh->update(
+        DB_PREFIX . "users",
+        array(
+          'user_first_name' => $firstName,
+          'user_last_name' => $lastName,
+          'user_display_name' => $displayName,
+          'user_email' => $email,
+          'user_edited_id' => $this->uid,
+          'user_edited_dtm' => date('Y-m-d H:i:s')
+        ),
+        eq("user_id", $this->uid)
+      );
+
+      // Check if updated successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return TRUE
+        return TRUE;
+      } // Unable to edit. Return FALSE.
+
+    } // Data invalid. Return FALSE.
+
+    // Return FALSE
     return FALSE;
   }
 }

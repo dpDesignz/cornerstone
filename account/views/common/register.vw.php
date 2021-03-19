@@ -16,9 +16,12 @@ $pageMetaType = "website";
 
 // Set any page injected values
 $pageHasForm = TRUE;
-$pageBodyClassID = 'class="cs-grid cs-components me-account"';
+$pageBodyClassID = 'class="cs-page cs-components cs-account"';
 $pageHeadExtras = '';
-$pageFooterExtras = '<script src="https://www.google.com/recaptcha/api.js?render=' . $data->recaptcha_site_key . '"></script>';
+$pageFooterExtras = '';
+if (!empty($data->recaptcha_site_key)) {
+  $pageFooterExtras .= '<script src="https://www.google.com/recaptcha/api.js?render=' . $data->recaptcha_site_key . '"></script>';
+}
 
 // Load html head
 require(get_theme_path('head.php'));
@@ -40,7 +43,7 @@ require(get_theme_path('layout.php')); ?>
       echo outputBreadcrumbs((object) $data->breadcrumbs);
     } ?>
   </nav>
-  <div class="wrapper">
+  <div class="csc-wrapper">
     <?php flashMsg('account_register'); ?>
     <div class="csc-row cs-pb-5">
       <main class="csc-col csc-col12 csc-col--md8">
@@ -49,12 +52,12 @@ require(get_theme_path('layout.php')); ?>
           <input type="hidden" name="action" value="register" />
           <input type="hidden" name="recaptcha_response" id="recaptchaResponse">
           <div class="csc-input-field cs-mt-4">
-            <input type="text" name="firstname" id="firstname" tabindex="1" autocapitalize="on" <?php if (!empty($data->firstname)) echo ' value="' . $data->firstname . '"'; ?> required>
-            <label for="firstname">First Name*</label>
+            <input type="text" name="first_name" id="first_name" tabindex="1" autocapitalize="on" <?php if (!empty($data->first_name)) echo ' value="' . $data->first_name . '"'; ?> required>
+            <label for="first_name">First Name*</label>
           </div>
           <div class="csc-input-field cs-mt-4">
-            <input type="text" name="lastname" id="lastname" tabindex="2" autocapitalize="on" <?php if (!empty($data->lastname)) echo ' value="' . $data->lastname . '"'; ?> required>
-            <label for="lastname">Last Name*</label>
+            <input type="text" name="last_name" id="last_name" tabindex="2" autocapitalize="on" <?php if (!empty($data->last_name)) echo ' value="' . $data->last_name . '"'; ?> required>
+            <label for="last_name">Last Name*</label>
           </div>
           <div class="csc-input-field cs-mt-4">
             <input type="email" name="email" id="email" tabindex="3" autocapitalize="off" <?php if (!empty($data->email)) echo ' value="' . $data->email . '"'; ?> required>
@@ -96,11 +99,11 @@ require(get_theme_path('layout.php')); ?>
   $(document).ready(function() {
     let validator = $("#registration-form").validate({
       rules: {
-        firstname: {
+        first_name: {
           required: true,
           minlength: 3
         },
-        lastname: {
+        last_name: {
           required: true,
           minlength: 3
         },
@@ -123,11 +126,11 @@ require(get_theme_path('layout.php')); ?>
         }
       },
       messages: {
-        firstname: {
+        first_name: {
           required: "Please enter your first name",
           minlength: "Please enter at least 3 characters"
         },
-        lastname: {
+        last_name: {
           required: "Please enter your last name",
           minlength: "Please enter at least 3 characters"
         },
@@ -149,23 +152,25 @@ require(get_theme_path('layout.php')); ?>
         "accepted_conditions": {
           required: "Please accept the terms &amp; conditions"
         }
-      },
-      submitHandler(form) {
-        if (typeof grecaptcha == 'object') {
-          // Init captcha
-          grecaptcha.execute('<?php echo $data->recaptcha_site_key; ?>', {
-            action: 'register'
-          }).then(function(token) {
-            const recaptchaResponse = document.getElementById('recaptchaResponse');
-            recaptchaResponse.value = token;
-            // Submit the form
-            form.submit();
-          });
-        } else {
-          document.getElementById('recaptchaResponse').value = -1;
-          form.submit();
-        }
       }
+      <?php if ($data->recaptcha_site_key) { ?>,
+        submitHandler(form) {
+          if (typeof grecaptcha == 'object') {
+            // Init captcha
+            grecaptcha.execute('<?php echo $data->recaptcha_site_key; ?>', {
+              action: 'register'
+            }).then(function(token) {
+              const recaptchaResponse = document.getElementById('recaptchaResponse');
+              recaptchaResponse.value = token;
+              // Submit the form
+              form.submit();
+            });
+          } else {
+            document.getElementById('recaptchaResponse').value = -1;
+            form.submit();
+          }
+        }
+      <?php } ?>
     });
     <?php
     // Output errors if they exist
