@@ -7,6 +7,12 @@
  * @link		https://github.com/dpDesignz/cornerstone
  */
 
+use function ezsql\functions\{
+  selecting,
+  updating,
+  eq
+};
+
 /**
  * Option Class
  */
@@ -25,9 +31,13 @@ class Option
 
     // Set the database connection
     $this->conn = $cdbh;
+    $this->conn->dbh->tableSetup('options', DB_PREFIX);
 
     // Load option data
-    foreach ($this->conn->dbh->selecting(DB_PREFIX . 'options', array('option_name', 'option_value'), eq('autoload', '1')) as $option) {
+    foreach (selecting(
+      array('option_name', 'option_value'),
+      eq('autoload', '1')
+    ) as $option) {
       // Set option to data
       $this->set($option->option_name, $option->option_value);
     }
@@ -43,6 +53,9 @@ class Option
    */
   public function get($key, $default = null)
   {
+    // Set table setup
+    $this->conn->dbh->tableSetup('options', DB_PREFIX);
+
     // Check if only 1 option
     if (is_string($key)) {
 
@@ -58,12 +71,15 @@ class Option
           exit;
         } else {
           // Check for value in the database
-          $optionData = $this->conn->dbh->selecting(DB_PREFIX . 'options', array('option_name', 'option_value'), eq('option_name', $key));
-          if ($this->conn->dbh->getNum_Rows() > 0) {
+          $optionResults = selecting(
+            array('option_name', 'option_value'),
+            eq('option_name', $key)
+          );
+          if ($this->conn->dbh->getNum_Rows() > 0 && !empty($optionResults)) {
             // Set value to data
-            $this->set(strtolower($optionData[0]->option_name), $optionData[0]->option_value);
+            $this->set(strtolower($optionResults[0]->option_name), $optionResults[0]->option_value);
             // Return data
-            return $this->data[$optionData[0]->option_name];
+            return $this->data[$optionResults[0]->option_name];
             exit;
           } // Value can't be found. Return $default value
         }
@@ -79,7 +95,7 @@ class Option
         // Create array to return
         $returnArray = array();
 
-        // Get the options from the databse
+        // Get the options from the database
         foreach ($key as $optionName) {
 
           // Lower $optionName
@@ -93,14 +109,17 @@ class Option
           } else {
 
             // Check for value in the database
-            $optionData = $this->conn->dbh->selecting(DB_PREFIX . 'options', array('option_name', 'option_value'), eq('option_name', $optionName));
-            if ($this->conn->dbh->getNum_Rows() > 0) {
+            $optionResults = selecting(
+              array('option_name', 'option_value'),
+              eq('option_name', $optionName)
+            );
+            if ($this->conn->dbh->getNum_Rows() > 0 && !empty($optionResults)) {
 
               // Set value to data
-              $this->set($optionName, $optionData[0]->option_value);
+              $this->set($optionName, $optionResults[0]->option_value);
 
               // If option is empty, return $default value, else return $key=>$value from table
-              $returnArray[$optionName] = (empty(trim($optionData[0]->option_value))) ? $default : $optionData[0]->option_value;
+              $returnArray[$optionName] = (empty(trim($optionResults[0]->option_value))) ? $default : $optionResults[0]->option_value;
             } else { // Value can't be found. Return $default value
               $returnArray[$optionName] = $default;
             }
@@ -152,6 +171,9 @@ class Option
    */
   public function update($key, $value)
   {
+    // Set table setup
+    $this->conn->dbh->tableSetup('options', DB_PREFIX);
+
     // Check key and value are set
     if (!empty($key) && !empty($value)) {
 
@@ -159,8 +181,7 @@ class Option
       $userID = (!empty($_SESSION['_cs']['user']['uid'])) ? $_SESSION['_cs']['user']['uid'] : 0;
 
       // Update row in `xxx_options`
-      $result = $this->conn->dbh->update(
-        DB_PREFIX . 'options',
+      $updateResult = updating(
         array(
           'option_value' => $value,
           'option_edited_id' => $userID,
@@ -170,7 +191,7 @@ class Option
       );
 
       // Check if updated successfully
-      if ($this->conn->dbh->affectedRows() > 0) {
+      if ($this->conn->dbh->affectedRows() > 0 && !empty($updateResult)) {
 
         // Update the data in the key if isset
         if (isset($this->data[$key])) {

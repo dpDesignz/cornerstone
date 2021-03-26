@@ -75,7 +75,7 @@ function get_crypto_token($length = '') {
 */
 function get_pin($length = 6) {
 
-  // Set minimim number
+  // Set minimum number
   $minNumber = (int)str_pad('1',$length,'0',STR_PAD_RIGHT);
 
   // Set maximum number
@@ -83,4 +83,4 @@ function get_pin($length = 6) {
 
   // Return generated pin
   return mt_rand ( $minNumber , $maxNumber );
-} ?>
+}

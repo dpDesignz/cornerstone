@@ -7,6 +7,19 @@
  * @subpackage Mission Equine
  */
 
+use function ezsql\functions\{
+  selecting,
+  inserting,
+  updating,
+  deleting,
+  leftJoin,
+  where,
+  eq,
+  like,
+  orderBy,
+  limit
+};
+
 class Content extends ModelBase
 {
 
@@ -20,6 +33,7 @@ class Content extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+    $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
   }
 
   ########################
@@ -38,8 +52,9 @@ class Content extends ModelBase
 
     // Check the ID is valid
     if (!empty($sectionID) && is_numeric($sectionID)) {
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_section",
+      // Get data
+      $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
+      $sectionResults = selecting(
         "section_id,
         section_name,
         section_type,
@@ -50,10 +65,10 @@ class Content extends ModelBase
       );
 
       // Return if results
-      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($sectionResults)) {
 
         // Return results
-        return $results[0];
+        return $sectionResults[0];
       } // No results. Return FALSE.
     } // ID is not valid. Return FALSE.
 
@@ -107,19 +122,20 @@ class Content extends ModelBase
       $this->sql[] = limit($params['limit'], $offset);
     }
 
+    // Setup table
+    $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
+
     if ($countResults) {
 
       // Run query to count data
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_section",
+      $results = selecting(
         "COUNT(section_id) AS total_results",
         ...$this->sql
       );
     } else {
 
       // Run query to find data
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_section",
+      $results = selecting(
         "section_id,
         section_name,
         section_type,
@@ -151,9 +167,9 @@ class Content extends ModelBase
   public function addSection(string $name, int $type, string $locationName = null)
   {
 
-    // Add data into `cs_content_section`
-    $this->conn->dbh->insert(
-      DB_PREFIX . "content_section",
+    // Add data
+    $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
+    inserting(
       array(
         'section_name' => $name,
         'section_type' => $type,
@@ -190,9 +206,9 @@ class Content extends ModelBase
     // Make sure the ID is a number
     if (!empty($sectionID) && is_numeric($sectionID)) {
 
-      // Update row in `cs_content_section`
-      $result = $this->conn->dbh->update(
-        DB_PREFIX . "content_section",
+      // Update data
+      $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
+      updating(
         array(
           'section_name' => $name,
           'section_type' => $type,
@@ -232,8 +248,9 @@ class Content extends ModelBase
 
     // Check the ID is valid
     if (!empty($pageID) && is_numeric($pageID)) {
-      $contentData = $this->conn->dbh->selecting(
-        DB_PREFIX . "content AS c",
+      // Get data
+      $this->conn->dbh->tableSetup('content AS c', DB_PREFIX);
+      $contentData = selecting(
         "c.content_id,
         c.content_title,
         c.content_content,
@@ -242,7 +259,13 @@ class Content extends ModelBase
         cs.section_id,
         cs.section_location_name,
         (SELECT seo_keyword FROM cs_seo_url WHERE seo_type_id = c.content_id AND seo_type = '0' ORDER BY seo_id DESC LIMIT 1) AS content_slug",
-        leftJoin("c", DB_PREFIX . "content_section", "content_section_id", "section_id", "cs"),
+        leftJoin(
+          "c",
+          DB_PREFIX . "content_section",
+          "content_section_id",
+          "section_id",
+          "cs"
+        ),
         where(
           eq('c.content_id', $pageID)
         )
@@ -347,19 +370,20 @@ class Content extends ModelBase
       $this->sql[] = limit($params['limit'], $offset);
     }
 
+    // Set table
+    $this->conn->dbh->tableSetup('content AS c', DB_PREFIX);
+
     if ($countResults) {
 
       // Run query to count data
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content AS c",
+      $pageResults = selecting(
         "COUNT(c.content_id) AS total_results",
         ...$this->sql
       );
     } else {
 
       // Run query to find data
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content AS c",
+      $pageResults = selecting(
         "c.content_id,
         c.content_title,
         c.content_status,
@@ -371,18 +395,36 @@ class Content extends ModelBase
         CONCAT(ua.user_first_name, ' ', ua.user_last_name) AS added_by,
         CONCAT(ue.user_first_name, ' ', ue.user_last_name) AS edited_by,
         (SELECT seo_keyword FROM cs_seo_url WHERE seo_type_id = c.content_id AND seo_type = '0' ORDER BY seo_id DESC LIMIT 1) AS content_slug",
-        leftJoin("c", DB_PREFIX . "content_section", "content_section_id", "section_id", "cs"),
-        leftJoin("c", DB_PREFIX . "users", "content_added_id", "user_id", "ua"),
-        leftJoin("c", DB_PREFIX . "users", "content_edited_id", "user_id", "ue"),
+        leftJoin(
+          "c",
+          DB_PREFIX . "content_section",
+          "content_section_id",
+          "section_id",
+          "cs"
+        ),
+        leftJoin(
+          "c",
+          DB_PREFIX . "users",
+          "content_added_id",
+          "user_id",
+          "ua"
+        ),
+        leftJoin(
+          "c",
+          DB_PREFIX . "users",
+          "content_edited_id",
+          "user_id",
+          "ue"
+        ),
         ...$this->sql
       );
     }
 
     // Return if results
-    if ($this->conn->dbh->getNum_Rows() > 0) {
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($pageResults)) {
 
       // Return results
-      return json_decode(json_encode(array('count' => $this->conn->dbh->getNum_Rows(), 'results' => $results)), FALSE);
+      return json_decode(json_encode(array('count' => $this->conn->dbh->getNum_Rows(), 'results' => $pageResults)), FALSE);
     } // No results. Return FALSE.
 
     // Return FALSE
@@ -398,8 +440,8 @@ class Content extends ModelBase
   {
 
     // Run query to find data
-    $results = $this->conn->dbh->selecting(
-      DB_PREFIX . "content_section",
+    $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
+    $pageSectionResults = selecting(
       "section_id,
       section_name",
       where(
@@ -408,10 +450,10 @@ class Content extends ModelBase
     );
 
     // Return if results
-    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($pageSectionResults)) {
 
       // Return results
-      return $results;
+      return $pageSectionResults;
     } // No results. Return FALSE.
 
     // Return FALSE
@@ -432,9 +474,9 @@ class Content extends ModelBase
   public function addPage(string $title, string $content, int $status, int $sectionID = 0, int $showUpdated = 0)
   {
 
-    // Add data into `cs_content`
-    $this->conn->dbh->insert(
-      DB_PREFIX . "content",
+    // Add data
+    $this->conn->dbh->tableSetup('content', DB_PREFIX);
+    inserting(
       array(
         'content_title' => $title,
         'content_content' => $content,
@@ -473,9 +515,11 @@ class Content extends ModelBase
     // Init added success
     $addedSuccess = 0;
 
-    // Add meta_title into `cs_content_meta`
-    $this->conn->dbh->insert(
-      DB_PREFIX . "content_meta",
+    // Setup table
+    $this->conn->dbh->tableSetup('content_meta', DB_PREFIX);
+
+    // Add data
+    inserting(
       array(
         'cmeta_content_id' => $contentID,
         'cmeta_key' => 'meta_title',
@@ -492,9 +536,8 @@ class Content extends ModelBase
       $addedSuccess++;
     }
 
-    // Add meta_description into `cs_content_meta`
-    $this->conn->dbh->insert(
-      DB_PREFIX . "content_meta",
+    // Add data
+    inserting(
       array(
         'cmeta_content_id' => $contentID,
         'cmeta_key' => 'meta_description',
@@ -541,9 +584,9 @@ class Content extends ModelBase
     // Make sure the ID is a number
     if (!empty($pageID) && is_numeric($pageID)) {
 
-      // Update row in `cs_content`
-      $result = $this->conn->dbh->update(
-        DB_PREFIX . "content",
+      // Update data
+      $this->conn->dbh->tableSetup('content', DB_PREFIX);
+      updating(
         array(
           'content_title' => $title,
           'content_content' => $content,
@@ -584,9 +627,9 @@ class Content extends ModelBase
     // Init edited success
     $editedSuccess = 0;
 
-    // Update meta_title in `cs_content_meta`
-    $this->conn->dbh->update(
-      DB_PREFIX . "content_meta",
+    // Update data
+    $this->conn->dbh->tableSetup('content_meta', DB_PREFIX);
+    updating(
       array(
         'cmeta_value' => $metaTitle,
         'cmeta_edited_id' => $_SESSION['_cs']['user']['uid'],
@@ -604,8 +647,7 @@ class Content extends ModelBase
     }
 
     // Update meta_description in `cs_content_meta`
-    $this->conn->dbh->update(
-      DB_PREFIX . "content_meta",
+    updating(
       array(
         'cmeta_value' => $metaDescription,
         'cmeta_edited_id' => $_SESSION['_cs']['user']['uid'],
@@ -650,8 +692,8 @@ class Content extends ModelBase
 
     // Check data is valid
     if (!empty($faqID) && is_numeric($faqID)) {
-      $contentData = $this->conn->dbh->selecting(
-        DB_PREFIX . "content AS c",
+      $this->conn->dbh->tableSetup('content AS c', DB_PREFIX);
+      $contentData = selecting(
         "c.content_id,
         c.content_title,
         c.content_content,
@@ -756,19 +798,20 @@ class Content extends ModelBase
       $this->sql[] = limit($params['limit'], $offset);
     }
 
+    // Setup table
+    $this->conn->dbh->tableSetup('content AS c', DB_PREFIX);
+
     if ($countResults) {
 
       // Run query to count data
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content AS c",
+      $results = selecting(
         "COUNT(c.content_id) AS total_results",
         ...$this->sql
       );
     } else {
 
       // Run query to find data
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content AS c",
+      $results = selecting(
         "c.content_id,
         c.content_title,
         c.content_status,
@@ -776,8 +819,20 @@ class Content extends ModelBase
         c.content_edited_dtm,
         CONCAT(ua.user_first_name, ' ', ua.user_last_name) AS added_by,
         CONCAT(ue.user_first_name, ' ', ue.user_last_name) AS edited_by",
-        leftJoin("c", DB_PREFIX . "users", "content_added_id", "user_id", "ua"),
-        leftJoin("c", DB_PREFIX . "users", "content_edited_id", "user_id", "ue"),
+        leftJoin(
+          "c",
+          DB_PREFIX . "users",
+          "content_added_id",
+          "user_id",
+          "ua"
+        ),
+        leftJoin(
+          "c",
+          DB_PREFIX . "users",
+          "content_edited_id",
+          "user_id",
+          "ue"
+        ),
         ...$this->sql
       );
     }
@@ -804,8 +859,8 @@ class Content extends ModelBase
   {
 
     // Run query to find data
-    $results = $this->conn->dbh->selecting(
-      DB_PREFIX . "content_faq_section AS fs",
+    $this->conn->dbh->tableSetup('content_faq_section AS f', DB_PREFIX);
+    $results = selecting(
       "fs.faqs_id,
       s.section_id,
       s.section_name",
@@ -844,8 +899,8 @@ class Content extends ModelBase
   {
 
     // Run query to find data
-    $results = $this->conn->dbh->selecting(
-      DB_PREFIX . "content_faq_section AS fs",
+    $this->conn->dbh->tableSetup('content_faq_section AS fs', DB_PREFIX);
+    $results = selecting(
       "fs.faqs_id,
       c.content_id,
       c.content_title,
@@ -888,8 +943,8 @@ class Content extends ModelBase
     if (!empty($faqSectionID) && is_numeric($faqSectionID)) {
 
       // Run query to delete
-      $this->conn->dbh->delete(
-        DB_PREFIX . "content_faq_section",
+      $this->conn->dbh->tableSetup('content_faq_section', DB_PREFIX);
+      deleting(
         where(
           eq("faqs_id", $faqSectionID)
         )
@@ -917,8 +972,8 @@ class Content extends ModelBase
   {
 
     // Run query to find data
-    $sectionResults = $this->conn->dbh->selecting(
-      DB_PREFIX . "content_section",
+    $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
+    $sectionResults = selecting(
       "section_id,
       section_name",
       where(
@@ -951,8 +1006,8 @@ class Content extends ModelBase
     if (!empty($faqSectionID) && is_numeric($faqSectionID)) {
 
       // Run query to find products
-      $this->conn->dbh->selecting(
-        DB_PREFIX . "content_faq_section",
+      $this->conn->dbh->tableSetup('content_faq_section', DB_PREFIX);
+      selecting(
         "faqs_id",
         where(
           eq("faqs_section_id", $faqSectionID)
@@ -979,8 +1034,8 @@ class Content extends ModelBase
   {
 
     // Add data
-    $this->conn->dbh->insert(
-      DB_PREFIX . "content",
+    $this->conn->dbh->tableSetup('content', DB_PREFIX);
+    inserting(
       array(
         'content_title' => $title,
         'content_content' => $content,
@@ -1019,8 +1074,8 @@ class Content extends ModelBase
     if (!empty($sectionID) && is_numeric($sectionID)) {
 
       // Insert data
-      $this->conn->dbh->insert(
-        DB_PREFIX . "content_faq_section",
+      $this->conn->dbh->tableSetup('content_faq_section', DB_PREFIX);
+      inserting(
         array(
           'faqs_content_id' => $contentID,
           'faqs_section_id' => $sectionID,
@@ -1057,9 +1112,9 @@ class Content extends ModelBase
     // Check data is valid
     if (!empty($faqID) && is_numeric($faqID)) {
 
-      // Update row in `cs_content`
-      $updateResult = $this->conn->dbh->update(
-        DB_PREFIX . "content",
+      // Update data
+      $this->conn->dbh->tableSetup('content', DB_PREFIX);
+      updating(
         array(
           'content_title' => $title,
           'content_content' => $content,
@@ -1102,8 +1157,8 @@ class Content extends ModelBase
       $sortOrder = (!empty($sortOrder)) ? $sortOrder : 0;
 
       // Update data
-      $this->conn->dbh->update(
-        DB_PREFIX . "content_faq_section",
+      $this->conn->dbh->tableSetup('content_faq_section', DB_PREFIX);
+      updating(
         array(
           'faqs_sort_order' => $sortOrder
         ),
@@ -1139,9 +1194,9 @@ class Content extends ModelBase
     // Check data is valid
     if (!empty($menuID) && is_numeric($menuID)) {
 
-      // Run query to find products
-      $this->conn->dbh->selecting(
-        DB_PREFIX . "content_menu",
+      // Get data
+      $this->conn->dbh->tableSetup('content_menu', DB_PREFIX);
+      selecting(
         "menui_id",
         where(
           eq("menui_menu_id", $menuID)
@@ -1163,8 +1218,8 @@ class Content extends ModelBase
   {
 
     // Run query to find data
-    $menuResults = $this->conn->dbh->selecting(
-      DB_PREFIX . "content_section",
+    $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
+    $menuResults = selecting(
       "section_id,
       section_name",
       where(
@@ -1198,8 +1253,8 @@ class Content extends ModelBase
     if (!empty($menuID) && is_numeric($menuID)) {
 
       // Run query to find data
-      $menuItemResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_menu AS cm",
+      $this->conn->dbh->tableSetup('content_menu AS cm', DB_PREFIX);
+      $menuItemResults = selecting(
         "cm.menui_id,
         COALESCE(c.content_type, 0) as content_type,
         cm.menui_content_id,
@@ -1256,8 +1311,8 @@ class Content extends ModelBase
       $sortOrder = (!empty($sortOrder)) ? $sortOrder : 0;
 
       // Insert data
-      $this->conn->dbh->insert(
-        DB_PREFIX . "content_menu",
+      $this->conn->dbh->tableSetup('content_menu', DB_PREFIX);
+      inserting(
         array(
           'menui_content_id' => $contentID,
           'menui_menu_id' => $menuID,
@@ -1305,8 +1360,8 @@ class Content extends ModelBase
       $sortOrder = (!empty($sortOrder)) ? $sortOrder : 0;
 
       // Update data
-      $this->conn->dbh->update(
-        DB_PREFIX . "content_menu",
+      $this->conn->dbh->tableSetup('content_menu', DB_PREFIX);
+      updating(
         array(
           'menui_content_id' => $contentID,
           'menui_custom_url' => $customURL,
@@ -1344,8 +1399,8 @@ class Content extends ModelBase
     if (!empty($menuItemID) && is_numeric($menuItemID)) {
 
       // Run query to delete
-      $this->conn->dbh->delete(
-        DB_PREFIX . "content_menu",
+      $this->conn->dbh->tableSetup('content_menu', DB_PREFIX);
+      deleting(
         where(
           eq("menui_id", $menuItemID)
         )
@@ -1382,8 +1437,8 @@ class Content extends ModelBase
     if (!empty($contentID) && is_numeric($contentID)) {
 
       // Run query to get results
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_meta",
+      $this->conn->dbh->tableSetup('content_meta', DB_PREFIX);
+      $results = selecting(
         "*",
         where(
           eq('cmeta_content_id', $contentID)
@@ -1413,8 +1468,8 @@ class Content extends ModelBase
   {
 
     // Run query to find data
-    $contentItemResults = $this->conn->dbh->selecting(
-      DB_PREFIX . "content",
+    $this->conn->dbh->tableSetup('content', DB_PREFIX);
+    $contentItemResults = selecting(
       "content_id,
       content_title",
       orderBy("content_title", "ASC")
@@ -1445,8 +1500,8 @@ class Content extends ModelBase
     if (!empty($contentID) && is_numeric($contentID)) {
 
       // Run query to find data
-      $menuResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_menu AS m",
+      $this->conn->dbh->tableSetup('content_menu AS m', DB_PREFIX);
+      $menuResults = selecting(
         "m.menui_id,
         s.section_name,
         m.menui_menu_id",

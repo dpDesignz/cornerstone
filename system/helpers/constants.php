@@ -7,10 +7,16 @@
  * @package Cornerstone
  */
 
+use function ezsql\functions\{
+	selecting,
+	eq
+};
+
 // Load options from `cs_options` table where `autoload` is `true`
 $csOptions = new CornerstoneDBH; // Init db connection
+$csOptions->dbh->tableSetup('options', DB_PREFIX);
 $row = null;
-foreach ($csOptions->dbh->selecting(DB_PREFIX . 'options', array('option_name', 'option_value'), eq('autoload', '1')) as $row) {
+foreach (selecting(array('option_name', 'option_value'), eq('autoload', '1')) as $row) {
 	define(strtoupper($row->option_name), $row->option_value);
 }
 unset($csOptions);
@@ -19,7 +25,7 @@ unset($row);
 /**#@+
  * Cornerstone constants
  */
-\defined('CS_VERSION') or \define('CS_VERSION', '0.4.3'); // Last updated ~ 2021-03-19
+\defined('CS_VERSION') or \define('CS_VERSION', '0.5.0'); // Last updated ~ 2021-03-26
 \defined('_DS') or \define('_DS', \DIRECTORY_SEPARATOR);
 /**#@-*/
 

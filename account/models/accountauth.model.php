@@ -6,6 +6,19 @@
  * @package Cornerstone
  */
 
+use function ezsql\functions\{
+  selecting,
+  inserting,
+  deleting,
+  where,
+  grouping,
+  eq,
+  neq,
+  gt,
+  orderBy,
+  limit
+};
+
 class AccountAuth extends ModelBase
 {
 
@@ -21,6 +34,7 @@ class AccountAuth extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
   }
 
   /**
@@ -97,8 +111,8 @@ class AccountAuth extends ModelBase
       }
 
       // Run query to find user by email
-      $userResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $userResult = selecting(
         "user_id",
         ...$this->sql
       );
@@ -134,8 +148,8 @@ class AccountAuth extends ModelBase
     try {
 
       // Get user data
-      $userData = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $userData = selecting(
         "user_id,
         user_password,
         user_password_key,
@@ -217,8 +231,8 @@ class AccountAuth extends ModelBase
       session_regenerate_id(true);
 
       // Get the user information
-      $userResult = $this->conn->dbh->selecting(
-        DB_PREFIX . 'users',
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $userResult = selecting(
         'user_id,
         user_email,
         user_display_name',
@@ -292,8 +306,8 @@ class AccountAuth extends ModelBase
         $authInfo = explode(':', $_SESSION['_cs']['auth_check']);
 
         // Get the authorization token from the database
-        $authResult = $this->conn->dbh->selecting(
-          DB_PREFIX . 'authorization',
+        $this->conn->dbh->tableSetup('authorization', DB_PREFIX);
+        $authResult = selecting(
           array(
             'auth_token',
             'auth_remember',
@@ -366,8 +380,8 @@ class AccountAuth extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Delete all other authorization codes for this user
-      $this->conn->dbh->delete(
-        DB_PREFIX . 'authorization',
+      $this->conn->dbh->tableSetup('authorization', DB_PREFIX);
+      deleting(
         eq('auth_user_id', $this->uid)
       );
 
@@ -397,8 +411,7 @@ class AccountAuth extends ModelBase
       $expireDtm->modify('+' . (int) $this->optn->get("auth_expire") . ' seconds');
 
       // Save authorization token to database
-      $token_id = $this->conn->dbh->insert(
-        DB_PREFIX . 'authorization',
+      $token_id = inserting(
         array(
           'auth_user_id' => $this->uid,
           'auth_selector' => $selector,
@@ -451,19 +464,20 @@ class AccountAuth extends ModelBase
     // Make sure the data is valid
     if (!empty($authID) && is_numeric($authID)) {
 
+      // Setup table
+      $this->conn->dbh->tableSetup('authorization', DB_PREFIX);
+
       // Check if $deleteAllForUser is set
       if ($deleteAllForUser) {
 
         // Delete all authorization tokens for user ID
-        $delete_status = $this->conn->dbh->delete(
-          DB_PREFIX . 'authorization',
+        deleting(
           eq('auth_user_id', $authID)
         );
       } else { // Delete authorization token
 
         // Delete authorization token
-        $delete_status = $this->conn->dbh->delete(
-          DB_PREFIX . 'authorization',
+        deleting(
           eq('auth_id', $authID)
         );
       }
@@ -496,8 +510,8 @@ class AccountAuth extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Run query
-      $emailResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $emailResult = selecting(
         "user_email",
         where(
           eq("user_id", $this->uid)
@@ -542,8 +556,8 @@ class AccountAuth extends ModelBase
       $max_time_check->modify('-' . $options->password_reset_expire . ' seconds');
 
       // Run query to check of locked login set within defined time
-      $loginLockResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "login_log",
+      $this->conn->dbh->tableSetup('login_log', DB_PREFIX);
+      $loginLockResults = selecting(
         "login_id",
         where(
           gt("login_dtm", $max_time_check->format('Y-m-d H:i:s')),
@@ -556,8 +570,7 @@ class AccountAuth extends ModelBase
       if ($this->conn->dbh->getNum_Rows() < 1) {
 
         // Run query to find if limit is reached within defined time
-        $loginLimitResults = $this->conn->dbh->selecting(
-          DB_PREFIX . "login_log",
+        $loginLimitResults = selecting(
           "login_id",
           where(
             gt("login_dtm", $max_time_check->format('Y-m-d H:i:s')),
@@ -599,8 +612,8 @@ class AccountAuth extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Run query to find the last locked login_dtm
-      $lockResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "login_log",
+      $this->conn->dbh->tableSetup('login_log', DB_PREFIX);
+      $lockResult = selecting(
         "login_dtm",
         where(
           eq("login_status", "3"),
@@ -637,8 +650,8 @@ class AccountAuth extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Log user login into `cs_login_log`
-      $this->conn->dbh->insert(
-        DB_PREFIX . "login_log",
+      $this->conn->dbh->tableSetup('login_log', DB_PREFIX);
+      inserting(
         array(
           'login_user_id' => $this->uid,
           'login_dtm' => date('Y-m-d H:i:s'),
@@ -737,8 +750,8 @@ class AccountAuth extends ModelBase
       $cookie_set = new \DateTime();
 
       // Save cookie information to database
-      $this->conn->dbh->insert(
-        DB_PREFIX . 'auth_cookie',
+      $this->conn->dbh->tableSetup('auth_cookie', DB_PREFIX);
+      inserting(
         array(
           'cookie_user_id' => $this->uid,
           'cookie_password_hash' => $random_password_hash,
@@ -794,8 +807,8 @@ class AccountAuth extends ModelBase
       if (!empty($cookieKey) && strlen($cookieKey) == 32) {
 
         // Get the cookie token from the database
-        $cookieToken = $this->conn->dbh->selecting(
-          DB_PREFIX . 'auth_cookie',
+        $this->conn->dbh->tableSetup('auth_cookie', DB_PREFIX);
+        $cookieToken = selecting(
           array(
             'cookie_id',
             'cookie_password_hash',
@@ -877,7 +890,8 @@ class AccountAuth extends ModelBase
     if (!empty($cookieKey) && strlen($cookieKey) == 32) {
 
       // Delete cookie information from database
-      if ($this->conn->dbh->delete(
+      $this->conn->dbh->tableSetup('auth_cookie', DB_PREFIX);
+      if (deleting(
         DB_PREFIX . 'auth_cookie',
         eq('cookie_key', $cookieKey)
       )) {

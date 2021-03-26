@@ -7,6 +7,16 @@
  * @subpackage Mission Equine
  */
 
+use function ezsql\functions\{
+  selecting,
+  inserting,
+  updating,
+  deleting,
+  where,
+  eq,
+  gt
+};
+
 class AccPassword extends ModelBase
 {
 
@@ -20,6 +30,7 @@ class AccPassword extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
   }
 
   /**
@@ -43,8 +54,8 @@ class AccPassword extends ModelBase
   {
 
     // Run query
-    $userIDResult = $this->conn->dbh->selecting(
-      DB_PREFIX . "users",
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
+    $userIDResult = selecting(
       "user_id",
       where(
         eq("user_email", $email)
@@ -82,8 +93,8 @@ class AccPassword extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Run query to find user key
-      $userKeyNameResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $userKeyNameResult = selecting(
         "user_password_key,
         user_first_name",
         where(
@@ -116,8 +127,8 @@ class AccPassword extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Run query
-      $emailResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $emailResult = selecting(
         "user_email",
         where(
           eq("user_id", $this->uid)
@@ -175,8 +186,8 @@ class AccPassword extends ModelBase
         $expireDtm->modify('+' . (int) $this->optn->get("password_reset_expire") . ' seconds');
 
         // Save reset request in database
-        $token_id = $this->conn->dbh->insert(
-          'cs_password_reset',
+        $this->conn->dbh->tableSetup('password_reset', DB_PREFIX);
+        $token_id = inserting(
           array(
             'pwdreset_user_id' => $this->uid,
             'pwdreset_selector' => $selector,
@@ -226,12 +237,12 @@ class AccPassword extends ModelBase
       $now = new \DateTime();
 
       // Run query to find customer key
-      $resetResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "password_reset",
+      $this->conn->dbh->tableSetup('password_reset', DB_PREFIX);
+      $resetResult = selecting(
         "pwdreset_user_id",
         where(
-          eq("pwdreset_selector", $selector, _AND),
-          eq("pwdreset_status", "0", _AND),
+          eq("pwdreset_selector", $selector),
+          eq("pwdreset_status", "0"),
           gt("pwdreset_expire", $now->format('Y-m-d H:i:s'))
         )
       );
@@ -267,12 +278,12 @@ class AccPassword extends ModelBase
     if (!empty($selector) && !empty($token)) {
 
       // Run query to get token to check
-      $tokenResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "password_reset",
+      $this->conn->dbh->tableSetup('password_reset', DB_PREFIX);
+      $tokenResult = selecting(
         "pwdreset_token",
         where(
-          eq("pwdreset_selector", $selector, _AND),
-          eq("pwdreset_status", "0", _AND)
+          eq("pwdreset_selector", $selector),
+          eq("pwdreset_status", "0")
         )
       );
 
@@ -315,8 +326,8 @@ class AccPassword extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid) && !empty($password) && !empty($key)) {
 
       // Save new password to database
-      $this->conn->dbh->update(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      updating(
         array(
           'user_password' => $password,
           'user_password_key' => $key
@@ -349,14 +360,14 @@ class AccPassword extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Delete session data for user
-      $this->conn->dbh->delete(
-        DB_PREFIX . 'session',
+      $this->conn->dbh->tableSetup('session', DB_PREFIX);
+      deleting(
         eq('session_user_id', $this->uid)
       );
 
       // Delete cookie data for user
-      $this->conn->dbh->delete(
-        DB_PREFIX . 'auth_cookie',
+      $this->conn->dbh->tableSetup('auth_cookie', DB_PREFIX);
+      deleting(
         eq('cookie_user_id', $this->uid)
       );
 
@@ -385,8 +396,8 @@ class AccPassword extends ModelBase
       $now = new \DateTime();
 
       // Update password reset as successful in database
-      $this->conn->dbh->update(
-        DB_PREFIX . 'password_reset',
+      $this->conn->dbh->tableSetup('password_reset', DB_PREFIX);
+      updating(
         array(
           'pwdreset_status' => '1',
           'pwdreset_success_dtm' => $now->format('Y-m-d H:i:s')

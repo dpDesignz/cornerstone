@@ -6,6 +6,18 @@
  * @package Cornerstone
  */
 
+use function ezsql\functions\{
+  selecting,
+  inserting,
+  updating,
+  deleting,
+  where,
+  eq,
+  like,
+  orderBy,
+  limit
+};
+
 class UserRole extends ModelBase
 {
 
@@ -19,6 +31,7 @@ class UserRole extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+    $this->conn->dbh->tableSetup('roles', DB_PREFIX);
   }
 
   /**
@@ -33,8 +46,10 @@ class UserRole extends ModelBase
 
     // Check the data is valid
     if (!empty($role) && is_numeric($role)) {
-      $roleData = $this->conn->dbh->selecting(
-        DB_PREFIX . "roles",
+
+      // Get data
+      $this->conn->dbh->tableSetup('roles', DB_PREFIX);
+      $roleData = selecting(
         "role_id,
         role_key,
         role_name,
@@ -101,19 +116,20 @@ class UserRole extends ModelBase
       $this->sql[] = limit($params['limit'], $offset);
     }
 
+    // Setup table
+    $this->conn->dbh->tableSetup('roles', DB_PREFIX);
+
     if ($countResults) {
 
       // Run query to count data
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "roles",
+      $results = selecting(
         "COUNT(role_id) AS total_results",
         ...$this->sql
       );
     } else {
 
       // Run query to find data
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "roles",
+      $results = selecting(
         "role_id,
         role_key,
         role_name,
@@ -146,8 +162,8 @@ class UserRole extends ModelBase
   {
 
     // Add data
-    $this->conn->dbh->insert(
-      DB_PREFIX . "roles",
+    $this->conn->dbh->tableSetup('roles', DB_PREFIX);
+    inserting(
       array(
         'role_key' => $key,
         'role_name' => $name,
@@ -182,8 +198,8 @@ class UserRole extends ModelBase
     if (!empty($roleID) && is_numeric($roleID)) {
 
       // Update row
-      $updateResult = $this->conn->dbh->update(
-        DB_PREFIX . "roles",
+      $this->conn->dbh->tableSetup('roles', DB_PREFIX);
+      $updateResult = updating(
         array(
           'role_key' => $key,
           'role_name' => $name,
@@ -219,8 +235,8 @@ class UserRole extends ModelBase
   {
 
     // Run query to find products
-    $this->conn->dbh->selecting(
-      DB_PREFIX . "role_permissions",
+    $this->conn->dbh->tableSetup('role_permissions', DB_PREFIX);
+    selecting(
       "rp_id"
     );
 
@@ -236,8 +252,8 @@ class UserRole extends ModelBase
   public function listPermissions()
   {
     // Run query to find data
-    $permissionResults = $this->conn->dbh->selecting(
-      DB_PREFIX . "role_permissions",
+    $this->conn->dbh->tableSetup('role_permissions', DB_PREFIX);
+    $permissionResults = selecting(
       "rp_id,
       rp_key",
       orderBy('rp_key', "ASC")
@@ -264,8 +280,8 @@ class UserRole extends ModelBase
   public function listRolePermissions(int $roleID)
   {
     // Run query to find data
-    $rolePermsResults = $this->conn->dbh->selecting(
-      DB_PREFIX . "role_perms",
+    $this->conn->dbh->tableSetup('role_perms', DB_PREFIX);
+    $rolePermsResults = selecting(
       "rpl_rp_id",
       where(
         eq("rpl_role_id", $roleID)
@@ -295,8 +311,8 @@ class UserRole extends ModelBase
   {
 
     // Add data
-    $this->conn->dbh->insert(
-      DB_PREFIX . "role_permissions",
+    $this->conn->dbh->tableSetup('role_permissions', DB_PREFIX);
+    inserting(
       array(
         'rp_key' => $key
       )
@@ -328,8 +344,8 @@ class UserRole extends ModelBase
     if (!empty($roleID) && is_numeric($roleID) && !empty($permissionID) && is_numeric($permissionID)) {
 
       // Add link
-      $this->conn->dbh->insert(
-        DB_PREFIX . "role_perms",
+      $this->conn->dbh->tableSetup('role_perms', DB_PREFIX);
+      inserting(
         array(
           'rpl_role_id' => $roleID,
           'rpl_rp_id' => $permissionID
@@ -363,8 +379,8 @@ class UserRole extends ModelBase
     if (!empty($roleID) && is_numeric($roleID) && !empty($permissionID) && is_numeric($permissionID)) {
 
       // Run query to delete
-      $this->conn->dbh->delete(
-        DB_PREFIX . "role_perms",
+      $this->conn->dbh->tableSetup('role_perms', DB_PREFIX);
+      deleting(
         where(
           eq("rpl_role_id", $roleID, _AND),
           eq("rpl_rp_id", $permissionID)

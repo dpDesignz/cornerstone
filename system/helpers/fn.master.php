@@ -106,7 +106,7 @@ function get_public_path($filePath = '')
 	// Set public directory
 	$directory = DIR_PUBLIC;
 
-	// Replace directory seperator in filePath
+	// Replace directory separator in filePath
 	$filePath = str_replace('/', _DS, $filePath);
 
 	// Return the path

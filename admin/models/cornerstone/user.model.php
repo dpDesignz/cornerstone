@@ -6,6 +6,19 @@
  * @package Cornerstone
  */
 
+use function ezsql\functions\{
+  selecting,
+  inserting,
+  updating,
+  leftJoin,
+  where,
+  grouping,
+  eq,
+  like,
+  orderBy,
+  limit
+};
+
 class User extends ModelBase
 {
 
@@ -20,6 +33,7 @@ class User extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
   }
 
   /**
@@ -61,8 +75,8 @@ class User extends ModelBase
     if (!empty($userID) && is_numeric($userID)) {
 
       // Run query to find data
-      $userData = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $userData = selecting(
         "user_id,
         user_login,
         user_display_name,
@@ -104,52 +118,30 @@ class User extends ModelBase
     $countResults = (!empty($params['count']) && $params['count'] == TRUE) ? TRUE : FALSE;
 
     // Build query
-    $this->sql = "";
-    $this->sqlItems = array();
+    $this->sql = array();
+    $this->whereArray = array();
 
-    // Start SQL based on count results
-    if ($countResults) {
-      $this->sql .= "SELECT COUNT(u.user_id) AS total_results";
-    } else {
-      $this->sql .= "SELECT u.user_id,
-      u.user_login,
-      CONCAT(u.user_first_name, ' ', u.user_last_name) AS users_name,
-      u.user_email,
-      r.role_id,
-      r.role_name,
-      l.login_dtm";
+    // Set user status
+    $this->whereArray[] = eq("u.user_status", '1');
+
+    // Check for search
+    if (!empty($params['search'])) {
+      $this->whereArray[] = grouping(
+        like("LOWER(u.user_login)", "%" . strtolower($params['search']) . "%", _OR),
+        like("LOWER(CONCAT(u.user_first_name, ' ' , u.user_last_name))", "%" . strtolower($params['search']) . "%", _OR),
+        like("LOWER(u.user_last_name)", "%" . strtolower($params['search']) . "%", _OR),
+        like("LOWER(u.user_email)", "%" . strtolower($params['search']) . "%", _OR)
+      );
     }
 
-    // Set FROM
-    $this->sql .= " FROM " . DB_PREFIX . "users AS u";
-
-    // Set LEFT JOIN for the user roles
-    $this->sql .= " LEFT JOIN " . DB_PREFIX . "roles AS r ON r.role_id = u.user_role_id";
-
-    // Set LEFT JOIN for the last login
-    $this->sql .= " LEFT JOIN (SELECT login_user_id, MAX(login_dtm) AS login_dtm FROM " . DB_PREFIX . "login_log WHERE login_status = '1' GROUP BY login_user_id) AS l ON l.login_user_id = u.user_id";
-
-    // Set WHERE
-    $this->sql .= " WHERE u.user_status = '1'";
-
-    // Set search
-    if (!empty($params['search'])) {
-      $this->sqlItems[':searchTerm'] = "%" . strtolower($this->conn->dbh->escape($params['search'])) . "%";
-      $this->sql .= " AND (
-      (LOWER(u.user_login) LIKE :searchTerm) OR
-      (LOWER(CONCAT(u.user_first_name, ' ' , u.user_last_name)) LIKE :searchTerm) OR
-      (LOWER(u.user_last_name) LIKE :searchTerm) OR
-      (LOWER(u.user_email) LIKE :searchTerm)
-    )";
+    // Combine where
+    if (!empty($this->whereArray)) {
+      $this->sql[] = where(...$this->whereArray);
     }
 
     // Check for sort
     if (!$countResults && !empty($params['sort']) && !empty($params['order'])) {
-      $this->sql .= " " . orderBy($params['sort'], $params['order']);
-    } else if ($countResults) {
-      $this->sql .= "";
-    } else {
-      $this->sql .= " " . orderBy("user_first_name", "ASC");
+      $this->sql[] = orderBy($params['sort'], $params['order']);
     }
 
     // Check for page number/limit
@@ -160,20 +152,50 @@ class User extends ModelBase
       } else {
         $offset = 0;
       }
-      $this->sql .= " " . limit($params['limit'], $offset);
+      $this->sql[] = limit($params['limit'], $offset);
     }
 
-    // Flush any previous results
-    $this->conn->dbh->flush();
+    // Setup table
+    $this->conn->dbh->tableSetup('users AS u', DB_PREFIX);
 
-    // Run query
-    $this->conn->dbh->query_prepared(
-      $this->sql,
-      $this->sqlItems
-    );
+    if ($countResults) {
+
+      // Run query to count data
+      $userResults = selecting(
+        "COUNT(u.user_id) AS total_results",
+        ...$this->sql
+      );
+    } else {
+
+      // Run query to find data
+      $userResults = selecting(
+        "u.user_id,
+        u.user_login,
+        CONCAT(u.user_first_name, ' ', u.user_last_name) AS users_name,
+        u.user_email,
+        r.role_id,
+        r.role_name,
+        l.login_dtm",
+        leftJoin(
+          "u",
+          DB_PREFIX . "roles",
+          "user_role_id",
+          "role_id",
+          "r"
+        ),
+        leftJoin(
+          "u",
+          "(SELECT login_user_id, MAX(login_dtm) AS login_dtm FROM " . DB_PREFIX . "login_log WHERE login_status = '1' GROUP BY login_user_id)",
+          "user_id",
+          "login_user_id",
+          "l"
+        ),
+        ...$this->sql
+      );
+    }
 
     // Return if results
-    if ($this->conn->dbh->getNum_Rows() > 0) {
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userResults)) {
 
       // Check if wanting the count returned
       if ($countResults) {
@@ -182,9 +204,6 @@ class User extends ModelBase
         return $this->conn->dbh->get_row(NULL)->total_results;
         exit;
       } else { // Wanting to return data
-
-        // Get the results
-        $userResults = $this->conn->dbh->queryResult();
 
         // Return results
         return json_decode(json_encode(array('count' => $this->conn->dbh->getNum_Rows(), 'results' => json_decode(json_encode($userResults)), FALSE)), FALSE);
@@ -207,8 +226,8 @@ class User extends ModelBase
   {
 
     // Run query to find users
-    $usersResults = $this->conn->dbh->selecting(
-      DB_PREFIX . "users",
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
+    $usersResults = selecting(
       "user_id,
       user_display_name,
       user_first_name,
@@ -256,8 +275,8 @@ class User extends ModelBase
   ) {
 
     // Add data
-    $this->conn->dbh->insert(
-      DB_PREFIX . "users",
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
+    inserting(
       array(
         'user_login' => $login,
         'user_display_name' => $displayName,
@@ -315,8 +334,8 @@ class User extends ModelBase
     $roleID = (empty($roleID)) ? NULL : $roleID;
 
     // Add data
-    $this->conn->dbh->update(
-      DB_PREFIX . "users",
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
+    updating(
       array(
         'user_login' => $login,
         'user_display_name' => $displayName,
@@ -356,8 +375,8 @@ class User extends ModelBase
   {
 
     // Run query to find data
-    $roleResults = $this->conn->dbh->selecting(
-      DB_PREFIX . "roles",
+    $this->conn->dbh->tableSetup('roles', DB_PREFIX);
+    $roleResults = selecting(
       "role_id,
       role_name",
       orderBy("role_name", "ASC")
@@ -387,9 +406,9 @@ class User extends ModelBase
     // Make sure the data is valid
     if (!empty($roleID) && is_numeric($roleID)) {
 
-      // Run query to find users group
-      $roleResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "roles",
+      // Get data
+      $this->conn->dbh->tableSetup('roles', DB_PREFIX);
+      $roleResults = selecting(
         "role_name",
         where(
           eq("role_id", $roleID)
@@ -423,8 +442,8 @@ class User extends ModelBase
     if (!empty($userID) && is_numeric($userID)) {
 
       // Run query to find users last successful login
-      $loginResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "login_log",
+      $this->conn->dbh->tableSetup('login_log', DB_PREFIX);
+      $loginResults = selecting(
         "login_dtm",
         where(
           eq("login_user_id", $userID, _AND),

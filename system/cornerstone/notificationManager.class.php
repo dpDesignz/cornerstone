@@ -7,6 +7,17 @@
  * @link		https://github.com/dpDesignz/cornerstone
  */
 
+use function ezsql\functions\{
+  table_setup,
+  selecting,
+  inserting,
+  updating,
+  where,
+  eq,
+  orderBy,
+  limit
+};
+
 /**
  * Notification Manager
  */
@@ -25,6 +36,7 @@ class NotificationManager
   {
     // Create a database connection
     $this->conn = new CornerstoneDBH;
+    $this->conn->dbh->tableSetup('notification', DB_PREFIX);
   }
 
   /**
@@ -39,8 +51,8 @@ class NotificationManager
   public function isDoublicate(Notification $notification)
   {
     // Run query to find if notification already exists
-    $doublicateResults = $this->conn->dbh->selecting(
-      "cs_notification",
+    $this->conn->dbh->tableSetup('notification', DB_PREFIX);
+    $doublicateResults = selecting(
       "noti_id",
       where(
         eq("noti_type", $notification->type()),
@@ -78,8 +90,8 @@ class NotificationManager
       // Notification doesn't exist. Insert.
 
       // Insert the notification
-      $this->conn->dbh->insert(
-        "cs_notification",
+      $this->conn->dbh->tableSetup('notification', DB_PREFIX);
+      inserting(
         array(
           'noti_type' => $notification->type(),
           'noti_content' => json_encode($notification->content()),
@@ -102,9 +114,9 @@ class NotificationManager
       return FALSE;
     } else { // Notification already exists. Set latest notification as unread
 
-      // Update row in `cs_notification`
-      $updateResult = $this->conn->dbh->update(
-        "cs_notification",
+      // Update data
+      $this->conn->dbh->tableSetup('notification', DB_PREFIX);
+      updating(
         array(
           'noti_status' => "0",
           'noti_created_at' => 'NOW()'
@@ -138,9 +150,9 @@ class NotificationManager
    */
   public function countUnread(Notification $notification)
   {
-    // Run query to find if notification already exists
-    $this->conn->dbh->selecting(
-      "cs_notification",
+    // Get data
+    $this->conn->dbh->tableSetup('notification', DB_PREFIX);
+    selecting(
       "noti_id",
       where(
         eq("noti_for_id", $notification->recipient()),
@@ -190,8 +202,8 @@ class NotificationManager
     $this->sql[] = limit($limit, $offset);
 
     // Run query to get results
-    $getResults = $this->conn->dbh->selecting(
-      "cs_notification",
+    $this->conn->dbh->tableSetup('notification', DB_PREFIX);
+    $getResults = selecting(
       "noti_id,
       noti_type,
       noti_content,
@@ -222,9 +234,9 @@ class NotificationManager
    */
   public function markStatus(Notification $notification)
   {
-    // Update row in `cs_notification`
-    $updateResult = $this->conn->dbh->update(
-      "cs_notification",
+    // Update data
+    $this->conn->dbh->tableSetup('notification', DB_PREFIX);
+    updating(
       array(
         'noti_status' => $notification->status(),
         'noti_read_at' => 'NOW()'
@@ -251,9 +263,9 @@ class NotificationManager
    */
   public function markAllStatus(Notification $notification)
   {
-    // Update row in `cs_notification`
-    $updateResult = $this->conn->dbh->update(
-      "cs_notification",
+    // Update data
+    $this->conn->dbh->tableSetup('notification', DB_PREFIX);
+    updating(
       array(
         'noti_status' => $notification->status(),
         'noti_read_at' => 'NOW()'

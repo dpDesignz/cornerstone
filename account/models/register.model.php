@@ -7,6 +7,14 @@
  * @subpackage Mission Equine
  */
 
+use function ezsql\functions\{
+  selecting,
+  inserting,
+  where,
+  eq,
+  like
+};
+
 class Register extends ModelBase
 {
 
@@ -20,6 +28,7 @@ class Register extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
   }
 
   /**
@@ -43,8 +52,8 @@ class Register extends ModelBase
   {
 
     // Run query to find data
-    $customerResults = $this->conn->dbh->selecting(
-      DB_PREFIX . "users",
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
+    $customerResults = selecting(
       "user_id",
       where(
         eq("user_email", $email)
@@ -70,8 +79,8 @@ class Register extends ModelBase
     $loginNameChecked = (!empty($loginRound)) ? $loginName . $loginRound : $loginName;
 
     // Run query to find data
-    $this->conn->dbh->selecting(
-      DB_PREFIX . "users",
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
+    $loginResults = selecting(
       "user_id",
       where(
         eq("user_login", $loginNameChecked)
@@ -79,10 +88,9 @@ class Register extends ModelBase
     );
 
     // Check results
-    if ($this->conn->dbh->getNum_Rows() > 0) {
-      // Check how many logins started with the same number
-      $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($loginResults)) {
+      // Check how many logins started with the same number suffix
+      selecting(
         "user_id",
         where(
           like("user_login", $loginNameChecked . "%")
@@ -119,8 +127,8 @@ class Register extends ModelBase
     $loginName = $this->checkLoginUnique(strtolower($firstName));
 
     // Add data into `me_customer`
-    $insertUsers = $this->conn->dbh->insert(
-      DB_PREFIX . "users",
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
+    inserting(
       array(
         'user_login' => $loginName,
         'user_display_name' => $firstName . " " . $lastName,

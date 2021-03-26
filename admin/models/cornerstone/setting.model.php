@@ -6,6 +6,13 @@
  * @package Cornerstone
  */
 
+use function ezsql\functions\{
+  selecting,
+  updating,
+  where,
+  eq
+};
+
 class Setting extends ModelBase
 {
 
@@ -19,6 +26,7 @@ class Setting extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+    $this->conn->dbh->tableSetup('options', DB_PREFIX);
   }
 
   /**
@@ -34,8 +42,9 @@ class Setting extends ModelBase
     // Check data is valid
     if (!empty($type)) {
 
-      $optionResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "options",
+      // Get data
+      $this->conn->dbh->tableSetup('options', DB_PREFIX);
+      $optionResults = selecting(
         "option_name,
         option_value",
         where(
@@ -68,8 +77,8 @@ class Setting extends ModelBase
   {
 
     // Update row
-    $updateResult = $this->conn->dbh->update(
-      DB_PREFIX . "options",
+    $this->conn->dbh->tableSetup('options', DB_PREFIX);
+    $updateResult = updating(
       array(
         'option_value' => $optionValue,
         'option_edited_id' => $_SESSION['_cs']['user']['uid'],

@@ -7,6 +7,14 @@
  * @link		https://github.com/dpDesignz/cornerstone
  */
 
+use function ezsql\functions\{
+  selecting,
+  leftJoin,
+  where,
+  eq,
+  orderBy
+};
+
 /**
  * Output Content Class
  */
@@ -44,8 +52,8 @@ class OPContent
     if (!empty($menuID) && is_numeric($menuID)) {
 
       // Run query to get results
-      $itemResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_menu AS mi",
+      $this->conn->dbh->tableSetup('content_menu AS mi', DB_PREFIX);
+      $itemResults = selecting(
         "mi.menui_id,
         COALESCE(c.content_type, 0) as content_type,
         mi.menui_content_id,
@@ -164,8 +172,8 @@ class OPContent
 
     // Check data is valid
     if (!empty($faqSectionID) && is_numeric($faqSectionID)) {
-      $sectionData = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_section",
+      $this->conn->dbh->tableSetup('content_section', DB_PREFIX);
+      $sectionData = selecting(
         "section_id,
         section_name",
         where(
@@ -213,8 +221,8 @@ class OPContent
     if (!empty($faqSectionID) && is_numeric($faqSectionID)) {
 
       // Run query to get results
-      $itemResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_faq_section AS fs",
+      $this->conn->dbh->tableSetup('content_faq_section AS fs', DB_PREFIX);
+      $itemResults = selecting(
         "c.content_id,
         c.content_title,
         c.content_content,
@@ -262,8 +270,8 @@ class OPContent
     if (!empty($faqID) && is_numeric($faqID)) {
 
       // Run query to get results
-      $itemResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "content",
+      $this->conn->dbh->tableSetup('content', DB_PREFIX);
+      $itemResults = selecting(
         "content_id,
         content_title,
         content_content,

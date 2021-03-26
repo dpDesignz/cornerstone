@@ -6,6 +6,16 @@
  * @package Cornerstone
  */
 
+use function ezsql\functions\{
+  selecting,
+  inserting,
+  leftJoin,
+  where,
+  eq,
+  neq,
+  like
+};
+
 class CornerstoneCore extends ModelBase
 {
 
@@ -39,8 +49,8 @@ class CornerstoneCore extends ModelBase
     if (!empty($keyword) && is_string($keyword)) {
 
       // Run query to get results
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "seo_url",
+      $this->conn->dbh->tableSetup('seo_url', DB_PREFIX);
+      $results = selecting(
         "*",
         where(
           eq('seo_keyword', $keyword)
@@ -48,7 +58,7 @@ class CornerstoneCore extends ModelBase
       );
 
       // Return if results
-      if ($this->conn->dbh->getNum_Rows() > 0) {
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
 
         // Return results
         return $results[0];
@@ -85,9 +95,9 @@ class CornerstoneCore extends ModelBase
       }
 
       // Run query to find if already exists
-      $this->conn->dbh->selecting(
-        DB_PREFIX . "seo_url",
-        "*",
+      $this->conn->dbh->tableSetup('seo_url', DB_PREFIX);
+      $results = selecting(
+        "seo_id",
         where(
           eq("seo_type", $type, _AND),
           eq("seo_type_id", $typeID, _AND),
@@ -96,7 +106,7 @@ class CornerstoneCore extends ModelBase
       );
 
       // Check if any results
-      if ($this->conn->dbh->getNum_Rows() > 0) {
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
         // Match found. Return TRUE
 
         // Return TRUE
@@ -108,9 +118,8 @@ class CornerstoneCore extends ModelBase
         $newURL = $this->checkUniqueSEO($url, (int) $typeID);
 
         // Run query to find if already exists
-        $this->conn->dbh->selecting(
-          DB_PREFIX . "seo_url",
-          "*",
+        $results = selecting(
+          "seo_id",
           where(
             eq("seo_type", $type, _AND),
             eq("seo_type_id", $typeID, _AND),
@@ -119,7 +128,7 @@ class CornerstoneCore extends ModelBase
         );
 
         // Check if any results
-        if ($this->conn->dbh->getNum_Rows() > 0) {
+        if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
           // Match found. Return TRUE
 
           // Return TRUE
@@ -127,8 +136,7 @@ class CornerstoneCore extends ModelBase
           exit;
         } else { // Doesn't exist. Add it
           // Add data into `cs_seo_url`
-          $this->conn->dbh->insert(
-            DB_PREFIX . "seo_url",
+          inserting(
             array(
               'seo_type' => $type,
               'seo_type_id' => $typeID,
@@ -162,11 +170,11 @@ class CornerstoneCore extends ModelBase
   private function checkUniqueSEO($url, int $typeID = 0)
   {
     // Run query to find if keyword is already being used
-    $this->conn->dbh->selecting(
-      DB_PREFIX . "seo_url",
+    $this->conn->dbh->tableSetup('seo_url', DB_PREFIX);
+    selecting(
       "*",
       where(
-        eq("seo_keyword", $url, _AND),
+        eq("seo_keyword", $url),
         neq("seo_type_id", $typeID)
       )
     );
@@ -176,11 +184,10 @@ class CornerstoneCore extends ModelBase
       // URL is being used. Check how many times
 
       // Run query to find how many times it's being used
-      $this->conn->dbh->selecting(
-        DB_PREFIX . "seo_url",
-        "*",
+      selecting(
+        "seo_id",
         where(
-          like("seo_keyword", $url . "%", _AND),
+          like("seo_keyword", $url . "%"),
           neq("seo_type_id", $typeID)
         )
       );
@@ -265,8 +272,8 @@ class CornerstoneCore extends ModelBase
     if (!empty($contentID) && is_numeric($contentID)) {
 
       // Run query to get results
-      $contentData = $this->conn->dbh->selecting(
-        DB_PREFIX . "content AS c",
+      $this->conn->dbh->tableSetup('content AS c', DB_PREFIX);
+      $contentData = selecting(
         "c.*,
         cs.section_name,
         cs.section_type,
@@ -279,8 +286,8 @@ class CornerstoneCore extends ModelBase
           "cs"
         ),
         where(
-          eq('c.content_id', $contentID, _AND),
-          neq('c.content_status', '0', _AND),
+          eq('c.content_id', $contentID),
+          neq('c.content_status', '0'),
           neq('c.content_status', '3')
         )
       );
@@ -326,8 +333,8 @@ class CornerstoneCore extends ModelBase
     if (!empty($contentID) && is_numeric($contentID)) {
 
       // Run query to get results
-      $results = $this->conn->dbh->selecting(
-        DB_PREFIX . "content_meta",
+      $this->conn->dbh->tableSetup('content_meta', DB_PREFIX);
+      $results = selecting(
         "*",
         where(
           eq('cmeta_content_id', $contentID)

@@ -12,6 +12,10 @@
 // These must be at the top of your script, not inside a function
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use function ezsql\functions\{
+  selecting,
+  eq
+};
 
 class SendMail
 {
@@ -32,19 +36,23 @@ class SendMail
 
       // Load database
       $csMailOptions = new CornerstoneDBH;
+      $this->conn->dbh->tableSetup('options', DB_PREFIX);
 
-      // Get the options from the databse
-      $result = $csMailOptions->dbh->selecting(DB_PREFIX . 'options', array('option_name', 'option_value'), eq('option_type', 'mail'));
+      // Get the options from the database
+      $optionResults = selecting(
+        array('option_name', 'option_value'),
+        eq('option_type', 'mail')
+      );
 
       // Check if any options are available
-      if ($csMailOptions->dbh->getNum_Rows() > 0) {
+      if ($csMailOptions->dbh->getNum_Rows() > 0 && !empty($optionResults)) {
         // Options available
 
         // Create array to return
         $returnArray = array();
 
         // Loop through options to output
-        foreach ($result as $row) {
+        foreach ($optionResults as $row) {
 
           // Set $key=>$value from table
           $returnArray[strtolower($row->option_name)] = trim($row->option_value);

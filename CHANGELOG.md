@@ -1,8 +1,23 @@
 # Cornerstone Change Log
 
-## 0.4.4 - Install Script
+## 0.5.1 - Install Script
 
-- *Coming soon*
+*Coming soon...*
+
+## 0.5.0 - ezSQL v5 (2020-03-26)
+
+### This release includes breaking changes
+
+- 🔄 Updated ezsql/ezsql (4.0.12 => 5.1.1): Extracting archive
+- 🔄 Updated filp/whoops (2.9.2 => 2.11.0): Extracting archive
+- 🔄 Updated guzzlehttp/psr7 (1.7.0 => 1.8.1): Extracting archive
+- 🔄 Updated illuminate/macroable (v8.32.1 => v8.34.0): Extracting archive
+- 🔄 Updated illuminate/contracts (v8.32.1 => v8.34.0): Extracting archive
+- 🔄 Updated illuminate/collections (v8.32.1 => v8.34.0): Extracting archive
+- 🔄 Updated illuminate/support (v8.32.1 => v8.34.0): Extracting archive
+- 🔄 Updated illuminate/filesystem (v8.32.1 => v8.34.0): Extracting archive
+- 🔄 Updated illuminate/cache (v8.32.1 => v8.34.0): Extracting archive
+- 🖊️ Changed the core files to use `ezSQL v5`
 
 ## 0.4.3 - Template + User Accounts (2020-03-19)
 

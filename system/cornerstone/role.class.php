@@ -9,6 +9,13 @@
  * Based on https://www.sitepoint.com/role-based-access-control-in-php/
  */
 
+use function ezsql\functions\{
+  selecting,
+  leftJoin,
+  where,
+  eq
+};
+
 /**
  * User Role Class
  */
@@ -29,6 +36,7 @@ class Role
 
     // Set the database connection
     $this->conn = $cdbh;
+    $this->conn->dbh->tableSetup('roles', DB_PREFIX);
     // Create array in $permissions property
     $this->permissions = array();
     // Set master user to false
@@ -49,8 +57,8 @@ class Role
       // Data is valid
 
       // Get the role permissions
-      $rolePermsResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "role_perms AS rpl",
+      $this->conn->dbh->tableSetup('role_perms AS rpl', DB_PREFIX);
+      $rolePermsResults = selecting(
         "rp.rp_key",
         leftJoin(
           "rpl",
@@ -89,8 +97,8 @@ class Role
       // Data is valid
 
       // Get the role permissions
-      $roleResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "roles",
+      $this->conn->dbh->tableSetup('roles', DB_PREFIX);
+      $roleResults = selecting(
         "role_key",
         where(
           eq('role_id', $roleID)
@@ -147,8 +155,8 @@ class Role
       // Data is valid
 
       // Get the role
-      $userRoleResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $userRoleResults = selecting(
         "user_role_id",
         where(
           eq('user_id', $userID)
@@ -181,8 +189,8 @@ class Role
       // Data is valid
 
       // Get the role
-      $userRoleResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "users AS u",
+      $this->conn->dbh->tableSetup('users AS u', DB_PREFIX);
+      $userRoleResults = selecting(
         "u.user_role_id,
         r.role_key",
         leftJoin(

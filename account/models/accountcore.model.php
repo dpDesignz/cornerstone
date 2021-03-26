@@ -6,6 +6,13 @@
  * @package Cornerstone
  */
 
+use function ezsql\functions\{
+  selecting,
+  updating,
+  where,
+  eq
+};
+
 class AccountCore extends ModelBase
 {
 
@@ -20,6 +27,7 @@ class AccountCore extends ModelBase
   {
     // Load the model base constructor
     parent::__construct($cdbh, $option);
+    $this->conn->dbh->tableSetup('users', DB_PREFIX);
 
     // Set the user ID if available
     if (!empty($_SESSION['_cs']['user']['uid']) && is_numeric($_SESSION['_cs']['user']['uid'])) {
@@ -85,8 +93,8 @@ class AccountCore extends ModelBase
       }
 
       // Run query to find user by email
-      $searchResult = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $searchResult = selecting(
         "user_id",
         ...$this->sql
       );
@@ -115,8 +123,8 @@ class AccountCore extends ModelBase
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
       // Run query to find data
-      $detailsResults = $this->conn->dbh->selecting(
-        DB_PREFIX . "users",
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $detailsResults = selecting(
         "user_id,
         user_first_name,
         user_last_name,
@@ -161,9 +169,9 @@ class AccountCore extends ModelBase
     // Check data is valid
     if (!empty($this->uid) && is_numeric($this->uid)) {
 
-      // Update info in `me_customer`
-      $this->conn->dbh->update(
-        DB_PREFIX . "users",
+      // Update data
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      updating(
         array(
           'user_first_name' => $firstName,
           'user_last_name' => $lastName,
