@@ -1,0 +1,168 @@
+@charset "UTF-8";
+/*########################################
+
+Project:	Cornerstone Framework
+Extends:	Cornerstone Framework Core CSS
+Script:		Cornerstone Framework
+Section:	Install
+Version:	1.0.0
+Last Change:	03/04/2021
+Developed:	dpDesignz - www.dpdesignz.co.nz
+
+#########################################*/
+@import url("//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800");
+
+html {
+  box-sizing: border-box;
+  color: #222;
+  font-size: 1em;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 1.4;
+  scroll-behavior: smooth;  /* https://css-tricks.com/snippets/jquery/smooth-scrolling/ */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+h1,
+h2 {
+  border-bottom: 1px solid #d4d4d4;
+}
+
+body {
+  display: grid;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "cs--body__header"
+    "cs--body__main"
+    "cs--body__footer";
+  min-height: 100vh;
+  background-image: linear-gradient(to bottom right, #d13f2d, #da4230, #8e44ad);
+  transition: all 1s;
+}
+
+body > header {
+  grid-template-columns: 1fr;
+  background-color: transparent;
+  padding: 0;
+  height: unset;
+  border-bottom: none;
+}
+body > header > section#cs--header__logo {
+  width: 100%;
+  min-width: 100vw;
+  text-align: center;
+}
+body > header > section#cs--header__logo img {
+  width: 100%;
+  height: auto;
+  max-width: 350px;
+  text-align: center;
+}
+
+.error {
+  padding: 3px 6px;
+  font-weight: bold;
+  border-left: 3px solid red;
+  border-bottom: 1px solid red;
+}
+.error span {
+  color: red;
+}
+
+body > main {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  align-items: start;
+  background-color: transparent;
+  box-shadow: unset;
+}
+body > main > section#cs--install-container {
+  width: 100vw;
+  max-width: 875px;
+  min-height: 148px;
+  margin-top: 40px;
+  padding: 10px 24px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 16px 24px 2px rgba(0,0,0,.14), 0 6px 30px 5px rgba(0,0,0,.12);
+}
+body > main > section#cs--install-container h3 {
+  margin: 0;
+}
+body > main > section#cs--install-container .install-table {
+  width: 100%;
+  border-spacing: 0 24px;
+}
+body > main > section#cs--install-container .install-table tr th,
+body > main > section#cs--install-container .install-table tr td {
+  vertical-align: top;
+}
+body > main > section#cs--install-container .install-table tr th {
+  width: 150px;
+  text-align: left;
+}
+body > main > section#cs--install-container .install-table tr td {
+  padding: 0 8px;
+}
+body > main > section#cs--install-container .install-table tr td:nth-child(3) {
+  font-size: 0.95rem;
+  color: #32373c;
+}
+
+.step {
+  text-align: right;
+}
+
+.csc-btn {
+  display: inline-flex;
+  border: none;
+  border-radius: 2px;
+  padding: 0 16px;
+  height: 44px;
+  line-height: 44px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  outline: 0;
+  text-decoration: none;
+  color: #000;
+  text-align: center;
+  letter-spacing: 0.5px;
+  background-color: #f0f0f0;
+  transition: background-color 0.2s ease-out;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.csc-btn:focus,
+.csc-btn:hover{
+  color: #fff;
+}
+.csc-btn:focus{
+  background-color: #d13f2d;
+}
+.csc-btn:hover{
+  background-color: #da4230;
+}
+
+body > footer {
+  padding: 0 20px;
+  text-align: left;
+}
+body > footer > p {
+  font-size: 0.7em;
+  color: #eeeeee;
+}
+body > footer > p > span {
+  margin-right: 10px;
+}
+body > footer > p a {
+  color: #eeeeee !important;
+  text-decoration: none !important;
+  font-weight: bold;
+}
