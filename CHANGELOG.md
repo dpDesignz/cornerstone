@@ -1,10 +1,15 @@
 # Cornerstone Change Log
 
+## 0.5.2 - Install Script (2020-04-03)
+
+- ➕ Added database connection test
+- ➕ Added initial role permissions
+
+*TO-DO: Fix rename install folder on completion*
+
 ## 0.5.1 - Install Script (2020-04-03)
 
 - ➕ Added the install script
-
-*TO-DO: Fix connection test and fix rename install folder on completion*
 
 ## 0.5.0 - ezSQL v5 (2020-03-26)
 

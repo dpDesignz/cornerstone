@@ -927,7 +927,7 @@ if ($cdbh->dbh->getNum_Rows() < 1) {
     )
   );
 
-  // Add initial role permission
+  // Add initial role permissions
   $cdbh->dbh->insert(
     DB_PREFIX . "role_permissions",
     array(
@@ -939,6 +939,158 @@ if ($cdbh->dbh->getNum_Rows() < 1) {
     array(
       'rpl_role_id' => '2',
       'rpl_rp_id' => '1'
+    )
+  );
+  // Settings
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_core_settings'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_mail_settings'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_security_settings'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_site_settings'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_addon_settings'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_log_settings'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_php_info'
+    )
+  );
+  // Users
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'add_user'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_user'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_user'
+    )
+  );
+  // Roles
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'add_user_role'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_user_role'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_user_role'
+    )
+  );
+  // Sections
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'add_section'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_section'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_section'
+    )
+  );
+  // Menu
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_menu'
+    )
+  );
+  // FAQ
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'add_faq'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_faq'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_faq'
+    )
+  );
+  // FAQ Section
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_faq_section'
+    )
+  );
+  // Page
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'add_page'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'view_page'
+    )
+  );
+  $cdbh->dbh->insert(
+    DB_PREFIX . "role_permissions",
+    array(
+      'rp_key' => 'edit_page'
     )
   );
 

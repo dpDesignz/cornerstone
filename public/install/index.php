@@ -171,6 +171,18 @@ $errorNo = isset($_GET['error']) ? (int) $_GET['error'] : 0; ?>
             unset($csdb);
             $csdb = new CornerstoneDBH;
 
+            // Test connection
+            try {
+              $this->dbh->connect();
+            } catch (\Throwable $th) {
+              echo '<p class="error"><span>ERROR:</span> There was an issue with your database details.</p><p><a href="?step=1" onclick="javascript:history.go(-1);return false;" class="csc-btn">Try Again</a></p>';
+              exit;
+            }
+            if (!$this->dbh->isConnected()) {
+              echo '<p class="error"><span>ERROR:</span> There was an issue with your database details.</p><p><a href="?step=1" onclick="javascript:history.go(-1);return false;" class="csc-btn">Try Again</a></p>';
+              exit;
+            }
+
             // Build the cs-config file
             foreach ($config_file as $line_num => $line) {
 
