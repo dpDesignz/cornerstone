@@ -15,7 +15,10 @@ $pageMetaCanonical = $data->action_url;
 $pageMetaType = "website";
 
 // Set any page injected values
-$pageHasForm = TRUE;
+$loadScripts = array(
+  'validate',
+  'chosen'
+);
 $pageHeadExtras = '
 <style>
   #submit-disabled {display: none;}

@@ -6,7 +6,7 @@ if (file_exists('../system/cs-config.php')) {
 
 // Redirect to Installer if config didn't load
 if (!file_exists('../system/cs-config.php') || !defined('DIR_PUBLIC')) {
-  header('Location: /install/');
+  header('Location: ./install/');
   exit;
 }
 

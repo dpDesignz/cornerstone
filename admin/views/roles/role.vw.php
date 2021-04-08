@@ -14,7 +14,10 @@ $pageMetaCanonical = $data->action_url;
 $pageMetaType = "website";
 
 // Set any page injected values
-$pageHasForm = TRUE;
+$loadScripts = array(
+  'validate',
+  'chosen'
+);
 $pageHeadExtras = '';
 $pageFooterExtras = '<script>
   $("#permissions").chosen({

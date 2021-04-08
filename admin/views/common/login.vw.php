@@ -15,7 +15,9 @@ $pageMetaCanonical = get_site_url('/admin/login');
 $pageMetaType = "website";
 
 // Set any page injected values
-$pageHasForm = TRUE;
+$loadScripts = array(
+  'validate'
+);
 $pageHeadExtras = '<link href="' . get_site_url('admin-files/css/user-forms.css?v=' . str_replace(' ', '', trim($option->get('site_version')))) . '" rel="stylesheet" type="text/css">';
 $pageFooterExtras = '';
 

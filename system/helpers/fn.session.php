@@ -39,7 +39,7 @@ ini_set('session.use_only_cookies', 1);
 # Force transparent sid support to 0 to prevent exposed ids
 ini_set('session.use_trans_sid', 0);
 # Set the cookie domain to the root so it can be accessed across sub-domains
-ini_set('session.cookie_domain', str_replace('www', '', $option->get('site_url')));
+ini_set('session.cookie_domain', str_replace('www', '', rtrim(str_replace(get_site_subfolder(), '', $option->get('site_url')), '/')));
 # Set a custom session name
 session_name('CSSESSID');
 # Load the session class

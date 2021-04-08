@@ -487,7 +487,7 @@ if ($cdbh->dbh->getNum_Rows() < 1) {
   ADD CONSTRAINT `cs_roles_ibfk_1` FOREIGN KEY (`role_edited_id`) REFERENCES `cs_users` (`user_id`);", array());
 
   // Indexes for role permission links table
-  $cdbh->dbh->query_prepared("ALTER TABLE `" . DB_PREFIX . "role_perms`
+  $cdbh->dbh->query_prepared("ALTER TABLE `" . DB_PREFIX . "role_permissions`
   ADD CONSTRAINT `cs_role_perms_ibfk_1` FOREIGN KEY (`rpl_role_id`) REFERENCES `cs_roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `cs_role_perms_ibfk_2` FOREIGN KEY (`rpl_rp_id`) REFERENCES `cs_role_permissions` (`rp_id`) ON DELETE CASCADE ON UPDATE CASCADE;", array());
 
@@ -1124,7 +1124,6 @@ if ($cdbh->dbh->getNum_Rows() < 1) {
       'content_content' => '<p>Welcome to <strong>Cornerstone</strong>. This is your first page. Edit or delete it, it\'s up to you. Enjoy creating!</p>',
       'content_status' => 1,
       'content_type' => 0,
-      'content_section_id' => 1,
       'content_sort_order' => 0,
       'content_show_updated' => 0,
       'content_added_id' => 1,

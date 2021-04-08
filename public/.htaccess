@@ -1,6 +1,7 @@
 <IfModule mod_rewrite.c>
     Options -Multiviews
     RewriteEngine On
+    # CHANGE THIS LINE BELOW TO INCLUDE YOUR SUBFOLDER
     RewriteBase /public
     # Don't Redirect Existing Directory
     RewriteCond %{REQUEST_FILENAME} !-d

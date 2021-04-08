@@ -12,7 +12,7 @@
     "vendor-dir": "./system/storage/vendor/"
   },
   "require": {
-    "ezsql/ezsql": "^4.0",
+    "ezsql/ezsql": "^5.0",
     "whichbrowser/parser": "^2.0",
     "phpmailer/phpmailer": "^6.0",
     "paragonie/random_compat": ">=2",

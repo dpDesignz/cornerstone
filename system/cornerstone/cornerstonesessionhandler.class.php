@@ -34,7 +34,7 @@ class CornerstoneSessionHandler implements SessionHandlerInterface
     $this->conn = new CornerstoneDBH;
     $this->conn->dbh->tableSetup('session', DB_PREFIX);
 
-    // Set the handler to overide SESSION
+    // Set the handler to override SESSION
     session_set_save_handler(
       array($this, "open"),
       array($this, "close"),

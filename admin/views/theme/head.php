@@ -16,7 +16,7 @@
   <meta property="og:image" content="<?php echo $pageMetaImage; ?>">
   <meta property="og:url" content="<?php echo $pageMetaCanonical; ?>">
   <!-- Add Additional Open Graph / Facebook Info -->
-  <meta property="og:site_name" content="<?php echo SITE_NAME; ?>">
+  <meta property="og:site_name" content="<?php echo $data->site_name; ?>">
   <meta property="og:locale" content="en_NZ">
   <!-- Add Icons -->
   <link rel="apple-touch-icon" sizes="180x180" href="<?php echo get_site_url('admin-files/apple-touch-icon.png'); ?>">
@@ -42,12 +42,16 @@
   <?php } ?>
   <!-- Toastify ~ https://apvarun.github.io/toastify-js/ -->
   <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <?php if (!empty($pageHasForm) && $pageHasForm === TRUE) : ?>
-    <!-- Chosen ~ https://harvesthq.github.io/chosen/ -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
-    <!-- Trumbowyg ~ https://alex-d.github.io/Trumbowyg/ -->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.19.1/ui/trumbowyg.min.css" integrity="sha256-iS3knajmo8cvwnS0yrVDpNnCboUEwZMJ6mVBEW1VcSA=" crossorigin="anonymous" />
-  <?php endif; ?>
+  <?php if (!empty($loadScripts) && is_array($loadScripts)) :
+    if (in_array("chosen", $loadScripts)) { ?>
+      <!-- Chosen ~ https://harvesthq.github.io/chosen/ -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
+    <?php }
+    if (in_array("trumbowyg", $loadScripts)) { ?>
+      <!-- Trumbowyg ~ https://alex-d.github.io/Trumbowyg/ -->
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.19.1/ui/trumbowyg.min.css" integrity="sha256-iS3knajmo8cvwnS0yrVDpNnCboUEwZMJ6mVBEW1VcSA=" crossorigin="anonymous" />
+  <?php }
+  endif; ?>
   <!-- Perfect Scrollbar ~ https://github.com/mdbootstrap/perfect-scrollbar -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.4.0/css/perfect-scrollbar.min.css">
   <!-- Site Styling -->

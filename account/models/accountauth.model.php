@@ -865,7 +865,7 @@ class AccountAuth extends ModelBase
       '',
       1,
       "/",
-      str_replace('www', '', $this->optn->get('site_url')),
+      str_replace('www', '', rtrim(str_replace(get_site_subfolder(), '', $this->optn->get('site_url')), '/')),
       $setSSL,
       true
     );

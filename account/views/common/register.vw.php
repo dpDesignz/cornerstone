@@ -15,7 +15,9 @@ $pageMetaCanonical = get_site_url('account/register');
 $pageMetaType = "website";
 
 // Set any page injected values
-$pageHasForm = TRUE;
+$loadScripts = array(
+  'validate'
+);
 $pageBodyClassID = 'class="cs-page cs-components cs-account"';
 $pageHeadExtras = '';
 $pageFooterExtras = '';
@@ -34,7 +36,7 @@ require(get_theme_path('layout.php')); ?>
     margin-bottom: 0;
   }
 </style>
-<div id="content">
+<div id="cs-main">
   <nav class="csc-breadcrumbs" aria-label="Breadcrumb">
     <?php
     // Check for and output breadcrumbs

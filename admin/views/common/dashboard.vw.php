@@ -8,9 +8,9 @@
  */
 
 // Set the meta/og information for the page
-$pageMetaTitle = "Dashboard | " . SITE_NAME . " Admin";
-$pageMetaDescription = SITE_NAME . " admin dashboard.";
-$pageMetaImage = get_site_url('img/cornerstone_framework_logo_white.png');
+$pageMetaTitle = "Dashboard | " . $data->site_name . " Admin";
+$pageMetaDescription = $data->site_name . " admin dashboard.";
+$pageMetaImage = get_site_url('admin-files/img/site_logo.png');
 $pageMetaCanonical = get_site_url('admin/dashboard');
 $pageMetaType = "website";
 

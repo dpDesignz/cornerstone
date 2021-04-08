@@ -14,7 +14,10 @@ $pageMetaCanonical = get_site_url('admin/settings/security');
 $pageMetaType = "website";
 
 // Set any page injected values
-$pageHasForm = TRUE;
+$loadScripts = array(
+  'validate',
+  'chosen'
+);
 $pageHeadExtras = '';
 $pageFooterExtras = '<script>
   // Bind values chosen

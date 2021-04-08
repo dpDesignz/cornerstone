@@ -189,7 +189,7 @@ body.cs-admin > aside#sidebar__main {
   grid-area: cs--body__sidebar;
   position: relative;
   width: 100%;
-  background: transparent url("/admin-files/img/menu_bg.jpg") center center no-repeat;
+  background: transparent url("../img/menu_bg.jpg") center center no-repeat;
   background-size: cover;
   box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.8);
 }

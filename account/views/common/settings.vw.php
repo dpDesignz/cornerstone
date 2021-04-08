@@ -15,13 +15,13 @@ $pageMetaCanonical = get_site_url('account/settings');
 $pageMetaType = "website";
 
 // Set any page injected values
-$pageHasForm = TRUE;
+$loadScripts = array(
+  'validate',
+  'chosen'
+);
 $pageBodyClassID = 'class="cs-page cs-components cs-account"';
-$pageHeadExtras = '<!-- Chosen ~ https://harvesthq.github.io/chosen/ -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">';
-$pageFooterExtras = '<!-- Chosen ~ https://harvesthq.github.io/chosen/ -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js" integrity="sha256-c4gVE6fn+JRKMRvqjoDp+tlG4laudNYrXI1GncbfAYY=" crossorigin="anonymous"></script>
-<script>
+$pageHeadExtras = '';
+$pageFooterExtras = '<script>
   $("#title, #default_address_id, #default_payment_id").chosen({
     disable_search_threshold: 10,
     no_results_text: "Sorry, nothing was found matching",
@@ -37,7 +37,7 @@ require(get_theme_path('head.php'));
 require(get_theme_path('layout.php')); ?>
 
 <!-- End Header ~#~ Start Content -->
-<div id="content">
+<div id="cs-main">
   <nav class="csc-breadcrumbs" aria-label="Breadcrumb">
     <?php
     // Check for and output breadcrumbs

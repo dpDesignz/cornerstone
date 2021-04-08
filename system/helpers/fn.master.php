@@ -13,7 +13,7 @@
  */
 function redirectTo($path)
 {
-	header('location: ' . get_site_url() . ltrim($path, '/'));
+	header('location: ' . get_site_url() . ltrim(str_replace(get_site_subfolder(), '', $path), '/'));
 }
 
 /**
@@ -50,6 +50,17 @@ function get_site_url($filePath = '')
 	$siteSSL = (SITE_HTTPS) ? 'https://' : 'http://';
 
 	return (isset($filePath) && !empty($filePath) && is_string($filePath)) ? $siteSSL . SITE_URL . '/' . ltrim($filePath, '/') : $siteSSL . SITE_URL . '/';
+}
+
+/**
+ * Get the site subfolder
+ *
+ * @return string The site subfolder if it exists
+ */
+function get_site_subfolder()
+{
+	// Parse the URL
+	return trim(parse_url(get_site_url())['path'], '/');
 }
 
 /**

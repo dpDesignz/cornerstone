@@ -14,7 +14,10 @@ $pageMetaCanonical = get_site_url('admin/settings/add-on');
 $pageMetaType = "website";
 
 // Set any page injected values
-$pageHasForm = TRUE;
+$loadScripts = array(
+  'validate',
+  'chosen'
+);
 $pageHeadExtras = '';
 $pageFooterExtras = '';
 $currentNav = 'settings';

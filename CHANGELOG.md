@@ -1,5 +1,16 @@
 # Cornerstone Change Log
 
+## 0.5.4 - Core Fixes (2020-04-09)
+
+- 🖊️ Changed how scripts load in the footer to use a `$loadScripts` array
+- 🖊️ Changed how session handling works to allow subdomain support
+- 🧹 Fixed account page styling
+
+## 0.5.3 - Core Fixes (2020-04-04)
+
+- 🧹 Fixed bugs with subfolder support
+- 🧹 Fixed bug with creating the initial tables in the install script
+
 ## 0.5.2 - Install Script (2020-04-03)
 
 - ➕ Added database connection test

@@ -11323,20 +11323,21 @@ body.cs-page > #cs-footer {
   grid-template-columns: 1fr;
 }
 
-body.cs-account #content {
+body.cs-account #cs-main {
+  display: block;
   background-color: #F8F8F8;
 }
-body.cs-account #content h3, body.cs-account #content h4, body.cs-account #content h5, body.cs-account #content h6, body.cs-account #content p {
+body.cs-account #cs-main h3, body.cs-account #cs-main h4, body.cs-account #cs-main h5, body.cs-account #cs-main h6, body.cs-account #cs-main p {
   margin-top: 0;
 }
-body.cs-account #content .csc-breadcrumbs {
+body.cs-account #cs-main .csc-breadcrumbs {
   padding-top: 0.65rem;
   padding-left: 11px;
   margin-bottom: 20px;
   background-color: whitesmoke;
   border-bottom: none;
 }
-body.cs-account #content .csc-breadcrumbs .csc-breadcrumb {
+body.cs-account #cs-main .csc-breadcrumbs .csc-breadcrumb {
   font-size: 0.825em;
   color: #616161;
   letter-spacing: 0;

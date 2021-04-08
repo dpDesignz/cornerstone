@@ -6,9 +6,8 @@
  * Allows for some configuration in the cs-config.php
  *
  * @package Cornerstone
- * @version 0.2.19
  * @author Damien Peden <support@dpdesignz.co>
- * @copyright 2019-2020 dpDesignz. All Rights Reserved
+ * @copyright dpDesignz. All Rights Reserved
  * @license This script can be used FREE of charge for any commercial or personal projects. Enjoy!
  * - LIMITATIONS
  * --- This script cannot be sold.

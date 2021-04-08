@@ -50,15 +50,15 @@ $errorNo = isset($_GET['error']) ? (int) $_GET['error'] : 0; ?>
   <meta name="robots" content="noindex,nofollow" />
   <title>Cornerstone Install</title>
   <!-- Site Styling -->
-  <link href="/install/normalize.css" rel="stylesheet" type="text/css">
-  <link href="/install/install.css" rel="stylesheet" type="text/css">
+  <link href="./normalize.css" rel="stylesheet" type="text/css">
+  <link href="./install.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
   <!-- Start Header -->
   <header>
     <section id="cs--header__logo">
-      <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website"><img src="/img/cornerstone/cornerstone_framework_logo_white.svg" alt="Cornerstone PHP Framework"></a>
+      <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework Website"><img src="../img/cornerstone/cornerstone_framework_logo_white.svg" alt="Cornerstone PHP Framework"></a>
     </section>
   </header>
   <!-- End Header ~#~ Start Main -->
@@ -173,13 +173,13 @@ $errorNo = isset($_GET['error']) ? (int) $_GET['error'] : 0; ?>
 
             // Test connection
             try {
-              $this->dbh->connect();
+              $csdb->dbh->connect();
             } catch (\Throwable $th) {
               echo '<p class="error"><span>ERROR:</span> There was an issue with your database details.</p><p><a href="?step=1" onclick="javascript:history.go(-1);return false;" class="csc-btn">Try Again</a></p>';
               exit;
             }
-            if (!$this->dbh->isConnected()) {
-              echo '<p class="error"><span>ERROR:</span> There was an issue with your database details.</p><p><a href="?step=1" onclick="javascript:history.go(-1);return false;" class="csc-btn">Try Again</a></p>';
+            if (!$csdb->dbh->isConnected()) {
+              echo '<p class="error"><span>ERROR:</span> There was an error connecting to your database. Your credentials may be incorrect.</p><p><a href="?step=1" onclick="javascript:history.go(-1);return false;" class="csc-btn">Try Again</a></p>';
               exit;
             }
 
@@ -231,7 +231,7 @@ $errorNo = isset($_GET['error']) ? (int) $_GET['error'] : 0; ?>
             }
           } else {
             // Redirect to the first step
-            header('Location: /install/?error=101');
+            header('Location: ./?error=101');
             exit;
           }
           ?>
@@ -246,7 +246,7 @@ $errorNo = isset($_GET['error']) ? (int) $_GET['error'] : 0; ?>
             require_once(DIR_SYSTEM . 'cs-config.php');
           } else {
             // Redirect to the first step
-            header('Location: /install/?error=101');
+            header('Location: ./?error=101');
             exit;
           }
 

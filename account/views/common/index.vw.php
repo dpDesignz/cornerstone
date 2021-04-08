@@ -25,7 +25,7 @@ require(get_theme_path('head.php'));
 require(get_theme_path('layout.php')); ?>
 
 <!-- End Header ~#~ Start Content -->
-<div id="content">
+<div id="cs-main">
   <nav class="csc-breadcrumbs" aria-label="Breadcrumb">
     <?php
     // Check for and output breadcrumbs
