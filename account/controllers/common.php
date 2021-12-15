@@ -3,7 +3,7 @@
 /**
  * User Account Common Controller Class
  */
-class Common extends Controller
+class Common extends Cornerstone\Controller
 {
 
   /**
@@ -228,7 +228,7 @@ class Common extends Controller
               if ($userEmail = $this->passwordModel->getUserEmail()) {
 
                 // Load SendMail Class
-                $sendMail = new \SendMail();
+                $sendMail = new Cornerstone\SendMail();
 
                 // Set the HTML message from the template
                 if ($message = $sendMail->createEmailTemplate(
@@ -473,7 +473,7 @@ class Common extends Controller
             $emailSent = ' but your login details were unable to be emailed to you';
 
             // Load SendMail Class
-            $sendMail = new \SendMail();
+            $sendMail = new Cornerstone\SendMail();
 
             // Set the HTML message from the template
             if ($message = $sendMail->createEmailTemplate(
@@ -654,7 +654,7 @@ class Common extends Controller
               if ($userEmail = $this->authModel->getUserEmail()) {
 
                 // Load SendMail Class
-                $sendMail = new \SendMail();
+                $sendMail = new Cornerstone\SendMail();
 
                 // Set the HTML message from the template
                 if ($message = $sendMail->createEmailTemplate(

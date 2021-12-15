@@ -118,8 +118,9 @@ require(get_theme_path('layout.php', 'admin')); ?>
       <div class="csc-row">
         <div class="csc-col csc-col12 csc-input-field">
           <select name="setting[smtp_secure][set]" id="smtp_secure" tabindex="6" data-placeholder="Set SMTP Secure">
-            <option value="TRUE" <?php if (!empty($data->set_smtp_secure) && $data->set_smtp_secure == "TRUE") echo 'selected'; ?>>True</option>
-            <option value="FALSE" <?php if (empty($data->set_smtp_secure) || $data->set_smtp_secure == "FALSE") echo 'selected'; ?>>False</option>
+            <option value="" <?php if (empty($data->set_smtp_secure)) echo 'selected'; ?>>None</option>
+            <option value="tls" <?php if (!empty($data->set_smtp_secure) && $data->set_smtp_secure == "tls") echo 'selected'; ?>>STARTTLS</option>
+            <option value="ssl" <?php if (empty($data->set_smtp_secure) || $data->set_smtp_secure == "ssl") echo 'selected'; ?>>SMTPS</option>
           </select>
           <label>SMTP Secure</label>
         </div>

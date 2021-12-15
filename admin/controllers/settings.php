@@ -1,5 +1,5 @@
 <?php
-class Settings extends Controller
+class Settings extends Cornerstone\Controller
 {
 
   /**

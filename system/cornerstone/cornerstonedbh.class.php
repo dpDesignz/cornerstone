@@ -1,5 +1,7 @@
 <?php
 
+namespace Cornerstone;
+
 /**
  * Cornerstone DB Connection using ezSQL
  *
@@ -12,7 +14,7 @@
 // ** Load ezSQL Database Class ** //
 use ezsql\Database;
 
-class CornerstoneDBH extends ezsql\Database
+class CornerstoneDBH extends Database
 {
 
   // Set the properties

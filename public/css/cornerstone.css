@@ -595,6 +595,15 @@ body.cs-page {
   grid-template-rows: auto 1fr auto;
   grid-template-areas: "cs--body__header" "cs--body__main" "cs--body__footer";
 }
+body.cs-page .csc-container {
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  min-height: 148px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+}
 body.cs-page .csc-wrapper {
   margin: 0 auto;
   width: 100%;
@@ -609,15 +618,6 @@ body.cs-page .csc-wrapper {
   body.cs-page .csc-wrapper {
     max-width: 70%;
   }
-}
-body.cs-page .csc-container {
-  position: relative;
-  width: 100%;
-  max-width: 100vw;
-  min-height: 148px;
-  background-color: #fff;
-  border-radius: 2px;
-  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
 }
 body.cs-page .paper {
   padding: 20px;
@@ -6845,7 +6845,7 @@ body.cs-component__data-tables .csc-data-table td#no-results {
 body.cs-components .blocker,
 body.cs-component__dialogs .blocker {
   position: fixed;
-  z-index: 1;
+  z-index: 10;
   top: 0;
   right: 0;
   bottom: 0;

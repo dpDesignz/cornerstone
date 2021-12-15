@@ -19,7 +19,7 @@ use function ezsql\functions\{
   limit
 };
 
-class User extends ModelBase
+class User extends Cornerstone\ModelBase
 {
 
   // Set the default properties

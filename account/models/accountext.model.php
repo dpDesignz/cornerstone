@@ -7,7 +7,7 @@
  * @subpackage Mission Equine
  */
 
-class AccountExt extends ModelBase
+class AccountExt extends Cornerstone\ModelBase
 {
 
   // Set the default properties

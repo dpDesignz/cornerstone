@@ -1,10 +1,13 @@
 # Cornerstone Change Log
 
-## 0.5.4 - Core Fixes (2020-04-09)
+## 0.5.4 - Core Fixes (2020-04-09 to 2020-04-23)
 
 - 🖊️ Changed how scripts load in the footer to use a `$loadScripts` array
 - 🖊️ Changed how session handling works to allow subdomain support
 - 🧹 Fixed account page styling
+- 🧹 Fixed a bug with the remember me cookie not setting
+- 🧹 Fixed a bug when adding a user wouldn't send the password
+- 🖊️ Changed how SMTP Secure is handled in PHP Mailer to be security type, not boolean
 
 ## 0.5.3 - Core Fixes (2020-04-04)
 

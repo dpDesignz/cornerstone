@@ -13,7 +13,7 @@ use function ezsql\functions\{
   eq
 };
 
-class Setting extends ModelBase
+class Setting extends Cornerstone\ModelBase
 {
 
   // Set the default properties

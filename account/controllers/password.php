@@ -1,5 +1,8 @@
 <?php
-class Password extends Controller
+
+use Cornerstone\SendMail;
+
+class Password extends Cornerstone\Controller
 {
 
   /**
@@ -95,7 +98,7 @@ class Password extends Controller
               }
 
               // Load SendMail Class
-              $sendMail = new \SendMail();
+              $sendMail = new SendMail();
 
               // Set the HTML message from the template
               if ($message = $sendMail->createEmailTemplate(
@@ -162,7 +165,7 @@ class Password extends Controller
           }
 
           // Load SendMail Class
-          $sendMail = new \SendMail();
+          $sendMail = new SendMail();
 
           // Set the HTML message from the template
           if ($message = $sendMail->createEmailTemplate(
@@ -387,7 +390,7 @@ class Password extends Controller
             if ($userEmail = $this->passwordModel->getUserEmail()) {
 
               // Load SendMail Class
-              $sendMail = new \SendMail();
+              $sendMail = new SendMail();
 
               // Set the HTML message from the template
               if ($message = $sendMail->createEmailTemplate(

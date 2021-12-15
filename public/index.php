@@ -11,4 +11,4 @@ if (!file_exists('../system/cs-config.php') || !defined('DIR_PUBLIC')) {
 }
 
 // Init Core Library
-$init = new Core($registry);
+$init = new Cornerstone\Core($registry);

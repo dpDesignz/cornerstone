@@ -43,7 +43,7 @@ ini_set('session.cookie_domain', str_replace('www', '', rtrim(str_replace(get_si
 # Set a custom session name
 session_name('CSSESSID');
 # Load the session class
-new CornerstoneSessionHandler();
+new Cornerstone\CornerstoneSessionHandler();
 # Start the session if it's not already started
 if (session_status() == PHP_SESSION_NONE) {
   session_start();
@@ -200,11 +200,11 @@ function userPageProtect($logout = FALSE)
       $userAuth = $loader->model('accountauth', 'account');
 
       // Check if the cookie is expired
-      if ($userID = $userAuth->checkAuthCookie()) {
+      if ($userID = $userAuth->checkAuthCookie(FALSE)) {
         // Cookie is valid
 
         // Set user ID
-        $userAuth->setUID($userID);
+        $userAuth->setUserID($userID);
 
         // Authenticate user
         $userAuth->authenticateUser();

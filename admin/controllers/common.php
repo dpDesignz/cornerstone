@@ -1,5 +1,5 @@
 <?php
-class Common extends Controller
+class Common extends Cornerstone\Controller
 {
 
   /**

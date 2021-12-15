@@ -1,5 +1,7 @@
 <?php
 
+namespace Cornerstone;
+
 /**
  * Cornerstone DB Session Handler Class
  *
@@ -17,7 +19,7 @@ use function ezsql\functions\{
   lt
 };
 
-class CornerstoneSessionHandler implements SessionHandlerInterface
+class CornerstoneSessionHandler implements \SessionHandlerInterface
 {
 
   // Set database connection property

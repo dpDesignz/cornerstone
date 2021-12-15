@@ -1,6 +1,6 @@
 <?php
 
-class Pages extends Controller
+class Pages extends Cornerstone\Controller
 {
 
   /**
@@ -32,7 +32,7 @@ class Pages extends Controller
       ),
       array(
         'text' => 'Pages',
-        'href' => get_site_url('admin/pages')
+        'href' => get_site_url('admin/pages/')
       )
     );
   }
@@ -82,7 +82,7 @@ class Pages extends Controller
       $dataListOut = '';
 
       // Set the pagination
-      $pagination = new Pagination;
+      $pagination = new Cornerstone\Pagination;
       $pagination->set_props((int) $this->data['totalResults'], (int) $this->params['page'], (int) $this->params['limit']);
       $this->data['pagination'] = $pagination->render();
 

@@ -25,9 +25,10 @@ $adminSidebarCustomMenu = array(
         'href' => get_site_url('admin/pages')
       ),
       array(
-        'identifier' => 'media',
-        'text' => 'Media Manager',
-        'href' => ''
+        'permission' => 'view_files',
+        'identifier' => 'filemanager',
+        'text' => 'File Manager',
+        'href' => get_site_url('admin/files/')
       ),
       array(
         'permission' => 'view_faq',

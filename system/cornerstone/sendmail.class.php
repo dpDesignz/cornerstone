@@ -1,5 +1,7 @@
 <?php
 
+namespace Cornerstone;
+
 /**
  * Mail Class
  * Used for generating and sending emails.
@@ -159,14 +161,14 @@ class SendMail
    *
    * @link For plain text conversion, check out http://www.webtoolhub.com/tn561393-html-to-text-converter.aspx
    */
-  public function sendPHPMail($replyToEmail = '', $from = ADMIN_EMAIL, $fromName = SITE_NAME, $to, $toName = '', $subject, $htmlMessage = '', $textMessage = '', $ccArray = '')
+  public function sendPHPMail($replyToEmail = '', $from = \ADMIN_EMAIL, $fromName = \SITE_NAME, $to, $toName = '', $subject, $htmlMessage = '', $textMessage = '', $ccArray = '')
   {
     // Set Default Options
     if (empty($toName)) {
       $toName = $to;
     }
     if (empty($subject)) {
-      $subject = "An Email from " . SITE_NAME;
+      $subject = "An Email from " . \SITE_NAME;
     }
     if (empty($replyToEmail)) {
       $replyToEmail = $from;
@@ -184,7 +186,16 @@ class SendMail
         $mail->SMTPAuth = $this->mailOptions->smtp_auth;  // Enable SMTP authentication
         $mail->Username = $this->mailOptions->smtp_username;  // SMTP username
         $mail->Password = $this->mailOptions->smtp_password;    // SMTP password
-        $mail->SMTPSecure = $this->mailOptions->smtp_secure;  // Enable encryption, 'ssl' also ac
+        if (!empty($this->mailOptions->smtp_secure)) {  // Enable encryption
+          switch (strtolower($this->mailOptions->smtp_secure)) {
+            case 'tls':
+              $mail->SMTPSecure = 'tls';
+              break;
+            case 'smtps':
+              $mail->SMTPSecure = 'ssl';
+              break;
+          }
+        }
         $mail->Port = $this->mailOptions->smtp_port;    // SMTP Port
         // Set Email Values
         $mail->setFrom($from, $fromName); // Set "From" Email & Name
@@ -280,14 +291,14 @@ class SendMail
    *
    * @link For plain text conversion, check out http://www.webtoolhub.com/tn561393-html-to-text-converter.aspx
    */
-  public function sendSwiftmail($replyToEmail = '', $from = ADMIN_EMAIL, $fromName = SITE_NAME, $to, $toName = '', $subject, $htmlMessage = '', $textMessage = '', $ccArray = '')
+  public function sendSwiftmail($replyToEmail = '', $from = \ADMIN_EMAIL, $fromName = \SITE_NAME, $to, $toName = '', $subject, $htmlMessage = '', $textMessage = '', $ccArray = '')
   {
     // Set Default Options
     if (empty($toName)) {
       $toName = $to;
     }
     if (empty($subject)) {
-      $subject = "An Email from " . SITE_NAME;
+      $subject = "An Email from " . \SITE_NAME;
     }
     if (empty($replyToEmail)) {
       $replyToEmail = $from;
@@ -357,7 +368,7 @@ class SendMail
 
         // Add generic options to array
         $arrayReplace['site_url'] = get_site_url();
-        $arrayReplace['site_name'] = SITE_NAME;
+        $arrayReplace['site_name'] = \SITE_NAME;
         $arrayReplace['support_url'] = get_site_url('support');
         $arrayReplace['current_year'] = date('Y');
 

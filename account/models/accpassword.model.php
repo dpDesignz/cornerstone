@@ -17,7 +17,7 @@ use function ezsql\functions\{
   gt
 };
 
-class AccPassword extends ModelBase
+class AccPassword extends Cornerstone\ModelBase
 {
 
   // Set the default properties

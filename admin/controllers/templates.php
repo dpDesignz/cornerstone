@@ -1,5 +1,5 @@
 <?php
-class Templates extends Controller
+class Templates extends Cornerstone\Controller
 {
 
   /**

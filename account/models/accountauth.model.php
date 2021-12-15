@@ -19,7 +19,7 @@ use function ezsql\functions\{
   limit
 };
 
-class AccountAuth extends ModelBase
+class AccountAuth extends Cornerstone\ModelBase
 {
 
   // Set the default properties
@@ -726,7 +726,7 @@ class AccountAuth extends ModelBase
         $random_key . '.' . bin2hex($random_password),
         $cookie_expiration->format('U'),
         "/",
-        str_replace('www', '', $this->optn->get('site_url')),
+        str_replace('www', '', rtrim(str_replace(get_site_subfolder(), '', $this->optn->get('site_url')), '/')),
         $setSSL,
         true
       );
@@ -892,7 +892,6 @@ class AccountAuth extends ModelBase
       // Delete cookie information from database
       $this->conn->dbh->tableSetup('auth_cookie', DB_PREFIX);
       if (deleting(
-        DB_PREFIX . 'auth_cookie',
         eq('cookie_key', $cookieKey)
       )) {
 

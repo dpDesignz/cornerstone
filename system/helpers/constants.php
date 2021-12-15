@@ -13,7 +13,7 @@ use function ezsql\functions\{
 };
 
 // Load options from `cs_options` table where `autoload` is `true`
-$csOptions = new CornerstoneDBH; // Init db connection
+$csOptions = new Cornerstone\CornerstoneDBH; // Init db connection
 $csOptions->dbh->tableSetup('options', DB_PREFIX);
 $row = null;
 foreach (selecting(array('option_name', 'option_value'), eq('autoload', '1')) as $row) {

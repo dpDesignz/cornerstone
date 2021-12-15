@@ -3,7 +3,7 @@
 // Open mobile menu
 function toggleMM(elm) {
   // Get the menu
-  const menu = document.querySelector('#header__nav');
+  const menu = document.querySelector('#sidebar__nav');
   const menuBtn =
     elm.target.nodeName === 'BUTTON' ? elm.target : elm.target.parentNode;
   // Check if the menu is open

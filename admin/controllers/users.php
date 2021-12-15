@@ -1,5 +1,5 @@
 <?php
-class Users extends Controller
+class Users extends Cornerstone\Controller
 {
 
   /**
@@ -75,7 +75,7 @@ class Users extends Controller
       $dataListOut = '';
 
       // Set the pagination
-      $pagination = new Pagination;
+      $pagination = new Cornerstone\Pagination;
       $pagination->set_props(
         (int) $this->data['totalResults'],
         (int) $this->params['page'],
@@ -335,8 +335,14 @@ class Users extends Controller
           // Set the user ID
           if ($this->userModel->setUserID((int) $userID)) {
 
+            // Load the password model
+            $this->passwordModel = $this->load->model('accpassword', 'account');
+
+            // Set the user ID
+            $this->passwordModel->setUserID((int) $userID);
+
             // Set password reset request
-            $resetObject = $this->userModel->setPasswordReset();
+            $resetObject = $this->passwordModel->setPasswordReset();
 
             // Check reset worked
             if ($resetObject !== FALSE) {
@@ -348,7 +354,7 @@ class Users extends Controller
               $supportEmail = $this->optn->get('site_from_email');
 
               // Load SendMail Class
-              $sendMail = new \SendMail();
+              $sendMail = new Cornerstone\SendMail();
 
               // Set the HTML message from the template
               if ($message = $sendMail->createEmailTemplate(

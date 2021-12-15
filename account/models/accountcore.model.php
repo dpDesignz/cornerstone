@@ -13,7 +13,7 @@ use function ezsql\functions\{
   eq
 };
 
-class AccountCore extends ModelBase
+class AccountCore extends Cornerstone\ModelBase
 {
 
   // Set the default properties

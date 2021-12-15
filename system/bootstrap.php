@@ -25,7 +25,7 @@ function cornerstoneAutoLoader($className)
   // Fix director separator
   $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
   // Set the full path to the classes
-  $classesPath = DIR_SYSTEM . 'cornerstone' . DIRECTORY_SEPARATOR . strtolower($className) . '.class.php';
+  $classesPath = DIR_SYSTEM . strtolower($className) . '.class.php';
   // Check if path exists and return false if it doesn't, else, include the path file
   if (!file_exists($classesPath)) {
     return FALSE;
@@ -44,23 +44,23 @@ require_once(DIR_HELPERS . 'fn.errors.php'); // Load the error handler
 require_once(DIR_HELPERS . 'fn.master.php');
 
 // Load the registry
-$registry = new Registry();
+$registry = new Cornerstone\Registry();
 
 // Create a database connection
-$cdbh = new CornerstoneDBH;
+$cdbh = new Cornerstone\CornerstoneDBH;
 
 // Options
-$option = new Option($cdbh);
+$option = new Cornerstone\Option($cdbh);
 $registry->set('optn', $option);
 
 // Role
-$role = new Role($cdbh);
+$role = new Cornerstone\Role($cdbh);
 
 // Loader
-$loader = new Loader($registry, $cdbh, $option, $role);
+$loader = new Cornerstone\Loader($registry, $cdbh, $option, $role);
 
 // Request
-$registry->set('request', new Request());
+$registry->set('request', new Cornerstone\Request());
 
 // Set the default timezone for the site
 if (!ini_get('date.timezone')) {

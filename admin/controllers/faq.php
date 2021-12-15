@@ -1,6 +1,6 @@
 <?php
 
-class FAQ extends Controller
+class FAQ extends Cornerstone\Controller
 {
 
   /**
@@ -82,7 +82,7 @@ class FAQ extends Controller
       $dataListOut = '';
 
       // Set the pagination
-      $pagination = new Pagination;
+      $pagination = new Cornerstone\Pagination;
       $pagination->set_props((int) $this->data['totalResults'], (int) $this->params['page'], (int) $this->params['limit']);
       $this->data['pagination'] = $pagination->render();
 

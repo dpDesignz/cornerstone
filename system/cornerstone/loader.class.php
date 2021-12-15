@@ -1,5 +1,7 @@
 <?php
 
+namespace Cornerstone;
+
 /**
  * @package		Cornerstone
  * @author		Damien Peden
