@@ -28,6 +28,7 @@ class FileManager
   protected $max_upload_size_bytes = 5000; // Maximum file upload size. Increase the following values in php.ini to work properly: memory_limit, upload_max_filesize, post_max_size
   protected $show_hidden_files = false; // Show or hide files and folders that starts with a dot
   protected $show_directory_size = false; // Show directory size: true or speedup output: false
+  protected $hide_cols = false; // Hide Permissions and Owner cols in file-listing
 
   /**
    * Constructor
@@ -258,7 +259,7 @@ class FileManager
    * @param int $size
    * @return string
    */
-  public function get_filesize($size)
+  public function get_file_size($size)
   {
     $size = (float) $size;
     $units = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
@@ -1046,6 +1047,16 @@ class FileManager
     $this->show_directory_size = $show;
   }
 
+  /**
+   * Hide Permissions and Owner cols in file-listing
+   *
+   * @param bool $show Boolean of whether to show or not
+   */
+  public function setHideCols(bool $show)
+  {
+    $this->hide_cols = $show;
+  }
+
   /* GET */
 
   public function isWindows()
@@ -1101,6 +1112,11 @@ class FileManager
   public function showDirectorySize()
   {
     return $this->show_directory_size;
+  }
+
+  public function hideCols()
+  {
+    return $this->hide_cols;
   }
 }
 

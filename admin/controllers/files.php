@@ -46,10 +46,6 @@ class Files extends Cornerstone\Controller
         'href' => get_site_url('admin')
       ),
       array(
-        'text' => 'Site Content',
-        'href' => ''
-      ),
-      array(
         'text' => 'File Manager',
         'href' => get_site_url('admin/files/')
       )
@@ -727,56 +723,204 @@ class Files extends Cornerstone\Controller
 
     /*************************** /ACTIONS ***************************/
 
-    // get current path
-    $path = $this->cfmh->rootPath();
-    if ($this->cfmh->currentPath() != '') {
-      $path .= '/' . $this->cfmh->currentPath();
-    }
-
-    // check path
-    if (!is_dir($path)) {
-      redirectTo('admin/files/');
-    }
-
-    // get parent folder
-    $parent = $this->cfmh->get_parent_path($this->cfmh->currentPath());
-
-    $objects = is_readable($path) ? scandir($path) : array();
-    $folders = array();
-    $files = array();
-    $current_path = array_slice(explode("/", $path), -1)[0];
-    if (is_array($objects) && $this->cfmh->is_exclude_items($current_path)) {
-      foreach ($objects as $file) {
-        if ($file == '.' || $file == '..') {
-          continue;
-        }
-        if (!$this->cfmh->showHiddenFiles() && substr($file, 0, 1) === '.') {
-          continue;
-        }
-        $new_path = $path . '/' . $file;
-        if (@is_file($new_path) && $this->cfmh->is_exclude_items($file)) {
-          $files[] = $file;
-        } elseif (
-          @is_dir($new_path) && $file != '.' && $file != '..' && $this->cfmh->is_exclude_items($file)
-        ) {
-          $folders[] = $file;
-        }
-      }
-    }
-
-    // Sort files and folders
-    if (!empty($files)) {
-      natcasesort($files);
-    }
-    if (!empty($folders)) {
-      natcasesort($folders);
-    }
+    //--- FILE MANAGER MAIN
 
     // Set headers
     header("Content-Type: text/html; charset=utf-8");
     header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
     header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
     header("Pragma: no-cache");
+
+    // Page specific outputs
+    $this->data['opPermissionColumns'] = (!$this->cfmh->isWindows() && !$this->cfmh->hideCols()) ? True : False;
+
+    // get current path
+    $this->data['path'] = $this->cfmh->rootPath();
+    $this->data['input_path'] = '';
+    if ($this->cfmh->currentPath() != '') {
+      $this->data['path'] .= '/' . $this->cfmh->currentPath();
+      $this->data['input_path'] = $this->cfmh->currentPath();
+    }
+
+    // check path
+    if (!is_dir($this->data['path'])) {
+      redirectTo('admin/files/');
+    }
+
+    // get parent folder
+    $this->data['parent'] = $this->cfmh->get_parent_path($this->cfmh->currentPath());
+
+    $this->data['objects'] = is_readable($this->data['path']) ? scandir($this->data['path']) : array();
+    $this->data['folders'] = array();
+    $this->data['files'] = array();
+    $this->data['current_path'] = array_slice(explode("/", $this->data['path']), -1)[0];
+    if (is_array($this->data['objects']) && $this->cfmh->is_exclude_items($this->data['current_path'])) {
+      foreach ($this->data['objects'] as $file) {
+        if ($file == '.' || $file == '..') {
+          continue;
+        }
+        if (!$this->cfmh->showHiddenFiles() && substr($file, 0, 1) === '.') {
+          continue;
+        }
+        $new_path = $this->data['path'] . '/' . $file;
+        if (@is_file($new_path) && $this->cfmh->is_exclude_items($file)) {
+          $this->data['files'][] = $file;
+        } elseif (
+          @is_dir($new_path) && $file != '.' && $file != '..' && $this->cfmh->is_exclude_items($file)
+        ) {
+          $this->data['folders'][] = $file;
+        }
+      }
+    }
+
+    $this->data['num_files'] = count($this->data['files']);
+    $this->data['num_folders'] = count($this->data['folders']);
+    $this->data['all_files_size'] = 0;
+
+    // Sort and output files and folders
+    if (!empty($this->data['files'])) {
+      natcasesort($this->data['files']);
+    }
+    $this->data['opFiles'] = '';
+    $ik = 6070;
+    foreach ($this->data['files'] as $f) {
+      $is_link = is_link($this->data['path'] . '/' . $f);
+      $img = $is_link ? 'fa fa-file-text-o' : $this->cfmh->get_file_icon_class($this->data['path'] . '/' . $f);
+      $modif_raw = filemtime($this->data['path'] . '/' . $f);
+      $modif = date('d/m/Y H:i', $modif_raw);
+      $filesize_raw = $this->cfmh->get_size($this->data['path'] . '/' . $f);
+      $filesize = $this->cfmh->get_file_size($filesize_raw);
+      $filelink = '?p=' . urlencode($this->cfmh->currentPath()) . '&amp;view=' . urlencode($f);
+      $this->data['all_files_size'] += $filesize_raw;
+      $perms = substr(decoct(fileperms($this->data['path'] . '/' . $f)), -4);
+      if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
+        $owner = posix_getpwuid(fileowner($this->data['path'] . '/' . $f));
+        $group = posix_getgrgid(filegroup($this->data['path'] . '/' . $f));
+      } else {
+        $owner = array('name' => '?');
+        $group = array('name' => '?');
+      }
+
+      // Check for image type
+      if (in_array(strtolower(pathinfo($f, PATHINFO_EXTENSION)), array('gif', 'jpg', 'jpeg', 'png', 'bmp', 'ico', 'svg', 'webp', 'avif'))) {
+        $imagePreview = $this->cfmh->enc(get_site_url(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f));
+        $file_name_link = '<a href="' . $filelink . '" data-preview-image="' . $imagePreview . '" title="' . $this->cfmh->enc($f) . '">';
+      } else {
+        $file_name_link = '<a href=" ' . $filelink . '" title="' . $this->cfmh->enc($f) . '">';
+      }
+
+      // Check to output permission columns
+      $op_file_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="?p= ' . urlencode($this->data['path']) . '&amp;chmod=' . urlencode($f) . '">' . $perms . '</a></td>' : '';
+
+      // Set to output
+      $this->data['opFiles'] .= '<tr>
+          <td class="custom-checkbox-td">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="' . $ik . '" name="file[]" value="' . $this->cfmh->enc($f) . '">
+              <label class="custom-control-label" for="' . $ik . '"></label>
+            </div>
+          </td>
+          <td>
+            <div class="filename">
+              ' . $file_name_link . '
+                <i class="' . $img . '"></i> ' . $this->cfmh->convert_win($this->cfmh->enc($f)) . '
+              </a>
+              ' . ($is_link ? ' &rarr; <i>' . readlink($this->data['path'] . '/' . $f) . '</i>' : '') . '
+            </div>
+          </td>
+          <td data-sort=b-"' . str_pad($filesize_raw, 18, "0", STR_PAD_LEFT) . '">
+            <span title="' . $filesize_raw . ' bytes">' . $filesize . '</span>
+          </td>
+          <td data-sort="b-' . $modif_raw . '">' . $modif  . '</td>
+          ' . $op_file_cols . '
+          <td class="inline-actions">
+            <a title="Preview" href="' . $filelink . '&quickView=1' . '" data-toggle="lightbox" data-gallery="tiny-gallery" data-title="' . $this->cfmh->convert_win($this->cfmh->enc($f)) . '" data-max-width="100%" data-width="100%"><i class="fa fa-eye"></i></a>
+            <a title="Delete" href="?p=' . urlencode($this->data['path']) . '&amp;del=' . urlencode($f) . '" onclick="return confirm(\'Delete File?\'\n \n ( ' . urlencode($f) . ' )\');"> <i class="fa fa-trash-o"></i></a>
+            <a title="Rename" href="#" onclick="rename(\'' . $this->cfmh->enc(addslashes($this->cfmh->currentPath())) . '\', \'' . $this->cfmh->enc(addslashes($f)) . '\');return false;"><i class="fa fa-pencil-square-o"></i></a>
+            <a title="Copy to..." href="?p=' . urlencode($this->cfmh->currentPath()) . '&amp;copy=' . urlencode(trim($this->cfmh->currentPath() . '/' . $f, '/')) . '"><i class="fa fa-files-o"></i></a>
+            <a title="Direct link" href="' . $this->cfmh->enc(get_site_url(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f)) . '" target="_blank"><i class="fa fa-link"></i></a>
+            <a title="Download" href="?p=' . urlencode($this->cfmh->currentPath()) . '&amp;dl=' . urlencode($f) . '"><i class="fa fa-download"></i></a>
+          </td>
+        </tr>';
+      flush();
+      $ik++;
+    }
+
+    if (!empty($this->data['folders'])) {
+      natcasesort($this->data['folders']);
+    }
+    $this->data['opFolders'] = '';
+    $ii = 3399;
+    foreach ($this->data['folders'] as $f) {
+      $is_link = is_link($this->data['path'] . '/' . $f);
+      $img = $is_link ? 'icon-link_folder' : 'fa fa-folder-o';
+      $modif_raw = filemtime($this->data['path'] . '/' . $f);
+      $modif = date('d/m/Y H:i', $modif_raw);
+      if ($this->cfmh->showDirectorySize()) {
+        $filesize_raw = $this->cfmh->get_directory_size($this->data['path'] . '/' . $f);
+        $filesize = $this->cfmh->get_file_size($filesize_raw);
+      } else {
+        $filesize_raw = "";
+        $filesize = "Folder";
+      }
+      $perms = substr(decoct(fileperms($this->data['path'] . '/' . $f)), -4);
+      if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
+        $owner = posix_getpwuid(fileowner($this->data['path'] . '/' . $f));
+        $group = posix_getgrgid(filegroup($this->data['path'] . '/' . $f));
+      } else {
+        $owner = array('name' => '?');
+        $group = array('name' => '?');
+      }
+
+      // Check to output permission columns
+      $op_folder_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="?p=' . urlencode($this->data['path']) . '&amp;chmod=' . urlencode($f) . '"> ' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
+      // Set to output
+      $this->data['opFolders'] .= '<tr>
+          <td class="custom-checkbox-td">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="' . $ii . '" name="file[]" value="' . $this->cfmh->enc($f) . '">
+              <label class="custom-control-label" for="' . $ii . '"></label>
+            </div>
+          </td>
+          <td>
+            <div class="filename"><a href="?p=' . urlencode(trim($this->cfmh->currentPath() . '/' . $f, '/')) . '"><i class="' . $img . '"></i> ' . $this->cfmh->convert_win($this->cfmh->enc($f)) . '
+              </a>' . ($is_link ? ' &rarr; <i>' . readlink($this->data['path'] . '/' . $f) . '</i>' : '') . '</div>
+          </td>
+          <td data-sort="a-' . str_pad($filesize_raw, 18, "0", STR_PAD_LEFT) . '">
+            ' . $filesize . '
+          </td>
+          <td data-sort="a-' . $modif_raw . '">' . $modif . '</td>
+          ' . $op_folder_cols . '
+          <td class="inline-actions">
+              <a title="Delete" href="?p=' . urlencode($this->data['path']) . '&amp;del=' . urlencode($f) . '" onclick="return confirm(\'Delete Folder\n \n ( ' . urlencode($f) . ' )\');"> <i class="fa fa-trash-o" aria-hidden="true"></i></a>
+              <a title="Rename" href="#" onclick="rename(\'' . $this->cfmh->enc(addslashes($this->cfmh->currentPath())) . '\', \'' . $this->cfmh->enc(addslashes($f)) . '\');return false;"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+              <a title="Copy to..." href="?p=&amp;copy=' . urlencode(trim($this->cfmh->currentPath() . '/' . $f, '/')) . '"><i class="fa fa-files-o" aria-hidden="true"></i></a>
+            <a title="Direct link" href="' . $this->cfmh->enc(get_site_url(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f . '/')) . '" target="_blank"><i class="fa fa-link" aria-hidden="true"></i></a>
+          </td>
+        </tr>';
+      flush();
+      $ii++;
+    }
+
+    // Calculate footer information
+    $this->data['opFullSize'] = 'Full Size: <span class="badge badge-light">' . $this->cfmh->get_file_size($this->data['all_files_size']) . '</span>';
+    $this->data['opFileCount'] = 'File: <span class="badge badge-light">' . $this->data['num_files'] . '</span>';
+    $this->data['opFolderCount'] = 'Folder: <span class="badge badge-light">' . $this->data['num_folders'] . '</span>';
+    $this->data['opPartitionSize'] = 'Partition Size: <span class="badge badge-light">' . $this->cfmh->get_file_size(@disk_free_space($this->data['path'])) . '</span> free of <span class="badge badge-light">' . $this->cfmh->get_file_size(@disk_total_space($this->data['path'])) . '</span>';
+
+    // Set Breadcrumbs
+    if ($this->cfmh->currentPath() != '') {
+      $exploded = explode('/', $this->cfmh->currentPath());
+      $parent = '';
+      foreach ($exploded as $folderName) {
+        $parent = trim($parent . '/' . $folderName, '/');
+        $parent_enc = urlencode($parent);
+        $this->data['breadcrumbs'][] = array(
+          'text' => $folderName,
+          'href' => get_site_url("admin/files/?p={$parent_enc}")
+        );
+      }
+    }
 
     // Load view
     $this->load->view('common/filemanager', $this->data, 'admin');

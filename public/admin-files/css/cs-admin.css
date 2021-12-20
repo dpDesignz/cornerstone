@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*########################################
 
 Project:	Cornerstone Framework
@@ -683,6 +684,444 @@ form#menu-form #menu-items .fa-trash-alt {
 
 form#faq-form #faq-items .fa-trash-alt {
   cursor: pointer;
+}
+
+#admin-file-manager a:hover,
+#admin-file-manager a:visited,
+#admin-file-manager a:focus {
+  text-decoration: none !important;
+}
+#admin-file-manager * {
+  -webkit-border-radius: 0 !important;
+  -moz-border-radius: 0 !important;
+  border-radius: 0 !important;
+}
+#admin-file-manager .filename,
+#admin-file-manager td,
+#admin-file-manager th {
+  white-space: nowrap;
+}
+#admin-file-manager .filename {
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#admin-file-manager .nav-item.avatar a {
+  cursor: pointer;
+  text-transform: capitalize;
+}
+#admin-file-manager .nav-item.avatar a > i {
+  font-size: 15px;
+}
+#admin-file-manager .nav-item.avatar .dropdown-menu a {
+  font-size: 13px;
+}
+#admin-file-manager #search-addon {
+  font-size: 12px;
+  border-right-width: 0;
+}
+#admin-file-manager #search-addon2 {
+  background: transparent;
+  border-left: 0;
+}
+#admin-file-manager .csc-data-table__table {
+  margin-bottom: 0;
+}
+#admin-file-manager #file-manager-table .filename a {
+  color: var(--font-color);
+}
+#admin-file-manager #file-manager-table td,
+#admin-file-manager #file-manager-table th {
+  font-size: 14px;
+  vertical-align: middle !important;
+  border: 1px solid #f1f1f1;
+}
+#admin-file-manager #file-manager-table .custom-checkbox-td .custom-control.custom-checkbox,
+#admin-file-manager #file-manager-table .custom-checkbox-header .custom-control.custom-checkbox {
+  min-width: 18px;
+}
+#admin-file-manager #file-manager-table .preview-img {
+  max-width: 100%;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAKklEQVR42mL5//8/Azbw+PFjrOJMDCSCUQ3EABZc4S0rKzsaSvTTABBgAMyfCMsY4B9iAAAAAElFTkSuQmCC);
+}
+#admin-file-manager #file-manager-table .inline-actions > a > i {
+  margin-left: 5px;
+  padding: 3px;
+  font-size: 1em;
+  color: #fff;
+  background: #3785c1;
+  border-radius: 3px;
+}
+#admin-file-manager #file-manager-table tfoot tr td {
+  padding: 12px;
+  border: none;
+}
+#admin-file-manager #file-manager-table tfoot tr td span.badge {
+  display: inline-block;
+  margin-right: 12px;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  border-bottom: 2px solid #f8f9fa;
+}
+#admin-file-manager #file-manager-table tfoot tr td span.badge-light {
+  color: #212529;
+  background-color: #f8f9fa;
+}
+#admin-file-manager #file-manager-table tfoot tr td span.badge:nth-child(1) {
+  border-color: #df4227;
+}
+#admin-file-manager #file-manager-table tfoot tr td span.badge:nth-child(2) {
+  border-color: #f8b600;
+}
+#admin-file-manager #file-manager-table tfoot tr td span.badge:nth-child(3) {
+  border-color: #00bd60;
+}
+#admin-file-manager #file-manager-table tfoot tr td span.badge:nth-child(4) {
+  margin-right: 0;
+  border-color: #4581ff;
+}
+#admin-file-manager #file-manager-table tfoot tr td span.badge:nth-child(5) {
+  border-color: #ac68fc;
+}
+#admin-file-manager #file-manager-table tfoot tr td span.badge:nth-child(6) {
+  border-color: #45c3d2;
+}
+#admin-file-manager pre.with-hljs {
+  padding: 0 code;
+  padding-margin: 0;
+  padding-border: 0;
+  padding-overflow: visible;
+}
+#admin-file-manager code.maxheight,
+#admin-file-manager pre.maxheight {
+  max-height: 512px;
+}
+#admin-file-manager .fa .fa-caret-right {
+  font-size: 1.2em;
+  margin: 0 4px;
+  vertical-align: middle;
+  color: #ececec;
+}
+#admin-file-manager .fa .fa-home {
+  font-size: 1.3em;
+  vertical-align: bottom;
+}
+#admin-file-manager .path {
+  margin-bottom: 10px;
+}
+#admin-file-manager form.dropzone {
+  min-height: 200px;
+  border: 2px dashed #007bff;
+  line-height: 6rem;
+}
+#admin-file-manager .right {
+  text-align: right;
+}
+#admin-file-manager .center,
+#admin-file-manager .close {
+  text-align: center;
+}
+#admin-file-manager .preview-video {
+  position: relative;
+  max-width: 100%;
+  height: 0;
+  padding-bottom: 62.5%;
+  margin-bottom: 10px;
+}
+#admin-file-manager .preview-video video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: #000;
+}
+#admin-file-manager .compact-table {
+  border: 0;
+  width: auto;
+}
+#admin-file-manager .compact-table td,
+#admin-file-manager .compact-table th {
+  width: 100px;
+  border: 0;
+  text-align: center;
+}
+#admin-file-manager .compact-table tr:hover td {
+  background-color: #fff;
+}
+#admin-file-manager .break-word {
+  word-wrap: break-word;
+  margin-left: 30px;
+}
+#admin-file-manager .break-word.float-left a {
+  color: #7d7d7d;
+}
+#admin-file-manager .break-word + .float-right {
+  padding-right: 30px;
+  position: relative;
+}
+#admin-file-manager .break-word + .float-right > a {
+  color: #7d7d7d;
+  font-size: 1.2em;
+  margin-right: 4px;
+}
+#admin-file-manager #editor {
+  position: absolute;
+  right: 15px;
+  top: 100px;
+  bottom: 15px;
+  left: 15px;
+}
+@media (max-width: 481px) {
+  #admin-file-manager #editor {
+    top: 150px;
+  }
+}
+#admin-file-manager #normal-editor {
+  border-radius: 3px;
+  border-width: 2px;
+  padding: 10px;
+  outline: none;
+}
+#admin-file-manager li.file:before, #admin-file-manager li.folder:before {
+  font: normal normal normal 14px/1 FontAwesome;
+  content: "";
+  margin-right: 5px;
+}
+#admin-file-manager li.folder:before {
+  content: "";
+}
+#admin-file-manager i[class^=fa].fa-folder {
+  color: #0157b3;
+}
+#admin-file-manager i[class^=fa].fa-image {
+  color: #26b99a;
+}
+#admin-file-manager i[class^=fa].fa-file-archive {
+  color: #da7d7d;
+}
+#admin-file-manager i[class^=fa].fa-css3 {
+  color: #f36fa0;
+}
+#admin-file-manager i[class^=fa].fa-file-code {
+  color: #007bff;
+}
+#admin-file-manager i[class^=fa].fa-code {
+  color: #cc4b4c;
+}
+#admin-file-manager i[class^=fa].fa-file-text {
+  color: #0096e6;
+}
+#admin-file-manager i[class^=fa].fa-html5 {
+  color: #d75e72;
+}
+#admin-file-manager i[class^=fa].fa-file-excel {
+  color: #09c55d;
+}
+#admin-file-manager i[class^=fa].fa-file-powerpoint {
+  color: #f6712e;
+}
+#admin-file-manager i.go-back {
+  font-size: 1.2em;
+  color: #007bff;
+}
+#admin-file-manager .main-nav {
+  padding: 0.2rem 1rem;
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+#admin-file-manager .dataTables_filter {
+  display: none;
+}
+#admin-file-manager table.dataTable thead .sorting {
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center right;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAQAAADYWf5HAAAAkElEQVQoz7XQMQ5AQBCF4dWQSJxC5wwax1Cq1e7BAdxD5SL+Tq/QCM1oNiJidwox0355mXnG/DrEtIQ6azioNZQxI0ykPhTQIwhCR+BmBYtlK7kLJYwWCcJA9M4qdrZrd8pPjZWPtOqdRQy320YSV17OatFC4euts6z39GYMKRPCTKY9UnPQ6P+GtMRfGtPnBCiqhAeJPmkqAAAAAElFTkSuQmCC");
+}
+#admin-file-manager table.dataTable thead .sorting_asc {
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center right;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAZ0lEQVQ4y2NgGLKgquEuFxBPAGI2ahhWCsS/gDibUoO0gPgxEP8H4ttArEyuQYxAPBdqEAxPBImTY5gjEL9DM+wTENuQahAvEO9DMwiGdwAxOymGJQLxTyD+jgWDxCMZRsEoGAVoAADeemwtPcZI2wAAAABJRU5ErkJggg==");
+}
+#admin-file-manager table.dataTable thead .sorting_desc {
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center right;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAZUlEQVQ4y2NgGAWjYBSggaqGu5FA/BOIv2PBIPFEUgxjB+IdQPwfC94HxLykus4GiD+hGfQOiB3J8SojEE9EM2wuSJzcsFMG4ttQgx4DsRalkZENxL+AuJQaMcsGxBOAmGvopk8AVz1sLZgg0bsAAAAASUVORK5CYII=");
+}
+#admin-file-manager table.dataTable thead tr:first-child th.custom-checkbox-header:first-child {
+  background-image: none;
+}
+#admin-file-manager .app-v-title {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+}
+#admin-file-manager hr.custom-hr {
+  border-top: 1px dashed #8c8b8b;
+  border-bottom: 1px dashed #fff;
+}
+#admin-file-manager .ekko-lightbox .modal-dialog {
+  max-width: 98%;
+}
+#admin-file-manager .ekko-lightbox-item.fade.in.show .row {
+  background: #fff;
+}
+#admin-file-manager .ekko-lightbox-nav-overlay {
+  display: flex !important;
+  opacity: 1 !important;
+  height: auto !important;
+  top: 50%;
+}
+#admin-file-manager .ekko-lightbox-nav-overlay a {
+  opacity: 1 !important;
+  width: auto !important;
+  text-shadow: none !important;
+  color: #3B3B3B;
+}
+#admin-file-manager .ekko-lightbox-nav-overlay a:hover {
+  color: #20507D;
+}
+#admin-file-manager #snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 30px;
+  font-size: 17px;
+}
+#admin-file-manager #snackbar.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+@-webkit-keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+@keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fadeout {
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+@keyframes fadeout {
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
+  #admin-file-manager .navbar-collapse .col-xs-6.text-right {
+    padding: 0;
+  }
+}
+#admin-file-manager .lds-facebook {
+  display: none;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+#admin-file-manager .lds-facebook div, #admin-file-manager .lds-facebook.show-me {
+  display: inline-block;
+}
+#admin-file-manager .lds-facebook div {
+  position: absolute;
+  left: 6px;
+  width: 13px;
+  background: #007bff;
+  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+#admin-file-manager .lds-facebook div:nth-child(1) {
+  left: 6px;
+  animation-delay: -0.24s;
+}
+#admin-file-manager .lds-facebook div:nth-child(2) {
+  left: 26px;
+  animation-delay: -0.12s;
+}
+#admin-file-manager .lds-facebook div:nth-child(3) {
+  left: 45px;
+  animation-delay: 0s;
+}
+@keyframes lds-facebook {
+  0% {
+    top: 6px;
+    height: 51px;
+  }
+  100%, 50% {
+    top: 19px;
+    height: 26px;
+  }
+}
+#admin-file-manager ul#search-wrapper {
+  padding-left: 0;
+  border: 1px solid #ecececcc;
+}
+#admin-file-manager ul#search-wrapper li {
+  list-style: none;
+  padding: 5px;
+  border-bottom: 1px solid #ecececcc;
+}
+#admin-file-manager ul#search-wrapper li:nth-child(odd) {
+  background: #f9f9f9cc;
+}
+#admin-file-manager .c-preview-img {
+  max-width: 300px;
+}
+#admin-file-manager .list-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+#admin-file-manager .list-inline li a {
+  padding: 3px 6px;
+}
+#admin-file-manager .list-inline li a i {
+  color: inherit !important;
 }
 
 section#users-list table tr th:nth-child(1) {
