@@ -60,6 +60,34 @@ require(get_theme_path('head.php')); ?>
           <p><label><input type="checkbox" name="demo_checkbox" id="demo_checkbox" tabindex="4"><span>Demo Checkbox</span></label></p>
         </div>
       </div>
+      <div class="csc-row">
+        <div class="csc-col csc-col12 csc-input-field">
+          <p>
+            <label>
+              <input name="group1" type="radio" checked />
+              <span>Red</span>
+            </label>
+          </p>
+          <p>
+            <label>
+              <input name="group1" type="radio" />
+              <span>Yellow</span>
+            </label>
+          </p>
+          <p>
+            <label>
+              <input class="with-gap" name="group1" type="radio" />
+              <span>Green</span>
+            </label>
+          </p>
+          <p>
+            <label>
+              <input name="group1" type="radio" disabled="disabled" />
+              <span>Brown</span>
+            </label>
+          </p>
+        </div>
+      </div>
       <div class="csc-row cs-mb-3">
         <div class="csc-col csc-col12">
           <p class="cs-body2">Head to <a href="<?php echo get_site_url('components/chosen'); ?>">Chosen</a> or <a href="<?php echo get_site_url('components/select2'); ?>">Select2</a> pages for dropdown examples</p>

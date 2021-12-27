@@ -6,7 +6,7 @@
  * @package Cornerstone
  */
 
-class Page extends Controller
+class Page extends Cornerstone\Controller
 {
 
   /**

@@ -6,7 +6,7 @@
  * @package Cornerstone
  */
 
-class Cron extends ModelBase
+class Cron extends Cornerstone\ModelBase
 {
 
   // Set the default properties

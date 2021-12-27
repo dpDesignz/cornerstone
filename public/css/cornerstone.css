@@ -3272,6 +3272,7 @@ body.cs-component__colours .csc-text-transparent {
   /*-- float utilities --*/
   /*-- text utilities --*/
   /*-- spacing utilities --*/
+  /*-- border utilities --*/
   /*-- display utilities --*/
 }
 .cs-float-left {
@@ -4467,6 +4468,78 @@ body.cs-component__colours .csc-text-transparent {
     padding-top: 3rem !important;
     padding-bottom: 3rem !important;
   }
+}
+.cs-border {
+  border: 1px solid #eeeeee !important;
+}
+.cs-border-0 {
+  border: 0 !important;
+}
+.cs-border-top {
+  border-top: 1px solid #eeeeee !important;
+}
+.cs-border-top-0 {
+  border-top: 0 !important;
+}
+.cs-border-end {
+  border-right: 1px solid #eeeeee !important;
+}
+.cs-border-end-0 {
+  border-right: 0 !important;
+}
+.cs-border-bottom {
+  border-bottom: 1px solid #eeeeee !important;
+}
+.cs-border-bottom-0 {
+  border-bottom: 0 !important;
+}
+.cs-border-start {
+  border-left: 1px solid #eeeeee !important;
+}
+.cs-border-start-0 {
+  border-left: 0 !important;
+}
+.cs-border-primary {
+  border-color: #2196F3 !important;
+}
+.cs-border-secondary {
+  border-color: #e0e0e0 !important;
+}
+.cs-border-success {
+  border-color: #4CAF50 !important;
+}
+.cs-border-info {
+  border-color: #00b0ff !important;
+}
+.cs-border-warning {
+  border-color: #ffc107 !important;
+}
+.cs-border-danger {
+  border-color: #C62828 !important;
+}
+.cs-border-light {
+  border-color: #9e9e9e !important;
+}
+.cs-border-dark {
+  border-color: #212121 !important;
+}
+.cs-border-white {
+  border-color: #fff !important;
+}
+.cs-border-1 {
+  border-width: 1px !important;
+}
+.cs-border-2 {
+  border-width: 2px !important;
+}
+.cs-border-3 {
+  border-width: 3px !important;
+}
+.cs-border-4 {
+  border-width: 4px !important;
+}
+.cs-border-5 {
+  border-width: 5px !important;
 }
 @media screen and (max-width: 575px) {
   .cs-show-sm-up, .cs-hide-sm-down {
@@ -7110,6 +7183,14 @@ body.cs-component__form .csc-form {
   /* Remove default checkbox */
   /* Indeterminate checkbox */
   /* Style Form Details */
+  /* Radio Buttons
+  ========================================================================== */
+  /* Unchecked styles */
+  /* Checked styles */
+  /* Radio With gap */
+  /* Focused styles */
+  /* Disabled Radio With gap */
+  /* Disabled style */
   /* Switch
   ========================================================================== */
 }
@@ -9079,6 +9160,125 @@ body.cs-components .csc-form-details,
 body.cs-component__form .csc-form-details {
   background-color: #eceff1;
   border-left: 1px solid #cfd8dc;
+}
+body.cs-components .csc-form [type=radio]:not(:checked),
+body.cs-components .csc-form [type=radio]:checked,
+body.cs-component__form .csc-form [type=radio]:not(:checked),
+body.cs-component__form .csc-form [type=radio]:checked {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+body.cs-components .csc-form [type=radio]:not(:checked) + span,
+body.cs-components .csc-form [type=radio]:checked + span,
+body.cs-component__form .csc-form [type=radio]:not(:checked) + span,
+body.cs-component__form .csc-form [type=radio]:checked + span {
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  display: inline-block;
+  height: 25px;
+  line-height: 25px;
+  font-size: 1rem;
+  transition: 0.28s ease;
+  user-select: none;
+}
+body.cs-components .csc-form [type=radio] + span:before,
+body.cs-components .csc-form [type=radio] + span:after,
+body.cs-component__form .csc-form [type=radio] + span:before,
+body.cs-component__form .csc-form [type=radio] + span:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 4px;
+  width: 16px;
+  height: 16px;
+  z-index: 0;
+  transition: 0.28s ease;
+}
+body.cs-components .csc-form [type=radio]:not(:checked) + span:before,
+body.cs-components .csc-form [type=radio]:not(:checked) + span:after,
+body.cs-components .csc-form [type=radio]:checked + span:before,
+body.cs-components .csc-form [type=radio]:checked + span:after,
+body.cs-components .csc-form [type=radio].with-gap:checked + span:before,
+body.cs-components .csc-form [type=radio].with-gap:checked + span:after,
+body.cs-component__form .csc-form [type=radio]:not(:checked) + span:before,
+body.cs-component__form .csc-form [type=radio]:not(:checked) + span:after,
+body.cs-component__form .csc-form [type=radio]:checked + span:before,
+body.cs-component__form .csc-form [type=radio]:checked + span:after,
+body.cs-component__form .csc-form [type=radio].with-gap:checked + span:before,
+body.cs-component__form .csc-form [type=radio].with-gap:checked + span:after {
+  border-radius: 50%;
+}
+body.cs-components .csc-form [type=radio]:not(:checked) + span:before,
+body.cs-components .csc-form [type=radio]:not(:checked) + span:after,
+body.cs-component__form .csc-form [type=radio]:not(:checked) + span:before,
+body.cs-component__form .csc-form [type=radio]:not(:checked) + span:after {
+  border: 2px solid #5a5a5a;
+}
+body.cs-components .csc-form [type=radio]:not(:checked) + span:after,
+body.cs-component__form .csc-form [type=radio]:not(:checked) + span:after {
+  transform: scale(0);
+}
+body.cs-components .csc-form [type=radio]:checked + span:before,
+body.cs-component__form .csc-form [type=radio]:checked + span:before {
+  border: 2px solid transparent;
+}
+body.cs-components .csc-form [type=radio]:checked + span:after,
+body.cs-components .csc-form [type=radio].with-gap:checked + span:before,
+body.cs-components .csc-form [type=radio].with-gap:checked + span:after,
+body.cs-component__form .csc-form [type=radio]:checked + span:after,
+body.cs-component__form .csc-form [type=radio].with-gap:checked + span:before,
+body.cs-component__form .csc-form [type=radio].with-gap:checked + span:after {
+  border: 2px solid #9c27b0;
+}
+body.cs-components .csc-form [type=radio]:checked + span:after,
+body.cs-components .csc-form [type=radio].with-gap:checked + span:after,
+body.cs-component__form .csc-form [type=radio]:checked + span:after,
+body.cs-component__form .csc-form [type=radio].with-gap:checked + span:after {
+  background-color: #9c27b0;
+}
+body.cs-components .csc-form [type=radio]:checked + span:after,
+body.cs-component__form .csc-form [type=radio]:checked + span:after {
+  transform: scale(1.02);
+}
+body.cs-components .csc-form [type=radio].csc-with-gap:checked + span:after,
+body.cs-component__form .csc-form [type=radio].csc-with-gap:checked + span:after {
+  transform: scale(0.5);
+}
+body.cs-components .csc-form [type=radio].tabbed:focus + span:before,
+body.cs-component__form .csc-form [type=radio].tabbed:focus + span:before {
+  box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
+}
+body.cs-components .csc-form [type=radio].csc-with-gap:disabled:checked + span:before,
+body.cs-component__form .csc-form [type=radio].csc-with-gap:disabled:checked + span:before {
+  border: 2px solid rgba(0, 0, 0, 0.42);
+}
+body.cs-components .csc-form [type=radio].csc-with-gap:disabled:checked + span:after,
+body.cs-component__form .csc-form [type=radio].csc-with-gap:disabled:checked + span:after {
+  border: none;
+  background-color: rgba(0, 0, 0, 0.42);
+}
+body.cs-components .csc-form [type=radio]:disabled:not(:checked) + span:before,
+body.cs-components .csc-form [type=radio]:disabled:checked + span:before,
+body.cs-component__form .csc-form [type=radio]:disabled:not(:checked) + span:before,
+body.cs-component__form .csc-form [type=radio]:disabled:checked + span:before {
+  background-color: transparent;
+  border-color: rgba(0, 0, 0, 0.42);
+}
+body.cs-components .csc-form [type=radio]:disabled + span,
+body.cs-component__form .csc-form [type=radio]:disabled + span {
+  color: rgba(0, 0, 0, 0.42);
+}
+body.cs-components .csc-form [type=radio]:disabled:not(:checked) + span:before,
+body.cs-component__form .csc-form [type=radio]:disabled:not(:checked) + span:before {
+  border-color: rgba(0, 0, 0, 0.42);
+}
+body.cs-components .csc-form [type=radio]:disabled:checked + span:after,
+body.cs-component__form .csc-form [type=radio]:disabled:checked + span:after {
+  background-color: rgba(0, 0, 0, 0.42);
+  border-color: #949494;
 }
 body.cs-components .csc-form .csc-switch,
 body.cs-components .csc-form .csc-switch *,

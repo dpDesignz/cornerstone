@@ -1,5 +1,5 @@
 <?php
-class Files extends Controller
+class Files extends Cornerstone\Controller
 {
 
   /**

@@ -478,6 +478,29 @@ class FileManager
   }
 
   /**
+   * This function gets the relative path
+   * @param string $path
+   * @return string
+   */
+  public function get_relative_path($path)
+  {
+    $rootPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->rootPath());
+    return trim(str_replace($rootPath, '', $path), '\\');
+  }
+
+  /**
+   * This function gets the relative path folder
+   * @param string $path
+   * @return string
+   */
+  public function get_relative_path_folder($path)
+  {
+    $rootPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->rootPath());
+    $path = pathinfo($path);
+    return trim(str_replace($rootPath, '', $path['dirname']), '\\');
+  }
+
+  /**
    * Get mime type
    * @param string $file_path
    * @return mixed|string

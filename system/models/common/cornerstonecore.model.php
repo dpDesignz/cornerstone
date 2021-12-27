@@ -16,7 +16,7 @@ use function ezsql\functions\{
   like
 };
 
-class CornerstoneCore extends ModelBase
+class CornerstoneCore extends Cornerstone\ModelBase
 {
 
   // Set the default properties

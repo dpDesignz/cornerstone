@@ -22,6 +22,15 @@ class Files extends Cornerstone\Controller
     // Load the file manager class
     $this->cfmh = new FileManager(array("rootPath" => DIR_SYSTEM . 'storage' . _DS . 'files'));
 
+    // Get path
+    $p = isset($this->request->get['p']) ? $this->request->get['p'] : (isset($this->request->post['p']) ? $this->request->post['p'] : '');
+
+    // Clean the path
+    $p = $this->cfmh->clean_path($p);
+
+    // Set current path
+    $this->cfmh->setCurrentPath($p);
+
     // max upload file size
     define('MAX_UPLOAD_SIZE', $this->cfmh->maxUploadSize());
 
@@ -35,9 +44,6 @@ class Files extends Cornerstone\Controller
 
     // Define the page type
     $this->pageType = 'file';
-
-    // Load the content model
-    // $this->contentModel = $this->load->model('sitecontent/content', 'admin');
 
     // Set Breadcrumbs
     $this->data['breadcrumbs'] = array(
@@ -69,15 +75,6 @@ class Files extends Cornerstone\Controller
 
     // Set params to request
     $this->request->set_params($params);
-
-    // Get path
-    $p = isset($this->request->get['p']) ? $this->request->get['p'] : (isset($this->request->post['p']) ? $this->request->post['p'] : '');
-
-    // Clean the path
-    $p = $this->cfmh->clean_path($p);
-
-    // Set current path
-    $this->cfmh->setCurrentPath($p);
 
     // for ajax request - save
     $input = file_get_contents('php://input');
@@ -323,75 +320,6 @@ class Files extends Cornerstone\Controller
       exit();
     }
 
-    // Copy folder / file
-    if (isset($_GET['copy'], $_GET['finish'])) {
-      // from
-      $copy = $_GET['copy'];
-      $copy = $this->cfmh->clean_path($copy);
-      // empty path
-      if ($copy == '') {
-        flashMsg('admin_filemanager', '<strong>Error</strong> Source path not defined', 'warning');
-        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-      }
-      // abs path from
-      $from = $this->cfmh->rootPath() . '/' . $copy;
-      // abs path to
-      $dest = $this->cfmh->rootPath();
-      if ($this->cfmh->currentPath() != '') {
-        $dest .= '/' . $this->cfmh->currentPath();
-      }
-      $dest .= '/' . basename($from);
-      // move?
-      $move = isset($_GET['move']);
-      // copy/move/duplicate
-      if ($from != $dest) {
-        $msg_from = trim($this->cfmh->currentPath() . '/' . basename($from), '/');
-        if ($move) { // Move and to != from so just perform move
-          $rename = $this->cfmh->rename($from, $dest);
-          if ($rename) {
-            flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Moved from <strong>%s</strong> to <strong>%s</strong>', $this->cfmh->enc($copy), $this->cfmh->enc($msg_from)), 'success');
-          } elseif ($rename === null) {
-            flashMsg('admin_filemanager', '<strong>Error</strong> File or folder with this path already exists. Please try again.', 'warning');
-          } else {
-            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Error while moving from <strong>%s</strong> to <strong>%s</strong>', $this->cfmh->enc($copy), $this->cfmh->enc($msg_from)), 'danger');
-          }
-        } else { // Not move and to != from so copy with original name
-          if ($this->cfmh->rcopy($from, $dest)) {
-            flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Copied from <strong>%s</strong> to <strong>%s</strong>', $this->cfmh->enc($copy), $this->cfmh->enc($msg_from)), 'success');
-          } else {
-            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Error while copying from <strong>%s</strong> to <strong>%s</strong>', $this->cfmh->enc($copy), $this->cfmh->enc($msg_from)), 'danger');
-          }
-        }
-      } else {
-        if (!$move) { //Not move and to = from so duplicate
-          $msg_from = trim($this->cfmh->currentPath() . '/' . basename($from), '/');
-          $fn_parts = pathinfo($from);
-          $extension_suffix = '';
-          if (!is_dir($from)) {
-            $extension_suffix = '.' . $fn_parts['extension'];
-          }
-          //Create new name for duplicate
-          $fn_duplicate = $fn_parts['dirname'] . '/' . $fn_parts['filename'] . '-' . date('YmdHis') . $extension_suffix;
-          $loop_count = 0;
-          $max_loop = 1000;
-          // Check if a file with the duplicate name already exists, if so, make new name (edge case...)
-          while (file_exists($fn_duplicate) & $loop_count < $max_loop) {
-            $fn_parts = pathinfo($fn_duplicate);
-            $fn_duplicate = $fn_parts['dirname'] . '/' . $fn_parts['filename'] . '-copy' . $extension_suffix;
-            $loop_count++;
-          }
-          if ($this->cfmh->rcopy($from, $fn_duplicate, False)) {
-            flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Copied from <strong>%s</strong> to <strong>%s</strong>', $this->cfmh->enc($copy), $this->cfmh->enc($fn_duplicate)), 'success');
-          } else {
-            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Error while copying from <strong>%s</strong> to <strong>%s</strong>', $this->cfmh->enc($copy), $this->cfmh->enc($fn_duplicate)), 'danger');
-          }
-        } else {
-          flashMsg('admin_filemanager', '<strong>Error</strong> Paths must not match. Please try again.', 'warning');
-        }
-      }
-      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-    }
-
     // Mass copy files/ folders
     if (isset($_POST['file'], $_POST['copy_to'], $_POST['finish'])) {
       // from
@@ -452,34 +380,6 @@ class Files extends Cornerstone\Controller
         }
       } else {
         flashMsg('admin_filemanager', "<strong>Error</strong> Nothing selected", 'warning');
-      }
-      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-    }
-
-    // Rename
-    if (isset($_GET['ren'], $_GET['to'])) {
-      // old name
-      $old = $_GET['ren'];
-      $old = $this->cfmh->clean_path($old);
-      $old = str_replace('/', '', $old);
-      // new name
-      $new = $_GET['to'];
-      $new = $this->cfmh->clean_path(strip_tags($new));
-      $new = str_replace('/', '', $new);
-      // path
-      $path = FM_ROOT_PATH;
-      if (FM_PATH != '') {
-        $path .= '/' . FM_PATH;
-      }
-      // rename
-      if ($this->cfmh->is_valid_filename($new) && $old != '' && $new != '') {
-        if ($this->cfmh->rename($path . '/' . $old, $path . '/' . $new)) {
-          flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Renamed from <strong>%s</strong> to <strong>%s</strong>', $this->cfmh->enc($old), $this->cfmh->enc($new)), 'success');
-        } else {
-          flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Error while renaming from <strong>%s</strong> to <strong>%s</strong>', $this->cfmh->enc($old), $this->cfmh->enc($new)), 'danger');
-        }
-      } else {
-        flashMsg('admin_filemanager', '<strong>Error</strong> Invalid characters in file name. Please try again.', 'warning');
       }
       redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
     }
@@ -665,31 +565,6 @@ class Files extends Cornerstone\Controller
       redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
     }
 
-    // Delete file / folder
-    if (isset($_GET['del'])) {
-      $del = str_replace('/', '', $this->cfmh->clean_path($_GET['del']));
-      if (
-        $del != '' && $del != '..' && $del != '.'
-      ) {
-        $path = $this->cfmh->rootPath();
-        if ($this->cfmh->currentPath() != '') {
-          $path .= '/' . $this->cfmh->currentPath();
-        }
-        $is_dir = is_dir($path . '/' . $del);
-        if ($this->cfmh->rdelete($path . '/' . $del)) {
-          $msg = $is_dir ? 'Folder <strong>%s</strong> Deleted' : 'File <strong>%s</strong> Deleted';
-          flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf($msg, $this->cfmh->enc($del)), 'success');
-        } else {
-          $msg = $is_dir ? 'Folder <strong>%s</strong> not deleted' : 'File <strong>%s</strong> not deleted';
-          $msg = $is_dir ? 'Folder <strong>%s</strong> Deleted' : 'File <strong>%s</strong> Deleted';
-          flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf($msg, $this->cfmh->enc($del)), 'danger');
-        }
-      } else {
-        flashMsg('admin_filemanager', '<strong>Error</strong> Invalid file or folder name', 'warning');
-      }
-      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-    }
-
     // Mass deleting
     if (isset($_POST['group'], $_POST['delete'])) {
       $path = $this->cfmh->rootPath();
@@ -812,13 +687,22 @@ class Files extends Cornerstone\Controller
       // Check to output permission columns
       $op_file_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="?p= ' . urlencode($this->data['path']) . '&amp;chmod=' . urlencode($f) . '">' . $perms . '</a></td>' : '';
 
+      // Check if allowed to delete
+      $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete File" data-tippy-content="Delete File" class="delete-this" data-t="File" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="fa fa-trash-o"></i></button>' : '';
+
+      // Check if allowed to rename
+      $renameOP = $this->role->canDo('rename_files') ? '<button type="button" title="Rename File" data-tippy-content="Rename File" class="rename-this" data-name="' . $this->cfmh->enc(addslashes($f)) . '"><i class="fa fa-pencil-square-o"></i></button>' : '';
+
+      // Check if allowed to copy
+      $copyOP = $this->role->canDo('copy_files') ? '<a title="Copy file" data-tippy-content="Copy file" href="' . get_site_url('admin/files/copy/') . '?p=' . urlencode($this->cfmh->currentPath()) . '&amp;copy=' . urlencode(trim($f, '/')) . '" rel="modal:open"><i class="fa fa-files-o"></i></a>' : '';
+
       // Set to output
       $this->data['opFiles'] .= '<tr>
           <td class="custom-checkbox-td">
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="' . $ik . '" name="file[]" value="' . $this->cfmh->enc($f) . '">
-              <label class="custom-control-label" for="' . $ik . '"></label>
-            </div>
+            <label>
+              <input type="checkbox"  id="' . $ik . '" name="file[]" value="' . $this->cfmh->enc($f) . '">
+              <span></span>
+            </label>
           </td>
           <td>
             <div class="filename">
@@ -835,9 +719,7 @@ class Files extends Cornerstone\Controller
           ' . $op_file_cols . '
           <td class="inline-actions">
             <a title="Preview" href="' . $filelink . '&quickView=1' . '" data-toggle="lightbox" data-gallery="tiny-gallery" data-title="' . $this->cfmh->convert_win($this->cfmh->enc($f)) . '" data-max-width="100%" data-width="100%"><i class="fa fa-eye"></i></a>
-            <a title="Delete" href="?p=' . urlencode($this->data['path']) . '&amp;del=' . urlencode($f) . '" onclick="return confirm(\'Delete File?\'\n \n ( ' . urlencode($f) . ' )\');"> <i class="fa fa-trash-o"></i></a>
-            <a title="Rename" href="#" onclick="rename(\'' . $this->cfmh->enc(addslashes($this->cfmh->currentPath())) . '\', \'' . $this->cfmh->enc(addslashes($f)) . '\');return false;"><i class="fa fa-pencil-square-o"></i></a>
-            <a title="Copy to..." href="?p=' . urlencode($this->cfmh->currentPath()) . '&amp;copy=' . urlencode(trim($this->cfmh->currentPath() . '/' . $f, '/')) . '"><i class="fa fa-files-o"></i></a>
+            ' . $deleteOP . $renameOP . $copyOP . '
             <a title="Direct link" href="' . $this->cfmh->enc(get_site_url(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f)) . '" target="_blank"><i class="fa fa-link"></i></a>
             <a title="Download" href="?p=' . urlencode($this->cfmh->currentPath()) . '&amp;dl=' . urlencode($f) . '"><i class="fa fa-download"></i></a>
           </td>
@@ -874,13 +756,23 @@ class Files extends Cornerstone\Controller
 
       // Check to output permission columns
       $op_folder_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="?p=' . urlencode($this->data['path']) . '&amp;chmod=' . urlencode($f) . '"> ' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
+
+      // Check if allowed to delete
+      $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete Folder" data-tippy-content="Delete Folder" class="delete-this" data-t="Folder" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="fa fa-trash-o"></i></button>' : '';
+
+      // Check if allowed to rename
+      $renameOP = $this->role->canDo('rename_files') ? '<button type="button" title="Rename Folder" data-tippy-content="Rename Folder" class="rename-this" data-name="' . $this->cfmh->enc(addslashes($f)) . '"><i class="fa fa-pencil-square-o"></i></button>' : '';
+
+      // Check if allowed to copy
+      $copyOP = $this->role->canDo('copy_files') ? '<a title="Copy folder" data-tippy-content="Copy folder" href="' . get_site_url('admin/files/copy/') . '?p=' . urlencode($this->cfmh->currentPath()) . '&amp;copy=' . urlencode(trim($f, '/')) . '" rel="modal:open"><i class="fa fa-files-o"></i></a>' : '';
+
       // Set to output
       $this->data['opFolders'] .= '<tr>
           <td class="custom-checkbox-td">
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="' . $ii . '" name="file[]" value="' . $this->cfmh->enc($f) . '">
-              <label class="custom-control-label" for="' . $ii . '"></label>
-            </div>
+            <label>
+              <input type="checkbox"  id="' . $ii . '" name="file[]" value="' . $this->cfmh->enc($f) . '">
+              <span></span>
+            </label>
           </td>
           <td>
             <div class="filename"><a href="?p=' . urlencode(trim($this->cfmh->currentPath() . '/' . $f, '/')) . '"><i class="' . $img . '"></i> ' . $this->cfmh->convert_win($this->cfmh->enc($f)) . '
@@ -892,10 +784,7 @@ class Files extends Cornerstone\Controller
           <td data-sort="a-' . $modif_raw . '">' . $modif . '</td>
           ' . $op_folder_cols . '
           <td class="inline-actions">
-              <a title="Delete" href="?p=' . urlencode($this->data['path']) . '&amp;del=' . urlencode($f) . '" onclick="return confirm(\'Delete Folder\n \n ( ' . urlencode($f) . ' )\');"> <i class="fa fa-trash-o" aria-hidden="true"></i></a>
-              <a title="Rename" href="#" onclick="rename(\'' . $this->cfmh->enc(addslashes($this->cfmh->currentPath())) . '\', \'' . $this->cfmh->enc(addslashes($f)) . '\');return false;"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-              <a title="Copy to..." href="?p=&amp;copy=' . urlencode(trim($this->cfmh->currentPath() . '/' . $f, '/')) . '"><i class="fa fa-files-o" aria-hidden="true"></i></a>
-            <a title="Direct link" href="' . $this->cfmh->enc(get_site_url(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f . '/')) . '" target="_blank"><i class="fa fa-link" aria-hidden="true"></i></a>
+            ' . $deleteOP . $renameOP . $copyOP . '
           </td>
         </tr>';
       flush();
@@ -923,7 +812,7 @@ class Files extends Cornerstone\Controller
     }
 
     // Load view
-    $this->load->view('common/filemanager', $this->data, 'admin');
+    $this->load->view('files/index', $this->data, 'admin');
     exit;
   }
 
@@ -935,7 +824,7 @@ class Files extends Cornerstone\Controller
   public function upload(...$params)
   {
     // Check user is allowed to view this
-    if (!$this->role->canDo('upload_files')) {
+    if (!$this->role->canDo('add_files')) {
       // Redirect user with error
       flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to upload files. Please contact your site administrator for access to this.', 'warning');
       redirectTo('admin/files/');
@@ -951,6 +840,70 @@ class Files extends Cornerstone\Controller
   }
 
   /**
+   * Create Page
+   *
+   * @param mixed $params Mixed values of extra parameters
+   */
+  public function create(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('add_files')) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to add files. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/files/');
+      exit;
+    }
+
+    // Set params to request
+    $this->request->set_params($params);
+    $this->request->set_params($params);
+
+    //Check if page posted and process form if it is
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "create") {
+
+      // Sanitize POST data
+      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+      // Create item
+      $type = htmlspecialchars(trim($_POST['item_type']));
+      $new = str_replace('/', '', $this->cfmh->clean_path(strip_tags($_POST['item_name'])));
+      if ($this->cfmh->is_valid_filename($new) && $new != '' && $new != '..' && $new != '.') {
+        // set path
+        $path = $this->cfmh->rootPath();
+        if ($this->cfmh->currentPath() != '') {
+          $path .= '/' . $this->cfmh->currentPath();
+        }
+        if ($type == "file") {
+          if (!file_exists($path . '/' . $new)) {
+            if ($this->cfmh->is_valid_ext($new)) {
+              @fopen($path . '/' . $new, 'w') or die('Cannot open file:  ' . $new);
+              flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('File "<em>%s</em>" created', $this->cfmh->enc($new)), 'success');
+            } else {
+              flashMsg('admin_filemanager', '<strong>Error</strong> File extension is not allowed. Please try again.', 'danger');
+            }
+          } else {
+            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('File "<em>%s</em>" already exists', $this->cfmh->enc($new)), 'danger');
+          }
+        } else {
+          if ($this->cfmh->mkdir($path . '/' . $new, false) === true) {
+            flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Folder "<em>%s</em>" created', $this->cfmh->enc($new)), 'success');
+          } elseif (fm_mkdir($path . '/' . $new, false) === $path . '/' . $new) {
+            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Folder "<em>%s</em>" already exists', $this->cfmh->enc($new)), 'danger');
+          } else {
+            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Folder "<em>%s</em>" not created. Please try again.', $this->cfmh->enc($new)), 'danger');
+          }
+        }
+      } else {
+        flashMsg('admin_filemanager', '<strong>Error</strong> Invalid characters in file or folder name. Please try again.', 'danger');
+      }
+    } else { // Page wasn't posted.
+      flashMsg('admin_filemanager', '<strong>Error</strong> There was an error creating your new item. Please try again.', 'warning');
+    }
+    redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+    exit;
+  }
+
+  /**
    * Copy Page
    *
    * @param mixed $params Mixed values of extra parameters
@@ -958,9 +911,9 @@ class Files extends Cornerstone\Controller
   public function copy(...$params)
   {
     // Check user is allowed to view this
-    if (!$this->role->canDo('upload_files')) {
+    if (!$this->role->canDo('add_files')) {
       // Redirect user with error
-      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to upload files. Please contact your site administrator for access to this.', 'warning');
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to copy files. Please contact your site administrator for access to this.', 'warning');
       redirectTo('admin/files/');
       exit;
     }
@@ -968,8 +921,208 @@ class Files extends Cornerstone\Controller
     // Set params to request
     $this->request->set_params($params);
 
-    // Load view
-    $this->load->view('common/filemanager', $this->data, 'admin');
+    //Check if page posted and process form if it is
+    if (
+      $_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && ($_POST['action'] == "copy" || $_POST['action'] == "move")
+    ) {
+
+      // Sanitize POST data
+      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+      // from
+      $path = $this->cfmh->clean_path($_POST['path']);
+      $copy = $this->cfmh->clean_path($path . _DS . $_POST['item']);
+      // empty path
+      if ($copy == '') {
+        flashMsg('admin_filemanager', '<strong>Error</strong> Source path not defined', 'warning');
+        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      }
+      // abs path from
+      $from = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->cfmh->rootPath() . _DS . $copy);
+      // abs path to
+      $dest = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->cfmh->rootPath());
+      if (!empty($_POST['destination'])) {
+        $dest = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->cfmh->clean_path($_POST['destination']));
+      }
+      $dest .= _DS . $this->cfmh->clean_path($_POST['item']);
+      // move?
+      $move = isset($_POST['action']) && $_POST['action'] == "move";
+      // copy/move/duplicate
+      if ($from != $dest) {
+        if ($move) { // Move and to != from so just perform move
+          $rename = $this->cfmh->rename($from, $dest);
+          if ($rename) {
+            flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Moved from "<em>%s</em>" to "<em>%s</em>"', $this->cfmh->enc($this->cfmh->get_relative_path($copy)), $this->cfmh->enc($this->cfmh->get_relative_path($dest))), 'success');
+            redirectTo('admin/files/?p=' . urlencode($this->cfmh->get_relative_path_folder($dest)));
+            exit;
+          } elseif ($rename === null) {
+            flashMsg('admin_filemanager', '<strong>Error</strong> File or folder with this path already exists. Please try again.', 'warning');
+          } else {
+            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Error while moving from "<em>%s</em>" to "<em>%s</em>"', $this->cfmh->enc($this->cfmh->get_relative_path($copy)), $this->cfmh->enc($this->cfmh->get_relative_path($dest))), 'danger');
+          }
+        } else { // Not move and to != from so copy with original name
+          if ($this->cfmh->rcopy($from, $dest)) {
+            flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Copied from "<em>%s</em>" to "<em>%s</em>"', $this->cfmh->enc($this->cfmh->get_relative_path($copy)), $this->cfmh->enc($this->cfmh->get_relative_path($dest))), 'success');
+            redirectTo('admin/files/?p=' . urlencode($this->cfmh->get_relative_path_folder($dest)));
+            exit;
+          } else {
+            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Error while copying from "<em>%s</em>" to "<em>%s</em>"', $this->cfmh->enc($this->cfmh->get_relative_path($copy)), $this->cfmh->enc($this->cfmh->get_relative_path($dest))), 'danger');
+          }
+        }
+      } else {
+        if (!$move) { //Not move and to = from so duplicate
+          $fn_parts = pathinfo($from);
+          $extension_suffix = '';
+          if (!is_dir($from)) {
+            $extension_suffix = '.' . $fn_parts['extension'];
+          }
+          //Create new name for duplicate
+          $fn_duplicate = $fn_parts['dirname'] . '/' . $fn_parts['filename'] . '-' . date('YmdHis') . $extension_suffix;
+          $loop_count = 0;
+          $max_loop = 1000;
+          // Check if a file with the duplicate name already exists, if so, make new name (edge case...)
+          while (file_exists($fn_duplicate) & $loop_count < $max_loop) {
+            $fn_parts = pathinfo($fn_duplicate);
+            $fn_duplicate = $fn_parts['dirname'] . '/' . $fn_parts['filename'] . '-copy' . $extension_suffix;
+            $loop_count++;
+          }
+          if ($this->cfmh->rcopy($from, $fn_duplicate, False)) {
+            flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Copied from "<em>%s</em>" to "<em>%s</em>"', $this->cfmh->enc($this->cfmh->get_relative_path($copy)), $this->cfmh->enc($this->cfmh->get_relative_path($fn_duplicate))), 'success');
+            redirectTo('admin/files/?p=' . urlencode($this->cfmh->get_relative_path_folder($fn_duplicate)));
+            exit;
+          } else {
+            flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Error while copying from "<em>%s</em>" to "<em>%s</em>"', $this->cfmh->enc($this->cfmh->get_relative_path($copy)), $this->cfmh->enc($this->cfmh->get_relative_path($fn_duplicate))), 'danger');
+          }
+        } else {
+          flashMsg('admin_filemanager', '<strong>Error</strong> Paths must not match. Please try again.', 'warning');
+        }
+      }
+      redirectTo('admin/files/?p=' . urlencode($this->cfmh->get_relative_path_folder($from)));
+    } else { // Page wasn't posted.
+
+      // get source path
+      $this->data['path'] = '';
+      if ($this->cfmh->currentPath() != '') {
+        $this->data['path'] = $this->cfmh->currentPath();
+      }
+
+      // Check for item
+      if (!empty($this->request->get['copy'])) {
+        $this->data['item'] = $this->request->get['copy'];
+      } else {
+        // No item found. Output error
+        echo '<div class="modal csc-modal--flowable" style="display: block;"><div class="csc-modal__content"><p><em>No file / folder was selected.<br>Please try again</em></p><p><a href="#" class="csc-btn--flat" rel="modal:close"><span>Cancel</span></a></p></div></div>';
+        exit;
+      }
+
+      // Get list of folders
+      $this->data['folder_options'] = '<option value="">Root Folder</option>';
+      $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($this->cfmh->rootPath(), RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+      );
+      $currentPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->data['path']);
+      $rootPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->cfmh->rootPath());
+      foreach ($iterator as $file) {
+        if ($file->isDir()) {
+          $selected = ($rootPath . _DS . $currentPath === $file->getRealpath()) ? ' selected' : '';
+          $this->data['folder_options'] .= '<option value="' . $file->getRealpath() . '"' . $selected . '>' . str_replace($rootPath, '', $file->getLinkTarget()) . '</option>';
+        }
+      }
+
+      // Load view
+      $this->load->view('files/copy', $this->data, 'admin');
+      exit;
+    }
+  }
+
+  /**
+   * Rename file / folder
+   *
+   * @param mixed $params Mixed values of extra parameters
+   */
+  public function rename(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('rename_files')) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to rename files. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/files/');
+      exit;
+    }
+
+    // Set params to request
+    $this->request->set_params($params);
+
+    // Check that the file / folder is set
+    if (isset($this->request->get['current']) && isset($this->request->get['new'])) {
+      // old name
+      $old = str_replace('/', '', $this->cfmh->clean_path($this->request->get['current']));
+      // new name
+      $new = str_replace('/', '', $this->cfmh->clean_path(strip_tags($this->request->get['new'])));
+      // path
+      $path = $this->cfmh->rootPath();
+      if ($this->cfmh->currentPath() != '') {
+        $path .= '/' . $this->cfmh->currentPath();
+      }
+      // rename
+      if ($this->cfmh->is_valid_filename($new) && $old != '' && $new != '') {
+        if ($this->cfmh->rename($path . '/' . $old, $path . '/' . $new)) {
+          flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Renamed from "<em>%s</em>" to "<em>%s</em>"', $this->cfmh->enc($old), $this->cfmh->enc($new)), 'success');
+        } else {
+          flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Error while renaming from "<em>%s</em>" to "<em>%s</em>"', $this->cfmh->enc($old), $this->cfmh->enc($new)), 'danger');
+        }
+      } else {
+        flashMsg('admin_filemanager', '<strong>Error</strong> Invalid characters in file name. Please try again.', 'warning');
+      }
+    } else {
+      flashMsg('admin_filemanager', '<strong>Error</strong> Invalid file or folder name', 'warning');
+    }
+    redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+    exit;
+  }
+
+  /**
+   * Delete file / folder
+   *
+   * @param mixed $params Mixed values of extra parameters
+   */
+  public function delete(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('delete_files')) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to delete files. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/files/');
+      exit;
+    }
+
+    // Set params to request
+    $this->request->set_params($params);
+
+    // Check that the file / folder is set
+    if (isset($this->request->get['f'])) {
+      $del = str_replace('/', '', $this->cfmh->clean_path($this->request->get['f']));
+      if ($del != '' && $del != '..' && $del != '.') {
+        $path = $this->cfmh->rootPath();
+        if ($this->cfmh->currentPath() != '') {
+          $path .= '/' . $this->cfmh->currentPath();
+        }
+        $is_dir = is_dir($path . '/' . $del);
+        if ($this->cfmh->rdelete($path . '/' . $del)) {
+          $msg = $is_dir ? 'Folder "<em>%s</em>"' : 'File "<em>%s</em>"';
+          flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf($msg, $this->cfmh->enc($del)) . ' was deleted', 'success');
+        } else {
+          $msg = $is_dir ? 'Folder "<em>%s</em>" ' : 'File "<em>%s</em>"';
+          flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf($msg, $this->cfmh->enc($del)) . ' was unable to be deleted. Please try again.', 'danger');
+        }
+      } else {
+        flashMsg('admin_filemanager', '<strong>Error</strong> Invalid file or folder name', 'warning');
+      }
+    } else {
+      flashMsg('admin_filemanager', '<strong>Error</strong> Invalid file or folder name', 'warning');
+    }
+    redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
     exit;
   }
 }

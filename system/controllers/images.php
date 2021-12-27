@@ -2,7 +2,7 @@
 // import the Intervention Image Manager Class ~ http://image.intervention.io/
 use Intervention\Image\ImageManager;
 
-class Images extends Controller
+class Images extends Cornerstone\Controller
 {
 
   private $manager;

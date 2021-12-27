@@ -6,7 +6,7 @@
  * @package Cornerstone
  */
 
-class Component extends Controller
+class Component extends Cornerstone\Controller
 {
 
   // Default Page
