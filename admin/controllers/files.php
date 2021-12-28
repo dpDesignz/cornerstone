@@ -2,6 +2,8 @@
 
 use Cornerstone\FileManager;
 
+// Based on Tiny File Manager ~ https://tinyfilemanager.github.io/
+
 class Files extends Cornerstone\Controller
 {
 
@@ -88,7 +90,7 @@ class Files extends Cornerstone\Controller
       // save
       if (isset($_POST['type']) && $_POST['type'] == "save") {
         // get current path
-        $path = $this->cmfh->rootPath();
+        $path = $this->cfmh->rootPath();
         if ($this->cfmh->currentPath() != '') {
           $path .= '/' . $this->cfmh->currentPath();
         }
@@ -153,170 +155,6 @@ class Files extends Cornerstone\Controller
         }
       }
 
-      //upload using url
-      if (isset($_POST['type']) && $_POST['type'] == "upload" && !empty($_REQUEST["uploadurl"])) {
-        $path = $this->cmfh->rootPath();
-        if ($this->cfmh->currentPath() != '') {
-          $path .= '/' . $this->cfmh->currentPath();
-        }
-
-        $url = !empty($_REQUEST["uploadurl"]) && preg_match("|^http(s)?://.+$|", stripslashes($_REQUEST["uploadurl"])) ? stripslashes($_REQUEST["uploadurl"]) : null;
-
-        //prevent 127.* domain and known ports
-        $domain = parse_url($url, PHP_URL_HOST);
-        $port = parse_url($url, PHP_URL_PORT);
-        $knownPorts = [22, 23, 25, 3306];
-
-        if (preg_match("/^localhost$|^127(?:\.[0-9]+){0,2}\.[0-9]+$|^(?:0*\:)*?:?0*1$/i", $domain) || in_array($port, $knownPorts)) {
-          $err = array("message" => "URL is not allowed");
-          $this->cfmh->event_callback(array("fail" => $err));
-          exit();
-        }
-
-        $use_curl = false;
-        $temp_file = tempnam(sys_get_temp_dir(), "upload-");
-        $fileinfo = new stdClass();
-        $fileinfo->name = trim(basename($url), ".\x00..\x20");
-
-        $allowed = ($this->cfmh->allowedUploadExtensions()) ? explode(',', $this->cfmh->allowedUploadExtensions()) : false;
-        $ext = strtolower(pathinfo($fileinfo->name, PATHINFO_EXTENSION));
-        $isFileAllowed = ($allowed) ? in_array($ext, $allowed) : true;
-
-        $err = false;
-
-        if (!$isFileAllowed) {
-          $err = array("message" => "File extension is not allowed");
-          $this->cfmh->event_callback(array("fail" => $err));
-          exit();
-        }
-
-        if (!$url) {
-          $success = false;
-        } else if ($use_curl) {
-          @$fp = fopen($temp_file, "w");
-          @$ch = curl_init($url);
-          curl_setopt($ch, CURLOPT_NOPROGRESS, false);
-          curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-          curl_setopt($ch, CURLOPT_FILE, $fp);
-          @$success = curl_exec($ch);
-          $curl_info = curl_getinfo($ch);
-          if (!$success) {
-            $err = array("message" => curl_error($ch));
-          }
-          @curl_close($ch);
-          fclose($fp);
-          $fileinfo->size = $curl_info["size_download"];
-          $fileinfo->type = $curl_info["content_type"];
-        } else {
-          $ctx = stream_context_create();
-          @$success = copy($url, $temp_file, $ctx);
-          if (!$success) {
-            $err = error_get_last();
-          }
-        }
-
-        if ($success) {
-          $success = rename($temp_file, $this->cfmh->get_file_path($path, $fileinfo));
-        }
-
-        if ($success) {
-          $this->cfmh->event_callback(array("done" => $fileinfo));
-        } else {
-          unlink($temp_file);
-          if (!$err) {
-            $err = array("message" => "Invalid url parameter");
-          }
-          $this->cfmh->event_callback(array("fail" => $err));
-        }
-      }
-
-      exit();
-    }
-
-    // Upload
-    if (!empty($_FILES)) {
-      $override_file_name = false;
-      $f = $_FILES;
-      $path = $this->cfmh->rootPath();
-      $ds = DIRECTORY_SEPARATOR;
-      if ($this->cfmh->currentPath() != '') {
-        $path .= '/' . $this->cfmh->currentPath();
-      }
-
-      $errors = 0;
-      $uploads = 0;
-      $allowed = ($this->cfmh->allowedUploadExtensions()) ? explode(',', $this->cfmh->allowedUploadExtensions()) : false;
-      $response = array(
-        'status' => 'error',
-        'info'   => 'Oops! Try again'
-      );
-
-      $filename = $f['file']['name'];
-      $tmp_name = $f['file']['tmp_name'];
-      $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-      $isFileAllowed = ($allowed) ? in_array(
-        $ext,
-        $allowed
-      ) : true;
-
-      if (!$this->cfmh->is_valid_filename($filename) && !$this->cfmh->is_valid_filename($_REQUEST['fullpath'])) {
-        $response = array(
-          'status'    => 'error',
-          'info'      => "Invalid File name!",
-        );
-        echo json_encode($response);
-        exit();
-      }
-
-      $targetPath = $path . $ds;
-      if (is_writable($targetPath)) {
-        $fullPath = $path . '/' . str_replace("./", "_", $_REQUEST['fullpath']);
-        $folder = substr($fullPath, 0, strrpos($fullPath, "/"));
-
-        if (file_exists($fullPath) && !$override_file_name) {
-          $ext_1 = $ext ? '.' . $ext : '';
-          $fullPath = str_replace(
-            $ext_1,
-            '',
-            $fullPath
-          ) . '_' . date('ymdHis') . $ext_1;
-        }
-
-        if (!is_dir($folder)) {
-          $old = umask(0);
-          mkdir($folder, 0777, true);
-          umask($old);
-        }
-
-        if (empty($f['file']['error']) && !empty($tmp_name) && $tmp_name != 'none' && $isFileAllowed) {
-          if (move_uploaded_file($tmp_name, $fullPath)) {
-            // Be sure that the file has been uploaded
-            if (file_exists($fullPath)) {
-              $response = array(
-                'status'    => 'success',
-                'info' => "file upload successful"
-              );
-            } else {
-              $response = array(
-                'status' => 'error',
-                'info'   => 'Couldn\'t upload the requested file.'
-              );
-            }
-          } else {
-            $response = array(
-              'status'    => 'error',
-              'info'      => "Error while uploading files. Uploaded files $uploads",
-            );
-          }
-        }
-      } else {
-        $response = array(
-          'status' => 'error',
-          'info'   => 'The specified folder for upload isn\'t writeable.'
-        );
-      }
-      // Return the response
-      echo json_encode($response);
       exit();
     }
 
@@ -495,76 +333,6 @@ class Files extends Cornerstone\Controller
       redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
     }
 
-    // Download
-    if (isset($_GET['dl'])) {
-      $dl = $_GET['dl'];
-      $dl = $this->cfmh->clean_path($dl);
-      $dl = str_replace('/', '', $dl);
-      $path = $this->cfmh->rootPath();
-      if ($this->cfmh->currentPath() != '') {
-        $path .= '/' . $this->cfmh->currentPath();
-      }
-      if ($dl != '' && is_file($path . '/' . $dl)) {
-        $this->cfmh->download_file($path . '/' . $dl, $dl, 1024);
-        exit;
-      } else {
-        flashMsg('admin_filemanager', '<strong>Error</strong> File not found. Please try again.', 'warning');
-        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-      }
-    }
-
-    // Change Perms (not for Windows)
-    if (isset($_POST['chmod']) && $this->cfmh->isWindows()) {
-      $path = $this->cfmh->rootPath();
-      if ($this->cfmh->currentPath() != '') {
-        $path .= '/' . $this->cfmh->currentPath();
-      }
-
-      $file = $_POST['chmod'];
-      $file = $this->cfmh->clean_path($file);
-      $file = str_replace('/', '', $file);
-      if ($file == '' || (!is_file($path . '/' . $file) && !is_dir($path . '/' . $file))) {
-        flashMsg('admin_filemanager', '<strong>Error</strong> File not found. Please try again.', 'warning');
-        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-      }
-
-      $mode = 0;
-      if (!empty($_POST['ur'])) {
-        $mode |= 0400;
-      }
-      if (!empty($_POST['uw'])) {
-        $mode |= 0200;
-      }
-      if (!empty($_POST['ux'])) {
-        $mode |= 0100;
-      }
-      if (!empty($_POST['gr'])) {
-        $mode |= 0040;
-      }
-      if (!empty($_POST['gw'])) {
-        $mode |= 0020;
-      }
-      if (!empty($_POST['gx'])) {
-        $mode |= 0010;
-      }
-      if (!empty($_POST['or'])) {
-        $mode |= 0004;
-      }
-      if (!empty($_POST['ow'])) {
-        $mode |= 0002;
-      }
-      if (!empty($_POST['ox'])) {
-        $mode |= 0001;
-      }
-
-      if (@chmod($path . '/' . $file, $mode)) {
-        flashMsg('admin_filemanager', '<strong>Success</strong> Permissions changed.', 'success');
-      } else {
-        flashMsg('admin_filemanager', '<strong>Error</strong> Permissions not changed.', 'warning');
-      }
-      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-    }
-
     // Mass deleting
     if (isset($_POST['group'], $_POST['delete'])) {
       $path = $this->cfmh->rootPath();
@@ -685,7 +453,7 @@ class Files extends Cornerstone\Controller
       }
 
       // Check to output permission columns
-      $op_file_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="?p= ' . urlencode($this->data['path']) . '&amp;chmod=' . urlencode($f) . '">' . $perms . '</a></td>' : '';
+      $op_file_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="' . get_site_url('admin/files/chmod/?p= ' . urlencode($this->data['path']) . '&amp;item=' . urlencode($f)) . '">' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
 
       // Check if allowed to delete
       $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete File" data-tippy-content="Delete File" class="delete-this" data-t="File" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="fa fa-trash-o"></i></button>' : '';
@@ -720,8 +488,8 @@ class Files extends Cornerstone\Controller
           <td class="inline-actions">
             <a title="Preview" href="' . $filelink . '&quickView=1' . '" data-toggle="lightbox" data-gallery="tiny-gallery" data-title="' . $this->cfmh->convert_win($this->cfmh->enc($f)) . '" data-max-width="100%" data-width="100%"><i class="fa fa-eye"></i></a>
             ' . $deleteOP . $renameOP . $copyOP . '
-            <a title="Direct link" href="' . $this->cfmh->enc(get_site_url(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f)) . '" target="_blank"><i class="fa fa-link"></i></a>
-            <a title="Download" href="?p=' . urlencode($this->cfmh->currentPath()) . '&amp;dl=' . urlencode($f) . '"><i class="fa fa-download"></i></a>
+            <a title="Direct link" href="' . $this->cfmh->enc(get_site_url('files' . ($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f)) . '" target="_blank"><i class="fa fa-link"></i></a>
+            <a title="Download" href="' . get_site_url('admin/files/download/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;file=' . urlencode($f)) . '"><i class="fa fa-download"></i></a>
           </td>
         </tr>';
       flush();
@@ -755,7 +523,7 @@ class Files extends Cornerstone\Controller
       }
 
       // Check to output permission columns
-      $op_folder_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="?p=' . urlencode($this->data['path']) . '&amp;chmod=' . urlencode($f) . '"> ' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
+      $op_folder_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="' . get_site_url('admin/files/chmod/?p= ' . urlencode($this->data['path']) . '&amp;item=' . urlencode($f)) . '">' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
 
       // Check if allowed to delete
       $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete Folder" data-tippy-content="Delete Folder" class="delete-this" data-t="Folder" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="fa fa-trash-o"></i></button>' : '';
@@ -834,8 +602,193 @@ class Files extends Cornerstone\Controller
     // Set params to request
     $this->request->set_params($params);
 
+    //Check if page posted and process form if it is - UPLOAD FROM URL
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "upload-url") {
+
+      // Sanitize POST data
+      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+      // Get path
+      $path = $this->cfmh->rootPath();
+      if ($this->cfmh->currentPath() != '') {
+        $path .= '/' . $this->cfmh->currentPath();
+      }
+
+      $this->data['uploadurl'] = !empty($_POST["uploadurl"]) && preg_match("|^http(s)?://.+$|", stripslashes($_POST["uploadurl"])) ? stripslashes($_POST["uploadurl"]) : null;
+
+      //prevent 127.* domain and known ports
+      $domain = parse_url($this->data['uploadurl'], PHP_URL_HOST);
+      $port = parse_url($this->data['uploadurl'], PHP_URL_PORT);
+      $knownPorts = [22, 23, 25, 3306];
+
+      if (preg_match("/^localhost$|^127(?:\.[0-9]+){0,2}\.[0-9]+$|^(?:0*\:)*?:?0*1$/i", $domain) || in_array($port, $knownPorts)) {
+        flashMsg('files_upload', '<strong>Error</strong> URL is not allowed. Please try again.', 'danger');
+      }
+
+      $use_curl = false;
+      $temp_file = tempnam(sys_get_temp_dir(), "upload-");
+      $fileinfo = new stdClass();
+      $fileinfo->name = trim(basename($this->data['uploadurl']), ".\x00..\x20");
+
+      $allowed = ($this->cfmh->allowedUploadExtensions()) ? explode(',', $this->cfmh->allowedUploadExtensions()) : false;
+      $ext = strtolower(pathinfo($fileinfo->name, PATHINFO_EXTENSION));
+      $isFileAllowed = ($allowed) ? in_array($ext, $allowed) : true;
+
+      $err = false;
+
+      if (!$isFileAllowed) {
+        flashMsg('files_upload', '<strong>Error</strong> File extension is not allowed. Please try again.', 'danger');
+      }
+
+      if (!$this->data['uploadurl']) {
+        $success = false;
+      } else if ($use_curl) {
+        @$fp = fopen($temp_file, "w");
+        @$ch = curl_init($this->data['uploadurl']);
+        curl_setopt($ch, CURLOPT_NOPROGRESS, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        @$success = curl_exec($ch);
+        $curl_info = curl_getinfo($ch);
+        if (!$success) {
+          $err = curl_error($ch);
+        }
+        @curl_close($ch);
+        fclose($fp);
+        $fileinfo->size = $curl_info["size_download"];
+        $fileinfo->type = $curl_info["content_type"];
+      } else {
+        $ctx = stream_context_create();
+        @$success = copy($this->data['uploadurl'], $temp_file, $ctx);
+        if (!$success) {
+          $err = error_get_last();
+        }
+      }
+
+      if ($success) {
+        $success = rename($temp_file, $this->cfmh->get_file_path($path, $fileinfo));
+      }
+
+      if ($success) {
+        flashMsg('admin_filemanager', '<strong>Success</strong> File "<em>' . $fileinfo->name . '</em>" has uploaded from the URL provided', 'success');
+        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      } else {
+        unlink($temp_file);
+        if (!$err) {
+          flashMsg('files_upload', '<strong>Error</strong> Invalid url parameter. Please try again.', 'danger');
+        }
+        flashMsg('files_upload', '<strong>Error</strong> ' . $err . '. Please try again.', 'danger');
+      }
+    } else if (empty($_POST['action']) && !empty($_FILES)) { // Dropzone Upload
+      $override_file_name = false;
+      $f = $_FILES;
+      $path = $this->cfmh->rootPath();
+      $ds = DIRECTORY_SEPARATOR;
+      if ($this->cfmh->currentPath() != '') {
+        $path .= '/' . $this->cfmh->currentPath();
+      }
+
+      $errors = 0;
+      $uploads = 0;
+      $allowed = ($this->cfmh->allowedUploadExtensions()) ? explode(',', $this->cfmh->allowedUploadExtensions()) : false;
+      $response = array(
+        'status' => 'error',
+        'info'   => 'Oops! Try again'
+      );
+
+      $filename = $f['file']['name'];
+      $tmp_name = $f['file']['tmp_name'];
+      $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+      $isFileAllowed = ($allowed) ? in_array(
+        $ext,
+        $allowed
+      ) : true;
+
+      if (!$this->cfmh->is_valid_filename($filename) && !$this->cfmh->is_valid_filename($_REQUEST['fullpath'])) {
+        $response = array(
+          'status'    => 'error',
+          'info'      => "Invalid File name!",
+        );
+        echo json_encode($response);
+        exit();
+      }
+
+      $targetPath = $path . $ds;
+      if (is_writable($targetPath)) {
+        $fullPath = $path . '/' . str_replace("./", "_", $_REQUEST['fullpath']);
+        $folder = substr($fullPath, 0, strrpos($fullPath, "/"));
+
+        if (file_exists($fullPath) && !$override_file_name) {
+          $ext_1 = $ext ? '.' . $ext : '';
+          $fullPath = str_replace(
+            $ext_1,
+            '',
+            $fullPath
+          ) . '_' . date('ymdHis') . $ext_1;
+        }
+
+        if (!is_dir($folder)) {
+          $old = umask(0);
+          mkdir($folder, 0777, true);
+          umask($old);
+        }
+
+        if (empty($f['file']['error']) && !empty($tmp_name) && $tmp_name != 'none' && $isFileAllowed) {
+          if (move_uploaded_file($tmp_name, $fullPath)) {
+            // Be sure that the file has been uploaded
+            if (file_exists($fullPath)) {
+              $response = array(
+                'status'    => 'success',
+                'info' => "file upload successful"
+              );
+            } else {
+              $response = array(
+                'status' => 'error',
+                'info'   => 'Couldn\'t upload the requested file.'
+              );
+            }
+          } else {
+            $response = array(
+              'status'    => 'error',
+              'info'      => "Error while uploading files. Uploaded files $uploads",
+            );
+          }
+        }
+      } else {
+        $response = array(
+          'status' => 'error',
+          'info'   => 'The specified folder for upload isn\'t writeable.'
+        );
+      }
+      // Return the response
+      echo json_encode($response);
+      exit();
+    }
+
+    // Set paths
+    $this->data['current_path'] = $this->cfmh->currentPath();
+    $this->data['current_path_enc'] = $this->cfmh->enc($this->cfmh->currentPath());
+    $this->data['destination_folder'] = $this->cfmh->enc($this->cfmh->convert_win($this->cfmh->currentPath()));
+
+    // Set options for Dropzone
+    $this->data['max_file_size'] = $this->cfmh->maxUploadSize();
+    $this->data['accepted_files'] = '';
+    $extArr = explode(',', $this->cfmh->allowedUploadExtensions());
+    if ($this->cfmh->allowedUploadExtensions() && $extArr) {
+      array_walk($extArr, function (&$x) {
+        $x = ".$x";
+      });
+      $this->data['accepted_files'] = implode(',', $extArr);
+    }
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => 'File Upload',
+      'href' => get_site_url("admin/files/upload/?p={$this->cfmh->currentPath()}")
+    );
+
     // Load view
-    $this->load->view('common/filemanager', $this->data, 'admin');
+    $this->load->view('files/upload', $this->data, 'admin');
     exit;
   }
 
@@ -855,7 +808,6 @@ class Files extends Cornerstone\Controller
     }
 
     // Set params to request
-    $this->request->set_params($params);
     $this->request->set_params($params);
 
     //Check if page posted and process form if it is
@@ -900,6 +852,104 @@ class Files extends Cornerstone\Controller
       flashMsg('admin_filemanager', '<strong>Error</strong> There was an error creating your new item. Please try again.', 'warning');
     }
     redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+    exit;
+  }
+
+  /**
+   * View File Page
+   *
+   * @param mixed $params Mixed values of extra parameters
+   */
+  public function view(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('view_files')) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to view files. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/files/');
+      exit;
+    }
+
+    // Set params to request
+    $this->request->set_params($params);
+
+    // get current path
+    $this->data['path'] = $this->cfmh->rootPath();
+    if ($this->cfmh->currentPath() != '') {
+      $this->data['path'] .= '/' . $this->cfmh->currentPath();
+    }
+
+    // Get file information
+    $this->data['quickView'] = (isset($this->request->get['quickView']) && $this->request->get['quickView'] == 1) ? true : false;
+    $file = str_replace('/', '', $this->cfmh->clean_path($this->request->get['view'], false));
+    if ($file == '' || !is_file($this->data['path'] . '/' . $file) || in_array($file, $GLOBALS['exclude_items'])) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> File not found. Please try again.', 'warning');
+      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      exit;
+    }
+
+    $this->data['file_url'] = get_site_url('files' . $this->cfmh->convert_win(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $file));
+    $file_path = $this->data['path'] . '/' . $file;
+
+    $ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+    $mime_type = fm_get_mime_type($file_path);
+    $filesize_raw = fm_get_size($file_path);
+    $filesize = fm_get_filesize($filesize_raw);
+
+    $is_zip = false;
+    $is_gzip = false;
+    $is_image = false;
+    $is_audio = false;
+    $is_video = false;
+    $is_text = false;
+    $is_onlineViewer = false;
+
+    $view_title = 'File';
+    $filenames = false; // for zip
+    $content = ''; // for text
+    $online_viewer = strtolower(FM_DOC_VIEWER);
+
+    if ($online_viewer && $online_viewer !== 'false' && in_array($ext, fm_get_onlineViewer_exts())) {
+      $is_onlineViewer = true;
+    } elseif ($ext == 'zip' || $ext == 'tar') {
+      $is_zip = true;
+      $view_title = 'Archive';
+      $filenames = fm_get_zif_info(
+        $file_path,
+        $ext
+      );
+    } elseif (in_array($ext, fm_get_image_exts())) {
+      $is_image = true;
+      $view_title = 'Image';
+    } elseif (in_array($ext, fm_get_audio_exts())) {
+      $is_audio = true;
+      $view_title = 'Audio';
+    } elseif (in_array($ext, fm_get_video_exts())) {
+      $is_video = true;
+      $view_title = 'Video';
+    } elseif (
+      in_array($ext, fm_get_text_exts()) || substr($mime_type, 0, 4) == 'text' || in_array($mime_type, fm_get_text_mimes())
+    ) {
+      $is_text = true;
+      $content = file_get_contents($file_path);
+    }
+
+    // Set paths
+    $this->data['current_path'] = $this->cfmh->currentPath();
+    $this->data['current_path_enc'] = $this->cfmh->enc($this->cfmh->currentPath());
+    $this->data['file_enc'] = $this->cfmh->enc($file);
+    $this->data['file_path'] = $this->data['current_path'] . '/' . $file;
+    $this->data['file_mode'] = fileperms($this->data['path'] . '/' . $file);
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => '',
+      'href' => get_site_url("admin/files/view/?p={$this->cfmh->currentPath()}?view={$this->request->get['view']}")
+    );
+
+    // Load view
+    $this->load->view('files/view', $this->data, 'admin');
     exit;
   }
 
@@ -1080,6 +1130,159 @@ class Files extends Cornerstone\Controller
     }
     redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
     exit;
+  }
+
+  /**
+   * Change Perms (not for Windows) Page
+   *
+   * @param mixed $params Mixed values of extra parameters
+   */
+  public function chmod(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('chmod_files')) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to change file permissions. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/files/');
+      exit;
+    }
+
+    // Check isn't windows
+    if ($this->cfmh->isWindows()) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, changing file permissions is not available on the Windows system.', 'danger');
+      redirectTo('admin/files/?p=' . $this->cfmh->currentPath());
+      exit;
+    }
+
+    // Set params to request
+    $this->request->set_params($params);
+
+    // get current path
+    $this->data['path'] = $this->cfmh->rootPath();
+    if ($this->cfmh->currentPath() != '') {
+      $this->data['path'] .= '/' . $this->cfmh->currentPath();
+    }
+
+    //Check if page posted and process form if it is - UPLOAD FROM URL
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "change") {
+
+      // Sanitize POST data
+      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+      $file = $_POST['item'];
+      $file = $this->cfmh->clean_path($file);
+      $file = str_replace('/', '', $file);
+      if ($file == '' || (!is_file($this->data['path'] . '/' . $file) && !is_dir($this->data['path'] . '/' . $file))) {
+        flashMsg('admin_filemanager', '<strong>Error</strong> File not found. Please try again.', 'warning');
+        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      }
+
+      $mode = 0;
+      if (!empty($_POST['ur'])) {
+        $mode |= 0400;
+      }
+      if (!empty($_POST['uw'])) {
+        $mode |= 0200;
+      }
+      if (!empty($_POST['ux'])) {
+        $mode |= 0100;
+      }
+      if (!empty($_POST['gr'])) {
+        $mode |= 0040;
+      }
+      if (!empty($_POST['gw'])) {
+        $mode |= 0020;
+      }
+      if (!empty($_POST['gx'])) {
+        $mode |= 0010;
+      }
+      if (!empty($_POST['or'])) {
+        $mode |= 0004;
+      }
+      if (!empty($_POST['ow'])) {
+        $mode |= 0002;
+      }
+      if (!empty($_POST['ox'])) {
+        $mode |= 0001;
+      }
+
+      if (@chmod($this->data['path'] . '/' . $file, $mode)) {
+        flashMsg('admin_filemanager', '<strong>Success</strong> Permissions changed.', 'success');
+        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      } else {
+        flashMsg('files_chmod', '<strong>Error</strong> Permissions not changed. Please try again', 'warning');
+      }
+    }
+
+    // Check file found
+    $file = str_replace('/', '', $this->cfmh->clean_path($this->request->get['item']));
+    if ($file == '' || (!is_file($this->data['path'] . '/' . $file) && !is_dir($this->data['path'] . '/' . $file))) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Item not found. Please try again.', 'warning');
+      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      exit;
+    }
+
+    // Item type
+    $this->data['item_type'] = 'Item';
+    if (is_file($this->data['path'] . '/' . $file)) {
+      $this->data['item_type'] = 'File';
+    } else if (is_dir($this->data['path'] . '/' . $file)) {
+      $this->data['item_type'] = 'Folder';
+    }
+
+    // Set paths
+    $this->data['current_path'] = $this->cfmh->currentPath();
+    $this->data['current_path_enc'] = $this->cfmh->enc($this->cfmh->currentPath());
+    $this->data['file_enc'] = $this->cfmh->enc($file);
+    $this->data['file_path'] = $this->data['current_path'] . '/' . $file;
+    $this->data['file_mode'] = fileperms($this->data['path'] . '/' . $file);
+
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => 'Change ' . $this->data['item_type'] . ' Permissions',
+      'href' => get_site_url("admin/files/chmod/?p={$this->cfmh->currentPath()}?item={$this->request->get['item']}")
+    );
+
+    // Load view
+    $this->load->view('files/chmod', $this->data, 'admin');
+    exit;
+  }
+
+  /**
+   * Download file
+   *
+   * @param mixed $params Mixed values of extra parameters
+   */
+  public function download(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('view_files')) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to download files. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/files/');
+      exit;
+    }
+
+    // Set params to request
+    $this->request->set_params($params);
+
+    // Download
+    $dl = $this->request->get['file'];
+    $dl = $this->cfmh->clean_path($dl);
+    $dl = str_replace('/', '', $dl);
+    $path = $this->cfmh->rootPath();
+    if ($this->cfmh->currentPath() != '') {
+      $path .= '/' . $this->cfmh->currentPath();
+    }
+    if ($dl != '' && is_file($path . '/' . $dl)) {
+      $this->cfmh->download_file($path . '/' . $dl, $dl, 1024);
+      exit;
+    } else {
+      flashMsg('admin_filemanager', '<strong>Error</strong> File not found. Please try again.', 'warning');
+      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+    }
   }
 
   /**

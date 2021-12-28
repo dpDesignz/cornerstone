@@ -8,7 +8,7 @@
  */ ?>
 
 <div class="modal csc-modal--flowable" style="display: block; width: 100%;">
-  <form action="<?= get_site_url('admin/files/copy'); ?>" method="POST" id="file-copy-form" class="csc-form">
+  <form action="<?= get_site_url('admin/files/copy/?p=' . $data->path); ?>" method="POST" id="file-copy-form" class="csc-form">
     <div class="csc-modal__header">
       <i class="fas fa-copy"></i> Copying "<em><?= $data->item; ?></em>"
     </div>

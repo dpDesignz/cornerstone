@@ -1051,44 +1051,6 @@ form#faq-form #faq-items .fa-trash-alt {
     padding: 0;
   }
 }
-#admin-file-manager .lds-facebook {
-  display: none;
-  position: relative;
-  width: 64px;
-  height: 64px;
-}
-#admin-file-manager .lds-facebook div, #admin-file-manager .lds-facebook.show-me {
-  display: inline-block;
-}
-#admin-file-manager .lds-facebook div {
-  position: absolute;
-  left: 6px;
-  width: 13px;
-  background: #007bff;
-  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
-}
-#admin-file-manager .lds-facebook div:nth-child(1) {
-  left: 6px;
-  animation-delay: -0.24s;
-}
-#admin-file-manager .lds-facebook div:nth-child(2) {
-  left: 26px;
-  animation-delay: -0.12s;
-}
-#admin-file-manager .lds-facebook div:nth-child(3) {
-  left: 45px;
-  animation-delay: 0s;
-}
-@keyframes lds-facebook {
-  0% {
-    top: 6px;
-    height: 51px;
-  }
-  100%, 50% {
-    top: 19px;
-    height: 26px;
-  }
-}
 #admin-file-manager ul#search-wrapper {
   padding-left: 0;
   border: 1px solid #ecececcc;
@@ -1121,6 +1083,16 @@ form#faq-form #faq-items .fa-trash-alt {
 #admin-file-manager #new-item-types {
   display: flex;
   gap: 10px;
+}
+#admin-file-manager #file-chmod-form table td,
+#admin-file-manager #file-chmod-form table th {
+  padding: 0.75rem;
+  width: 100px;
+  text-align: center;
+  white-space: nowrap;
+}
+#admin-file-manager #file-chmod-form table tr td:nth-child(1) {
+  text-align: right;
 }
 
 section#users-list table tr th:nth-child(1) {

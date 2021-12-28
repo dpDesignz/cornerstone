@@ -172,6 +172,34 @@ function toggleFAQCollapsible() {
         }
     }
 }
+const tabLinks = document.querySelectorAll('.csc-tab');
+if (tabLinks) {
+    tabLinks.forEach(tabLink => {
+        tabLink.addEventListener('click', function (e) {
+            const tabContents = document.querySelectorAll('.csc-tab__content');
+            tabContents.forEach(tabContent => {
+                tabContent.style.display = "none";
+            });
+            tabLinks.forEach(activeLink => {
+                activeLink.classList.remove("csc-tab--active");
+            });
+            const activeTab = document.querySelector(`#tab__${this.dataset.ref}`);
+            if (activeTab) {
+                activeTab.style.display = "block";
+                tabLink.classList.add("csc-tab--active");
+            }
+        });
+    });
+    ready(() => {
+        const activeTab = [...tabLinks].filter(el => el.classList.contains('csc-tab--active') !== false);
+        if (activeTab && activeTab.length > 0) {
+            activeTab[0].click();
+        }
+        else {
+            tabLinks[0].click();
+        }
+    });
+}
 ready(() => {
     const { hash } = window.location;
     if (hash) {

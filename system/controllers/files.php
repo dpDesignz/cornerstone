@@ -5,8 +5,10 @@ class Files extends Cornerstone\Controller
   /**
    * Class Constructor
    */
-  public function __construct()
+  public function __construct($registry)
   {
+    // Load the controller constructor
+    parent::__construct($registry);
   }
 
   /**
@@ -22,6 +24,23 @@ class Files extends Cornerstone\Controller
   }
 
   /**
+   * Serve File
+   *
+   * @param mixed $params
+   */
+  private function serve_file($filepath, $new_filename = null)
+  {
+    $filename = basename($filepath);
+    if (!$new_filename) {
+      $new_filename = $filename;
+    }
+    $mime_type = mime_content_type($filepath);
+    header('Content-type: ' . $mime_type);
+    header('Content-Disposition: inline; filename="' . $new_filename . '"');
+    readfile($filepath);
+  }
+
+  /**
    * Output File
    *
    * @param mixed $params
@@ -33,26 +52,17 @@ class Files extends Cornerstone\Controller
     if (!empty($params)) {
 
       // Set root path
-      $rootPath = DIR_SYSTEM . 'storage' . _DS . 'uploads' . _DS;
+      $rootPath = DIR_SYSTEM . 'storage' . _DS . 'files' . _DS;
 
       // Set the file path
       $filePath = str_replace('/', _DS, implode(_DS, $params));
 
-      // check the file exists
-      if (file_exists($rootPath . $filePath)) {
+      // check the file exists and isn't a directory
+      if (!is_dir($rootPath . $filePath) && file_exists($rootPath . $filePath)) {
 
-        // Get file information
-        $fileInformation = pathinfo($rootPath . $filePath);
-
-        // Check file is a PDF
-        if (strtolower($fileInformation['extension']) == 'pdf') {
-          // Open the file
-          header("Content-type: application/pdf");
-          header("Content-Disposition: inline; filename=" . $fileInformation['basename']);
-          @readfile($rootPath . $filePath);
-          exit;
-        } // File is not a PDF. Redirect to 404
-      } // File doesn't exist. Redirect to 404
+        // Serve the file
+        $this->serve_file($rootPath . $filePath);
+      } // File doesn't exist or is a directory. Redirect to 404
     } // Params were empty. Redirect to 404
 
     // Redirect to root index

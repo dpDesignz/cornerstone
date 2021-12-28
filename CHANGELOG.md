@@ -1,5 +1,9 @@
 # Cornerstone Change Log
 
+## 0.6.3 - Changelog (2021-12-28)
+
+- Changelog moved to be in Github commit notes
+
 ## 0.5.4 - Core Fixes (2020-04-09 to 2020-04-23)
 
 - 🖊️ Changed how scripts load in the footer to use a `$loadScripts` array

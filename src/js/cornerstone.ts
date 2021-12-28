@@ -290,6 +290,43 @@ function toggleFAQCollapsible(this: HTMLElement) {
   }
 }
 
+// Toggle Tabs
+const tabLinks = document.querySelectorAll<HTMLElement>('.csc-tab');
+if (tabLinks) {
+  tabLinks.forEach(tabLink => {
+    tabLink.addEventListener('click', function (e: MouseEvent | TouchEvent): void {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll<HTMLElement>('.csc-tab__content');
+      tabContents.forEach(tabContent => {
+        tabContent.style.display = "none";
+      });
+
+      // Remove the active button class
+      tabLinks.forEach(activeLink => {
+        activeLink.classList.remove("csc-tab--active");
+      });
+
+      // Show active tab
+      const activeTab: HTMLElement | null = document.querySelector(`#tab__${this.dataset.ref}`);
+      if (activeTab) {
+        activeTab.style.display = "block";
+        tabLink.classList.add("csc-tab--active");
+      }
+    });
+  });
+
+  // Load initial tab on document load
+  ready(() => {
+    // Check for tab with active class
+    const activeTab = [...tabLinks].filter(el => el.classList.contains('csc-tab--active') !== false);
+    if (activeTab && activeTab.length > 0) { // Load active tab
+      activeTab[0].click();
+    } else { // Load initial tab
+      tabLinks[0].click();
+    }
+  });
+}
+
 // Scroll to element from hash
 ready(() => {
   // Get the window location hash
