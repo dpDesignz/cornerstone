@@ -22,8 +22,11 @@ $loadScripts = array(
   'validate'
 );
 $pageID = 'admin-file-manager';
-$pageHeadExtras = '';
-$pageFooterExtras = '';
+$pageHeadExtras = '<!-- Highlight.js ~ https://highlightjs.org/ -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/vs.min.css">';
+$pageFooterExtras = '<!-- Highlight.js ~ https://highlightjs.org/ -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+<script>hljs.highlightAll(); var isHighlightingEnabled = true;</script>';
 $currentNav = 'filemanager';
 
 // Load html head
@@ -49,6 +52,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
   </section>
   <section class="csc-col csc-col12 csc-col--md6 cs-text-center cs-text-right-md csc-col--ga-middle">
     <p class="cs-mt-0 cs-mt-md-3">
+      <a title="Jump to Folder" class="csc-btn--flat-small" href="#jumpToFolder" rel="modal:open"><i class="fas fa-share csc-bi-left" aria-hidden="true"></i> Jump to Folder</a>
       <?php if ($role->canDo('add_files')) { ?>
         <a title="Upload" class="csc-btn--flat-small" href="<?= get_site_url('admin/files/upload/?p=' . $data->input_path); ?>"><i class="fas fa-cloud-upload-alt csc-bi-left" aria-hidden="true"></i> Upload</a>
         <a title="New Item" class="csc-btn--flat-small" href="#createNewItem" rel="modal:open"><i class="fas fa-plus-square csc-bi-left" aria-hidden="true"></i> New Item</a>
@@ -131,16 +135,20 @@ require(get_theme_path('layout.php', 'admin')); ?>
         <li class="list-inline-item"> <a href="#/select-all" class="csc-btn csc-btn--tiny csc-btn--outlined csc-btn--info" onclick="select_all();return false;"><i class="fas fa-check-square csc-bi-left"></i> Select all </a></li>
         <li class="list-inline-item"><a href="#/unselect-all" class="csc-btn csc-btn--tiny csc-btn--outlined csc-btn--info" onclick="unselect_all();return false;"><i class="fas fa-window-close csc-bi-left"></i> Unselect all </a></li>
         <li class="list-inline-item"><a href="#/invert-all" class="csc-btn csc-btn--tiny csc-btn--outlined csc-btn--info" onclick="invert_all();return false;"><i class="fas fa-th-list csc-bi-left"></i> Invert Selection </a></li>
-        <li class="list-inline-item"><input type="submit" class="hidden" name="delete" id="a-delete" value="Delete" onclick="return confirm('Delete selected files and folders?')">
+        <li class="list-inline-item">
+          <input type="submit" class="hidden" name="action" id="a-delete" value="delete" onclick="return confirm('Delete selected files and folders?')">
           <a href="javascript:document.getElementById('a-delete').click();" class="csc-btn csc-btn--tiny csc-btn--outlined csc-btn--info"><i class="far fa-trash-alt csc-bi-left"></i> Delete </a>
         </li>
-        <li class="list-inline-item"><input type="submit" class="hidden" name="zip" id="a-zip" value="zip" onclick="return confirm('Create archive?')">
+        <li class="list-inline-item">
+          <input type="submit" class="hidden" name="action" id="a-zip" value="zip" onclick="return confirm('Create archive?')">
           <a href="javascript:document.getElementById('a-zip').click();" class="csc-btn csc-btn--tiny csc-btn--outlined csc-btn--info"><i class="far fa-file-archive csc-bi-left"></i> Zip </a>
         </li>
-        <li class="list-inline-item"><input type="submit" class="hidden" name="tar" id="a-tar" value="tar" onclick="return confirm('Create archive?')">
+        <li class="list-inline-item">
+          <input type="submit" class="hidden" name="action" id="a-tar" value="tar" onclick="return confirm('Create archive?')">
           <a href="javascript:document.getElementById('a-tar').click();" class="csc-btn csc-btn--tiny csc-btn--outlined csc-btn--info"><i class="far fa-file-archive csc-bi-left"></i> Tar </a>
         </li>
-        <li class="list-inline-item"><input type="submit" class="hidden" name="copy" id="a-copy" value="Copy">
+        <li class="list-inline-item">
+          <input type="submit" class="hidden" name="action" id="a-copy" value="bulk-copy">
           <a href="javascript:document.getElementById('a-copy').click();" class="csc-btn csc-btn--tiny csc-btn--outlined csc-btn--info"><i class="far fa-copy csc-bi-left"></i> Copy </a>
         </li>
       </ul>
@@ -150,7 +158,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
 </section>
 
 <?php if ($role->canDo('add_files')) { ?>
-  <!-- Modal for generating a purchase order -->
+  <!-- Modal for creating a new item -->
   <div id="createNewItem" class="modal csc-modal--flowable">
     <form action="<?php echo get_site_url('admin/files/create/?p=' . $data->input_path); ?>" method="POST" id="new-item-form" class="csc-form">
       <div class="csc-modal__header">
@@ -219,6 +227,29 @@ require(get_theme_path('layout.php', 'admin')); ?>
     });
   </script>
 <?php } ?>
+
+<!-- Modal for jumping to another folder -->
+<div id="jumpToFolder" class="modal csc-modal--flowable">
+  <form action="<?php echo get_site_url('admin/files/'); ?>" method="GET" id="jump-to-folder-form" class="csc-form">
+    <div class="csc-modal__header">
+      <i class="fas fa-share"></i> Jump to Folder
+    </div>
+    <div class="csc-modal__content">
+      <fieldset>
+        <div class="csc-input-field">
+          <select name="p" id="destination" data-placeholder="Select a folder to jump to" tabindex="1" required>
+            <?php echo $data->folder_options; ?>
+          </select>
+          <label>Destination Folder</label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="csc-modal__actions">
+      <a href="#" class="csc-btn csc-btn--flat" rel="modal:close"><span>Cancel</span></a>
+      <button type="submit" class="csc-btn csc-btn--success">Jump <i class="fas fa-share csc-bi-right"></i></button>
+    </div>
+  </form>
+</div>
 
 <script>
   function template(html, options) {
@@ -315,13 +346,15 @@ require(get_theme_path('layout.php', 'admin')); ?>
     e.push(this), change_checkboxes(e)
   }
 
-  function backup(e, t) { //Create file backup with .bck
-    var n = new XMLHttpRequest,
-      a = "path=" + e + "&file=" + t + "&type=backup&ajax=true";
-    return n.open("POST", "", !0), n.setRequestHeader("Content-type", "application/x-www-form-urlencoded"), n.onreadystatechange = function() {
-      4 == n.readyState && 200 == n.status && toast(n.responseText)
-    }, n.send(a), !1
-  }
+  // Document Ready set
+  $(document).ready(function() {
+    $("#destination").chosen({
+      disable_search_threshold: 5,
+      no_results_text: "Sorry, nothing was found matching",
+      width: "100%",
+      search_contains: "true"
+    });
+  });
 </script>
 <?php
 // Load html footer

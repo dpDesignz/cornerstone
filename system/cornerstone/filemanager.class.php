@@ -29,6 +29,7 @@ class FileManager
   protected $show_hidden_files = false; // Show or hide files and folders that starts with a dot
   protected $show_directory_size = false; // Show directory size: true or speedup output: false
   protected $hide_cols = false; // Hide Permissions and Owner cols in file-listing
+  protected $online_viewer = 'google'; // Online office Docs Viewer
 
   /**
    * Constructor
@@ -145,9 +146,9 @@ class FileManager
       $exclude_items = unserialize($exclude_items);
     }
     if (!in_array($file, $exclude_items) && !in_array("*.$ext", $exclude_items)) {
-      return true;
+      return false;
     }
-    return false;
+    return true;
   }
 
   /**
@@ -269,14 +270,13 @@ class FileManager
   }
 
   /**
-   * Get director total size
+   * Get director information
    * @param string $directory
-   * @return int
+   * @return array [$size, $count, $dirCount]
    */
-  public function get_directory_size($directory)
+  public function get_directory_info($directory)
   {
-    global $calc_folder;
-    if ($calc_folder == true) { //  Slower output
+    if ($this->showDirectorySize() == true) { //  Slower output
       $size = 0;
       $count = 0;
       $dirCount = 0;
@@ -287,8 +287,8 @@ class FileManager
         } else if ($file->isDir()) {
           $dirCount++;
         }
-      // return [$size, $count, $dirCount];
-      return $size;
+      return [$size, $count, $dirCount];
+      // return $size;
     } else return 'Folder'; //  Quick output
   }
 
@@ -496,8 +496,13 @@ class FileManager
   public function get_relative_path_folder($path)
   {
     $rootPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->rootPath());
-    $path = pathinfo($path);
-    return trim(str_replace($rootPath, '', $path['dirname']), '\\');
+    // Check if path is a directory
+    if (is_dir($path)) {
+      return trim(str_replace($rootPath, '', $path), '\\');
+    } else {
+      $path = pathinfo($path);
+      return trim(str_replace($rootPath, '', $path['dirname']), '\\');
+    }
   }
 
   /**
@@ -1080,6 +1085,22 @@ class FileManager
     $this->hide_cols = $show;
   }
 
+  /**
+   * Online office Docs Viewer
+   * Available rules are 'google', 'microsoft' or false
+   * google => View documents using Google Docs Viewer
+   * microsoft => View documents using Microsoft Web Apps Viewer
+   * false => disable online doc viewer
+   *
+   * @param bool $show Boolean of whether to show or not
+   */
+  public function setOnlineViewer(string $viewer)
+  {
+    if (in_array(trim(strtolower($viewer)), array('google', 'microsoft', 'false'))) {
+      $this->online_viewer = strtolower($viewer);
+    }
+  }
+
   /* GET */
 
   public function isWindows()
@@ -1140,6 +1161,11 @@ class FileManager
   public function hideCols()
   {
     return $this->hide_cols;
+  }
+
+  public function onlineViewer()
+  {
+    return $this->online_viewer;
   }
 }
 

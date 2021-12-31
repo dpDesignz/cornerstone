@@ -173,7 +173,7 @@ function toggleFAQCollapsible() {
     }
 }
 const tabLinks = document.querySelectorAll('.csc-tab');
-if (tabLinks) {
+if (tabLinks.length > 0) {
     tabLinks.forEach(tabLink => {
         tabLink.addEventListener('click', function (e) {
             const tabContents = document.querySelectorAll('.csc-tab__content');

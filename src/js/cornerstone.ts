@@ -292,7 +292,7 @@ function toggleFAQCollapsible(this: HTMLElement) {
 
 // Toggle Tabs
 const tabLinks = document.querySelectorAll<HTMLElement>('.csc-tab');
-if (tabLinks) {
+if (tabLinks.length > 0) {
   tabLinks.forEach(tabLink => {
     tabLink.addEventListener('click', function (e: MouseEvent | TouchEvent): void {
       // Hide all tab contents

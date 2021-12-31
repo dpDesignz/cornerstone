@@ -29,14 +29,11 @@
     <div class="csc-modal__actions">
       <a href="#" class="csc-btn--flat" rel="modal:close"><span>Cancel</span></a>
       <button type="submit" name="action" tabindex="2" value="copy" class="csc-btn csc-btn--success">Copy <i class="fas fa-copy csc-bi-right"></i></button>
-      <button type="submit" name="action" tabindex="3" value="move" class="csc-btn csc-btn--success">Move <i class="fas fa-cut csc-bi-right"></i></button>
+      <button type="submit" name="action" tabindex="3" value="move" class="csc-btn csc-btn--info">Move <i class="fas fa-cut csc-bi-right"></i></button>
     </div>
   </form>
 
   <script>
-    // Add input change listeners
-    addLabelListeners(document.querySelector('#brand_name'));
-
     // Document Ready set
     $(document).ready(function() {
       $("#destination").chosen({

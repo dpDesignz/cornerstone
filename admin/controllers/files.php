@@ -84,43 +84,8 @@ class Files extends Cornerstone\Controller
 
     /*************************** ACTIONS ***************************/
 
-    // AJAX Request
+    // TODO AJAX Request
     if (isset($_POST['ajax'])) {
-
-      // save
-      if (isset($_POST['type']) && $_POST['type'] == "save") {
-        // get current path
-        $path = $this->cfmh->rootPath();
-        if ($this->cfmh->currentPath() != '') {
-          $path .= '/' . $this->cfmh->currentPath();
-        }
-        // check path
-        if (!is_dir($path)) {
-          flashMsg('admin_filemanager', '<strong>Error</strong> The folder you were trying to save to doesn\'t exist. Please try again', 'warning');
-          redirectTo('admin/files/');
-        }
-        $file = $this->request->get['edit'];
-        $file = $this->cfmh->clean_path($file);
-        $file = str_replace('/', '', $file);
-        if ($file == '' || !is_file($path . '/' . $file)) {
-          flashMsg('admin_filemanager', '<strong>Error</strong> File not found', 'warning');
-          redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-        }
-        header('X-XSS-Protection:0');
-        $file_path = $path . '/' . $file;
-
-        $writedata = $_POST['content'];
-        $fd = fopen($file_path, "w");
-        $write_results = @fwrite($fd, $writedata);
-        fclose($fd);
-        if (
-          $write_results === false
-        ) {
-          header("HTTP/1.1 500 Internal Server Error");
-          die("Could Not Write File! - Check Permissions / Ownership");
-        }
-        die(true);
-      }
 
       //search : get list of files from the current folder
       if (isset($_POST['type']) && $_POST['type'] == "search") {
@@ -159,71 +124,13 @@ class Files extends Cornerstone\Controller
     }
 
     // Mass copy files/ folders
-    if (isset($_POST['file'], $_POST['copy_to'], $_POST['finish'])) {
-      // from
-      $path = $this->cfmh->rootPath();
-      if ($this->cfmh->currentPath() != '') {
-        $path .= '/' . $this->cfmh->currentPath();
-      }
-      // to
-      $copy_to_path = $this->cfmh->rootPath();
-      $copy_to = $this->cfmh->clean_path($_POST['copy_to']);
-      if ($copy_to != '') {
-        $copy_to_path .= '/' . $copy_to;
-      }
-      if ($path == $copy_to_path) {
-        flashMsg('admin_filemanager', '<strong>Error</strong> Paths must not match. Please try again.', 'warning');
-        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-      }
-      if (!is_dir($copy_to_path)) {
-        if (!$this->cfmh->mkdir($copy_to_path, true)) {
-          flashMsg('admin_filemanager', '<strong>Error</strong> Unable to create destination folder. Please try again.', 'danger');
-          fm_set_msg('Unable to create destination folder', 'error');
-          redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-        }
-      }
-      // move?
-      $move = isset($_POST['move']);
-      // copy/move
-      $errors = 0;
-      $files = $_POST['file'];
-      if (is_array($files) && count($files)) {
-        foreach ($files as $f) {
-          if ($f != '') {
-            // abs path from
-            $from = $path . '/' . $f;
-            // abs path to
-            $dest = $copy_to_path . '/' . $f;
-            // do
-            if ($move) {
-              $rename = $this->cfmh->rename($from, $dest);
-              if ($rename === false) {
-                $errors++;
-              }
-            } else {
-              if (!$this->cfmh->rcopy($from, $dest)) {
-                $errors++;
-              }
-            }
-          }
-        }
-        if (
-          $errors == 0
-        ) {
-          $msg = $move ? 'Selected files and folders moved' : 'Selected files and folders copied';
-          flashMsg('admin_filemanager', "<strong>Success</strong> {$msg}", 'success');
-        } else {
-          $msg = $move ? 'Error while moving items' : 'Error while copying items';
-          flashMsg('admin_filemanager', "<strong>Error</strong> {$msg}", 'danger');
-        }
-      } else {
-        flashMsg('admin_filemanager', "<strong>Error</strong> Nothing selected", 'warning');
-      }
-      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "bulk-copy") {
+      $this->bulkcopy(...$params);
+      exit;
     }
 
     // Pack files
-    if (isset($_POST['group']) && (isset($_POST['zip']) || isset($_POST['tar']))) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['group'], $_POST['action']) && ($_POST['action'] == "zip" || $_POST['action'] == "tar")) {
       $path = $this->cfmh->rootPath();
       $ext = 'zip';
       if ($this->cfmh->currentPath() != '') {
@@ -231,7 +138,7 @@ class Files extends Cornerstone\Controller
       }
 
       //set pack type
-      $ext = isset($_POST['tar']) ? 'tar' : 'zip';
+      $ext = (isset($_POST['action']) && $_POST['action'] == "tar") ? 'tar' : 'zip';
 
       if (($ext == "zip" && !class_exists('ZipArchive')) || ($ext == "tar" && !class_exists('PharData'))) {
         flashMsg('admin_filemanager', '<strong>Error</strong> Operations with archives are not available', 'danger');
@@ -251,15 +158,15 @@ class Files extends Cornerstone\Controller
         }
 
         if ($ext == 'zip') {
-          $zipper = new FM_Zipper();
+          $zipper = new Cornerstone\CS_Zipper();
           $res = $zipper->create($zipname, $files);
         } elseif ($ext == 'tar') {
-          $tar = new FM_Zipper_Tar();
+          $tar = new Cornerstone\CS_Zipper_Tar();
           $res = $tar->create($zipname, $files);
         }
 
         if ($res) {
-          flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Archive <strong>%s</strong> Created', fm_enc($zipname)), 'success');
+          flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Archive "<em>%s</em>" Created', $this->cfmh->enc($zipname)), 'success');
         } else {
           flashMsg('admin_filemanager', '<strong>Error</strong> Archive not created', 'warning');
         }
@@ -267,81 +174,18 @@ class Files extends Cornerstone\Controller
         flashMsg('admin_filemanager', '<strong>Error</strong> Nothing selected', 'warning');
       }
       redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-    }
-
-    // Unpack
-    if (isset($_GET['unzip'])) {
-      $unzip = $_GET['unzip'];
-      $unzip = $this->cfmh->clean_path($unzip);
-      $unzip = str_replace('/', '', $unzip);
-      $isValid = false;
-
-      $path = $this->cfmh->rootPath();
-      if ($this->cfmh->currentPath() != '') {
-        $path .= '/' . $this->cfmh->currentPath();
-      }
-
-      if ($unzip != '' && is_file($path . '/' . $unzip)) {
-        $zip_path = $path . '/' . $unzip;
-        $ext = pathinfo($zip_path, PATHINFO_EXTENSION);
-        $isValid = true;
-      } else {
-        flashMsg('admin_filemanager', '<strong>Error</strong> File not found', 'danger');
-      }
-
-
-      if (($ext == "zip" && !class_exists('ZipArchive')) || ($ext == "tar" && !class_exists('PharData'))) {
-        flashMsg('admin_filemanager', '<strong>Error</strong> Operations with archives are not available', 'danger');
-        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
-      }
-
-      if ($isValid) {
-        //to folder
-        $tofolder = '';
-        if (isset($_GET['tofolder'])) {
-          $tofolder = pathinfo($zip_path, PATHINFO_FILENAME);
-          if ($this->cfmh->mkdir($path . '/' . $tofolder, true)) {
-            $path .= '/' . $tofolder;
-          }
-        }
-
-        if ($ext == "zip") {
-          $zipper = new FM_Zipper();
-          $res = $zipper->unzip($zip_path, $path);
-        } elseif ($ext == "tar") {
-          try {
-            $gzipper = new PharData($zip_path);
-            if (@$gzipper->extractTo($path, null, true)) {
-              $res = true;
-            } else {
-              $res = false;
-            }
-          } catch (Exception $e) {
-            //TODO:: need to handle the error
-            $res = true;
-          }
-        }
-
-        if ($res) {
-          flashMsg('admin_filemanager', '<strong>Success</strong> Archive unpacked', 'success');
-        } else {
-          flashMsg('admin_filemanager', '<strong>Error</strong> Archive not unpacked', 'warning');
-        }
-      } else {
-        flashMsg('admin_filemanager', '<strong>Error</strong> File not found', 'warning');
-      }
-      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      exit;
     }
 
     // Mass deleting
-    if (isset($_POST['group'], $_POST['delete'])) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['group'], $_POST['action']) && $_POST['action'] == "delete") {
       $path = $this->cfmh->rootPath();
       if ($this->cfmh->currentPath() != '') {
         $path .= '/' . $this->cfmh->currentPath();
       }
 
       $errors = 0;
-      $files = $_POST['file'];
+      $files = (!empty($_POST['file'])) ? $_POST['file'] : '';
       if (is_array($files) && count($files)) {
         foreach ($files as $f) {
           if ($f != '') {
@@ -351,10 +195,8 @@ class Files extends Cornerstone\Controller
             }
           }
         }
-        if (
-          $errors == 0
-        ) {
-          flashMsg('admin_filemanager', '<strong>Success</strong> Selected files and folder deleted', 'success');
+        if ($errors == 0) {
+          flashMsg('admin_filemanager', '<strong>Success</strong> Selected file(s) / folder(s) deleted', 'success');
         } else {
           flashMsg('admin_filemanager', '<strong>Error</strong> Error while deleting items', 'danger');
         }
@@ -362,6 +204,7 @@ class Files extends Cornerstone\Controller
         flashMsg('admin_filemanager', '<strong>Error</strong> Nothing selected', 'warning');
       }
       redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      exit;
     }
 
     /*************************** /ACTIONS ***************************/
@@ -385,6 +228,9 @@ class Files extends Cornerstone\Controller
       $this->data['input_path'] = $this->cfmh->currentPath();
     }
 
+    // Jump to folder options
+    $this->getDestinationFolders(true);
+
     // check path
     if (!is_dir($this->data['path'])) {
       redirectTo('admin/files/');
@@ -397,7 +243,7 @@ class Files extends Cornerstone\Controller
     $this->data['folders'] = array();
     $this->data['files'] = array();
     $this->data['current_path'] = array_slice(explode("/", $this->data['path']), -1)[0];
-    if (is_array($this->data['objects']) && $this->cfmh->is_exclude_items($this->data['current_path'])) {
+    if (is_array($this->data['objects']) && !$this->cfmh->is_exclude_items($this->data['current_path'])) {
       foreach ($this->data['objects'] as $file) {
         if ($file == '.' || $file == '..') {
           continue;
@@ -406,10 +252,10 @@ class Files extends Cornerstone\Controller
           continue;
         }
         $new_path = $this->data['path'] . '/' . $file;
-        if (@is_file($new_path) && $this->cfmh->is_exclude_items($file)) {
+        if (@is_file($new_path) && !$this->cfmh->is_exclude_items($file)) {
           $this->data['files'][] = $file;
         } elseif (
-          @is_dir($new_path) && $file != '.' && $file != '..' && $this->cfmh->is_exclude_items($file)
+          @is_dir($new_path) && $file != '.' && $file != '..' && !$this->cfmh->is_exclude_items($file)
         ) {
           $this->data['folders'][] = $file;
         }
@@ -433,7 +279,7 @@ class Files extends Cornerstone\Controller
       $modif = date('d/m/Y H:i', $modif_raw);
       $filesize_raw = $this->cfmh->get_size($this->data['path'] . '/' . $f);
       $filesize = $this->cfmh->get_file_size($filesize_raw);
-      $filelink = '?p=' . urlencode($this->cfmh->currentPath()) . '&amp;view=' . urlencode($f);
+      $filelink = get_site_url('admin/files/view/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;file=' . urlencode($f));
       $this->data['all_files_size'] += $filesize_raw;
       $perms = substr(decoct(fileperms($this->data['path'] . '/' . $f)), -4);
       if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
@@ -456,13 +302,13 @@ class Files extends Cornerstone\Controller
       $op_file_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="' . get_site_url('admin/files/chmod/?p= ' . urlencode($this->data['path']) . '&amp;item=' . urlencode($f)) . '">' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
 
       // Check if allowed to delete
-      $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete File" data-tippy-content="Delete File" class="delete-this" data-t="File" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="fa fa-trash-o"></i></button>' : '';
+      $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete File" data-tippy-content="Delete File" class="delete-this" data-t="File" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="far fa-trash-alt"></i></button>' : '';
 
       // Check if allowed to rename
-      $renameOP = $this->role->canDo('rename_files') ? '<button type="button" title="Rename File" data-tippy-content="Rename File" class="rename-this" data-name="' . $this->cfmh->enc(addslashes($f)) . '"><i class="fa fa-pencil-square-o"></i></button>' : '';
+      $renameOP = $this->role->canDo('rename_files') ? '<button type="button" title="Rename File" data-tippy-content="Rename File" class="rename-this" data-name="' . $this->cfmh->enc(addslashes($f)) . '"><i class="fas fa-i-cursor"></i></button>' : '';
 
       // Check if allowed to copy
-      $copyOP = $this->role->canDo('copy_files') ? '<a title="Copy file" data-tippy-content="Copy file" href="' . get_site_url('admin/files/copy/') . '?p=' . urlencode($this->cfmh->currentPath()) . '&amp;copy=' . urlencode(trim($f, '/')) . '" rel="modal:open"><i class="fa fa-files-o"></i></a>' : '';
+      $copyOP = $this->role->canDo('copy_files') ? '<a title="Copy file" data-tippy-content="Copy file" href="' . get_site_url('admin/files/copy/') . '?p=' . urlencode($this->cfmh->currentPath()) . '&amp;copy=' . urlencode(trim($f, '/')) . '" rel="modal:open"><i class="far fa-copy"></i></a>' : '';
 
       // Set to output
       $this->data['opFiles'] .= '<tr>
@@ -486,10 +332,10 @@ class Files extends Cornerstone\Controller
           <td data-sort="b-' . $modif_raw . '">' . $modif  . '</td>
           ' . $op_file_cols . '
           <td class="inline-actions">
-            <a title="Preview" href="' . $filelink . '&quickView=1' . '" data-toggle="lightbox" data-gallery="tiny-gallery" data-title="' . $this->cfmh->convert_win($this->cfmh->enc($f)) . '" data-max-width="100%" data-width="100%"><i class="fa fa-eye"></i></a>
+            <a title="Preview" href="' . $filelink . '&quickView=1' . '" rel="modal:open"><i class="far fa-eye"></i></a>
             ' . $deleteOP . $renameOP . $copyOP . '
-            <a title="Direct link" href="' . $this->cfmh->enc(get_site_url('files' . ($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f)) . '" target="_blank"><i class="fa fa-link"></i></a>
-            <a title="Download" href="' . get_site_url('admin/files/download/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;file=' . urlencode($f)) . '"><i class="fa fa-download"></i></a>
+            <a title="Direct link" href="' . $this->cfmh->enc(get_site_url('files' . ($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $f)) . '" target="_blank"><i class="fas fa-link"></i></a>
+            <a title="Download" href="' . get_site_url('admin/files/download/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;file=' . urlencode($f)) . '"><i class="fas fa-download"></i></a>
           </td>
         </tr>';
       flush();
@@ -507,11 +353,14 @@ class Files extends Cornerstone\Controller
       $modif_raw = filemtime($this->data['path'] . '/' . $f);
       $modif = date('d/m/Y H:i', $modif_raw);
       if ($this->cfmh->showDirectorySize()) {
-        $filesize_raw = $this->cfmh->get_directory_size($this->data['path'] . '/' . $f);
+        $directory_info = $this->cfmh->get_directory_info($this->data['path'] . '/' . $f);
+        $filesize_raw = $directory_info[0];
         $filesize = $this->cfmh->get_file_size($filesize_raw);
+        $directory_info_op = ' data-tippy-content="Folders: ' . $directory_info[2] . ', Files: ' . $directory_info[1] . '"';
       } else {
         $filesize_raw = "";
         $filesize = "Folder";
+        $directory_info_op = "";
       }
       $perms = substr(decoct(fileperms($this->data['path'] . '/' . $f)), -4);
       if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
@@ -526,13 +375,13 @@ class Files extends Cornerstone\Controller
       $op_folder_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="' . get_site_url('admin/files/chmod/?p= ' . urlencode($this->data['path']) . '&amp;item=' . urlencode($f)) . '">' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
 
       // Check if allowed to delete
-      $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete Folder" data-tippy-content="Delete Folder" class="delete-this" data-t="Folder" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="fa fa-trash-o"></i></button>' : '';
+      $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete Folder" data-tippy-content="Delete Folder" class="delete-this" data-t="Folder" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="far fa-trash-alt"></i></button>' : '';
 
       // Check if allowed to rename
-      $renameOP = $this->role->canDo('rename_files') ? '<button type="button" title="Rename Folder" data-tippy-content="Rename Folder" class="rename-this" data-name="' . $this->cfmh->enc(addslashes($f)) . '"><i class="fa fa-pencil-square-o"></i></button>' : '';
+      $renameOP = $this->role->canDo('rename_files') ? '<button type="button" title="Rename Folder" data-tippy-content="Rename Folder" class="rename-this" data-name="' . $this->cfmh->enc(addslashes($f)) . '"><i class="fas fa-i-cursor"></i></button>' : '';
 
       // Check if allowed to copy
-      $copyOP = $this->role->canDo('copy_files') ? '<a title="Copy folder" data-tippy-content="Copy folder" href="' . get_site_url('admin/files/copy/') . '?p=' . urlencode($this->cfmh->currentPath()) . '&amp;copy=' . urlencode(trim($f, '/')) . '" rel="modal:open"><i class="fa fa-files-o"></i></a>' : '';
+      $copyOP = $this->role->canDo('copy_files') ? '<a title="Copy folder" data-tippy-content="Copy folder" href="' . get_site_url('admin/files/copy/') . '?p=' . urlencode($this->cfmh->currentPath()) . '&amp;copy=' . urlencode(trim($f, '/')) . '" rel="modal:open"><i class="far fa-copy"></i></a>' : '';
 
       // Set to output
       $this->data['opFolders'] .= '<tr>
@@ -547,7 +396,7 @@ class Files extends Cornerstone\Controller
               </a>' . ($is_link ? ' &rarr; <i>' . readlink($this->data['path'] . '/' . $f) . '</i>' : '') . '</div>
           </td>
           <td data-sort="a-' . str_pad($filesize_raw, 18, "0", STR_PAD_LEFT) . '">
-            ' . $filesize . '
+            <span' . $directory_info_op . '>' . $filesize . '</span>
           </td>
           <td data-sort="a-' . $modif_raw . '">' . $modif . '</td>
           ' . $op_folder_cols . '
@@ -874,28 +723,29 @@ class Files extends Cornerstone\Controller
     $this->request->set_params($params);
 
     // get current path
-    $this->data['path'] = $this->cfmh->rootPath();
+    $path = $this->cfmh->rootPath();
     if ($this->cfmh->currentPath() != '') {
-      $this->data['path'] .= '/' . $this->cfmh->currentPath();
+      $path .= '/' . $this->cfmh->currentPath();
     }
 
     // Get file information
     $this->data['quickView'] = (isset($this->request->get['quickView']) && $this->request->get['quickView'] == 1) ? true : false;
-    $file = str_replace('/', '', $this->cfmh->clean_path($this->request->get['view'], false));
-    if ($file == '' || !is_file($this->data['path'] . '/' . $file) || in_array($file, $GLOBALS['exclude_items'])) {
+    $file = str_replace('/', '', $this->cfmh->clean_path($this->request->get['file'], false));
+    $this->data['file'] = $file;
+    if ($file == '' || !is_file($path . '/' . $file) || $this->cfmh->is_exclude_items($file)) {
       // Redirect user with error
       flashMsg('admin_filemanager', '<strong>Error</strong> File not found. Please try again.', 'warning');
       redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
       exit;
     }
 
-    $this->data['file_url'] = get_site_url('files' . $this->cfmh->convert_win(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $file));
-    $file_path = $this->data['path'] . '/' . $file;
+    $file_url = get_site_url('files' . $this->cfmh->convert_win(($this->cfmh->currentPath() != '' ? '/' . $this->cfmh->currentPath() : '') . '/' . $file));
+    $file_path = $path . '/' . $file;
 
     $ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
-    $mime_type = fm_get_mime_type($file_path);
-    $filesize_raw = fm_get_size($file_path);
-    $filesize = fm_get_filesize($filesize_raw);
+    $mime_type = $this->cfmh->get_mime_type($file_path);
+    $filesize_raw = $this->cfmh->get_size($file_path);
+    $filesize = $this->cfmh->get_file_size($filesize_raw);
 
     $is_zip = false;
     $is_gzip = false;
@@ -908,49 +758,200 @@ class Files extends Cornerstone\Controller
     $view_title = 'File';
     $filenames = false; // for zip
     $content = ''; // for text
-    $online_viewer = strtolower(FM_DOC_VIEWER);
+    $online_viewer = strtolower($this->cfmh->onlineViewer());
 
-    if ($online_viewer && $online_viewer !== 'false' && in_array($ext, fm_get_onlineViewer_exts())) {
+    if ($online_viewer && $online_viewer !== 'false' && in_array($ext, $this->cfmh->get_onlineViewer_exts())) {
       $is_onlineViewer = true;
     } elseif ($ext == 'zip' || $ext == 'tar') {
       $is_zip = true;
       $view_title = 'Archive';
-      $filenames = fm_get_zif_info(
+      $filenames = $this->cfmh->get_zip_info(
         $file_path,
         $ext
       );
-    } elseif (in_array($ext, fm_get_image_exts())) {
+    } elseif (in_array($ext, $this->cfmh->get_image_exts())) {
       $is_image = true;
       $view_title = 'Image';
-    } elseif (in_array($ext, fm_get_audio_exts())) {
+    } elseif (in_array($ext, $this->cfmh->get_audio_exts())) {
       $is_audio = true;
       $view_title = 'Audio';
-    } elseif (in_array($ext, fm_get_video_exts())) {
+    } elseif (in_array($ext, $this->cfmh->get_video_exts())) {
       $is_video = true;
       $view_title = 'Video';
     } elseif (
-      in_array($ext, fm_get_text_exts()) || substr($mime_type, 0, 4) == 'text' || in_array($mime_type, fm_get_text_mimes())
+      in_array($ext, $this->cfmh->get_text_exts()) || substr($mime_type, 0, 4) == 'text' || in_array($mime_type, $this->cfmh->get_text_mimes())
     ) {
       $is_text = true;
       $content = file_get_contents($file_path);
     }
 
+    // Set Breadcrumbs
+    if ($this->cfmh->currentPath() != '') {
+      $exploded = explode('/', $this->cfmh->currentPath());
+      $parent = '';
+      foreach ($exploded as $folderName) {
+        $parent = trim($parent . '/' . $folderName, '/');
+        $parent_enc = urlencode($parent);
+        $this->data['breadcrumbs'][] = array(
+          'text' => $folderName,
+          'href' => get_site_url("admin/files/?p={$parent_enc}")
+        );
+      }
+    }
+    $this->data['breadcrumbs'][] = array(
+      'text' => $this->cfmh->enc($this->cfmh->convert_win($file)),
+      'href' => get_site_url("admin/files/view/?p={$this->cfmh->currentPath()}&file={$this->request->get['file']}")
+    );
+
     // Set paths
     $this->data['current_path'] = $this->cfmh->currentPath();
-    $this->data['current_path_enc'] = $this->cfmh->enc($this->cfmh->currentPath());
-    $this->data['file_enc'] = $this->cfmh->enc($file);
-    $this->data['file_path'] = $this->data['current_path'] . '/' . $file;
-    $this->data['file_mode'] = fileperms($this->data['path'] . '/' . $file);
 
-    // Set Breadcrumbs
-    $this->data['breadcrumbs'][] = array(
-      'text' => '',
-      'href' => get_site_url("admin/files/view/?p={$this->cfmh->currentPath()}?view={$this->request->get['view']}")
-    );
+    // Get file icon
+    $is_link = is_link($file_path);
+    $this->data['file_icon'] = $is_link ? 'fa fa-file-text-o' : $this->cfmh->get_file_icon_class($file_path);
+
+    // Set content OP
+    $this->data['headerOP'] = '';
+    $this->data['contentOP'] = '';
+    // Check if Quick View and output file information if not
+    if (!$this->data['quickView']) {
+      // Get file size
+      $file_size_op = ($filesize_raw <= 1000) ? "$filesize_raw bytes" : $filesize;
+
+      // Set to output
+      $this->data['headerOP'] .= '<h1 class="cs-mb-0"><strong>' . $view_title . ' "' . $this->cfmh->enc($this->cfmh->convert_win($file)) . '" <i class="' . $this->data['file_icon'] . '"></i></strong></h1>
+      <p class="cs-subtitle1" style="word-wrap:break-word;">
+        File path: <span data-tippy-content="Full Path: ' . $this->cfmh->enc($this->cfmh->convert_win($file_path)) . '">' . $this->cfmh->enc($this->cfmh->convert_win('/' . $this->cfmh->currentPath() . '/' . $file)) . '</span><br>
+        File size: ' . $file_size_op . '<br>
+        MIME-type: ' . $mime_type . '<br>';
+
+      // If ZIP info
+      if (($is_zip || $is_gzip) && $filenames !== false) {
+        $total_files = 0;
+        $total_comp = 0;
+        $total_uncomp = 0;
+        foreach ($filenames as $fn) {
+          if (!$fn['folder']) {
+            $total_files++;
+          }
+          $total_comp += $fn['compressed_size'];
+          $total_uncomp += $fn['filesize'];
+        }
+        // Set to output
+        $this->data['headerOP'] .= 'Files in archive: ' . $total_files . '<br>
+          Total size: ' . $this->cfmh->get_file_size($total_uncomp) . '<br>
+          Size in archive: ' . $this->cfmh->get_file_size($total_comp) . '<br>
+          Compression: ' . round(($total_comp / $total_uncomp) * 100) . '%<br>';
+      }
+
+      // If Image info
+      if ($is_image) {
+        $image_size = getimagesize($file_path);
+        $this->data['headerOP'] .= 'Image sizes: ' . (isset($image_size[0]) ? $image_size[0] : '0') . ' x ' . (isset($image_size[1]) ? $image_size[1] : '0') . '<br>';
+      }
+
+      // If Text info
+      if ($is_text) {
+        $is_utf8 = $this->cfmh->is_utf8($content);
+        if (function_exists('iconv')) {
+          if (!$is_utf8) {
+            $content = iconv(FM_ICONV_INPUT_ENC, 'UTF-8//IGNORE', $content);
+          }
+        }
+        $this->data['headerOP'] .= 'Charset: ' . ($is_utf8 ? 'utf-8' : '8 bit') . '<br>';
+      }
+
+      // Add actions to output
+      $this->data['headerOP'] .= '<p>
+        <strong><a href="' . get_site_url('admin/files/download/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;file=' . urlencode($file)) . '"><i class="fas fa-download"></i> Download</a></strong> &nbsp; <strong><a href="' . $this->cfmh->enc($file_url) . '" target="_blank"><i class="fas fa-external-link-square-alt"></i> Open</a></strong> &nbsp;';
+
+      // Add ZIP actions to output
+      if (($is_zip || $is_gzip) && $filenames !== false) {
+        $zip_name = pathinfo($file_path, PATHINFO_FILENAME);
+        $this->data['headerOP'] .= ' <strong><a href="' . get_site_url('admin/files/unpack/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;archive=' . urlencode($file)) . '"><i class="fas fa-box-open"></i> Unpack</a></strong> &nbsp; <strong><a href="' . get_site_url('admin/files/unpack/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;archive=' . urlencode($file) . '&amp;tofolder=1') . '" title="Unpack to ' . $this->cfmh->enc($zip_name) . '"><i class="fas fa-box-open"></i> Unpack to Folder</a></strong> &nbsp;';
+      }
+
+      // Close actions for output
+      $this->data['headerOP'] .= '</p>';
+    }
+    // Check for online viewer
+    if ($is_onlineViewer) {
+      // Output online viewer
+      if ($online_viewer == 'google') {
+        $this->data['contentOP'] .= '<iframe src="https://docs.google.com/viewer?embedded=true&hl=en&url=' . $this->cfmh->enc($file_url) . '" frameborder="no" style="width:100%;min-height:460px;height:100%;"></iframe>';
+      } else if ($online_viewer == 'microsoft') {
+        $this->data['contentOP'] .= '<iframe src="https://view.officeapps.live.com/op/embed.aspx?src=' . $this->cfmh->enc($file_url) . '" frameborder="no" style="width:100%;min-height:460px;height:100%;"></iframe>';
+      }
+    } elseif ($is_zip) { // Check for ZIP content
+      // ZIP content
+      if ($filenames !== false) {
+        $this->data['contentOP'] .= '<code class="maxheight">';
+        foreach ($filenames as $fn) {
+          if ($fn['folder']) {
+            $this->data['contentOP'] .= '<strong>' . $this->cfmh->enc($fn['name']) . '</strong><br>';
+          } else {
+            $this->data['contentOP'] .= $this->cfmh->enc($fn['name']) . ' (' . $this->cfmh->get_file_size($fn['filesize']) . ')<br>';
+          }
+        }
+        $this->data['contentOP'] .= '</code>';
+      } else {
+        $this->data['contentOP'] .= '<p>Error while fetching archive info</p>';
+      }
+    } elseif ($is_image) { // Check for image content
+      // Image content
+      if (in_array($ext, array('gif', 'jpg', 'jpeg', 'png', 'bmp', 'ico', 'svg', 'webp', 'avif'))) {
+        $this->data['contentOP'] .= '<figure><img src="' . $this->cfmh->enc($file_url) . '" alt="" class="preview-img"></figure>';
+      }
+    } elseif ($is_audio) { // Check for audio content
+      // Audio content
+      $this->data['contentOP'] .= '<p><audio src="' . $this->cfmh->enc($file_url) . '" controls preload="metadata"></audio></p>';
+    } elseif ($is_video) { // Check for video content
+      // Video content
+      $this->data['contentOP'] .= '<div class="preview-video"><video src="' . $this->cfmh->enc($file_url) . '" width="640" height="360" controls preload="metadata"></video></div>';
+    } elseif ($is_text) { // Check if text content
+      // highlight
+      $hljs_classes = array(
+        'shtml' => 'xml',
+        'htaccess' => 'apache',
+        'phtml' => 'php',
+        'lock' => 'json',
+        'svg' => 'xml',
+      );
+      $hljs_class = isset($hljs_classes[$ext]) ? 'lang-' . $hljs_classes[$ext] : 'lang-' . $ext;
+      if (empty($ext) || in_array(strtolower($file), $this->cfmh->get_text_names()) || preg_match('#\.min\.(css|js)$#i', $file)) {
+        $hljs_class = 'nohighlight';
+      }
+      $this->data['contentOP'] .= '<pre class="with-hljs"><code class="' . $hljs_class . '">' . $this->cfmh->enc($content) . '</code></pre>';
+    }
 
     // Load view
     $this->load->view('files/view', $this->data, 'admin');
     exit;
+  }
+
+  /**
+   * get list of destination folders
+   *
+   * @param bool $relative Set if options should be relative paths
+   */
+  private function getDestinationFolders($relative = false)
+  {
+    // Get list of folders
+    $this->data['folder_options'] = '<option value="">Root Folder</option>';
+    $iterator = new RecursiveIteratorIterator(
+      new RecursiveDirectoryIterator($this->cfmh->rootPath(), RecursiveDirectoryIterator::SKIP_DOTS),
+      RecursiveIteratorIterator::SELF_FIRST
+    );
+    $currentPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->data['path']);
+    $rootPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->cfmh->rootPath());
+    $checkPath = (strpos($currentPath, $rootPath) === false) ? $rootPath . _DS . $currentPath : $currentPath;
+    foreach ($iterator as $file) {
+      if ($file->isDir()) {
+        $selected = ($checkPath === $file->getRealpath()) ? ' selected' : '';
+        $valueOP = ($relative) ? $this->cfmh->get_relative_path_folder($file->getRealpath()) : $file->getRealpath();
+        $this->data['folder_options'] .= '<option value="' . $valueOP . '"' . $selected . '>' . str_replace($rootPath, '', $file->getLinkTarget()) . '</option>';
+      }
+    }
   }
 
   /**
@@ -1066,22 +1067,131 @@ class Files extends Cornerstone\Controller
       }
 
       // Get list of folders
-      $this->data['folder_options'] = '<option value="">Root Folder</option>';
-      $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($this->cfmh->rootPath(), RecursiveDirectoryIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::SELF_FIRST
-      );
-      $currentPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->data['path']);
-      $rootPath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->cfmh->rootPath());
-      foreach ($iterator as $file) {
-        if ($file->isDir()) {
-          $selected = ($rootPath . _DS . $currentPath === $file->getRealpath()) ? ' selected' : '';
-          $this->data['folder_options'] .= '<option value="' . $file->getRealpath() . '"' . $selected . '>' . str_replace($rootPath, '', $file->getLinkTarget()) . '</option>';
-        }
-      }
+      $this->getDestinationFolders();
 
       // Load view
       $this->load->view('files/copy', $this->data, 'admin');
+      exit;
+    }
+  }
+
+  /**
+   * Bulk Copy Page
+   *
+   * @param mixed $params Mixed values of extra parameters
+   */
+  public function bulkcopy(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('add_files')) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to bulk copy. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/files/');
+      exit;
+    }
+
+    // Set params to request
+    $this->request->set_params($params);
+
+    // get current path
+    $this->data['path'] = $this->cfmh->rootPath();
+    if ($this->cfmh->currentPath() != '') {
+      $this->data['path'] .= '/' . $this->cfmh->currentPath();
+    }
+
+    //Check if page posted and process form if it is
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && ($_POST['action'] == "copy" || $_POST['action'] == "move")) {
+
+      // Sanitize POST data
+      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+      // from
+      $path = $this->cfmh->clean_path($_POST['path']);
+      // to
+      $copy_to_path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->cfmh->rootPath());
+      if (!empty($_POST['destination'])) {
+        $copy_to_path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->cfmh->clean_path($_POST['destination']));
+      }
+      // empty path
+      if ($path == $copy_to_path) {
+        flashMsg('admin_filemanager', '<strong>Error</strong> Paths must not match. Please try again.', 'warning');
+        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      }
+      if (!is_dir($copy_to_path)) {
+        if (!$this->cfmh->mkdir($copy_to_path, true)) {
+          flashMsg('admin_filemanager', '<strong>Error</strong> Unable to create destination folder. Please try again.', 'danger');
+          fm_set_msg('Unable to create destination folder', 'error');
+          redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+        }
+      }
+      // move?
+      $move = isset($_POST['action']) && $_POST['action'] == "move";
+      // copy/move
+      $errors = 0;
+      $files = $_POST['file'];
+      if (is_array($files) && count($files)) {
+        foreach ($files as $f) {
+          if ($f != '') {
+            // abs path from
+            $from = $path . '/' . $f;
+            // abs path to
+            $dest = $copy_to_path . '/' . $f;
+            // do
+            if ($move) {
+              $rename = $this->cfmh->rename($from, $dest);
+              if ($rename === false) {
+                $errors++;
+              }
+            } else {
+              if (!$this->cfmh->rcopy($from, $dest)) {
+                $errors++;
+              }
+            }
+          }
+        }
+        if ($errors == 0) {
+          $msg = $move ? 'Selected files and folders moved' : 'Selected files and folders copied';
+          flashMsg('admin_filemanager', "<strong>Success</strong> {$msg}", 'success');
+          redirectTo('admin/files/?p=' . urlencode($this->cfmh->get_relative_path_folder($copy_to_path)));
+          exit;
+        } else {
+          $msg = $move ? 'Error while moving items' : 'Error while copying items';
+          flashMsg('admin_filemanager', "<strong>Error</strong> {$msg}", 'danger');
+        }
+      } else {
+        flashMsg('admin_filemanager', "<strong>Error</strong> Nothing selected", 'warning');
+      }
+      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+    } else { // Page wasn't posted.
+
+      // Get list of files
+      $this->data['copy_files'] = isset($_POST['file']) ? $_POST['file'] : null;
+      $this->data['file_inputs'] = '';
+      if (!is_array($this->data['copy_files']) || empty($this->data['copy_files'])) {
+        // Redirect user with error
+        flashMsg('admin_filemanager', '<strong>Error</strong> Nothing selected. Please try again.', 'warning');
+        redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+      }
+      foreach ($this->data['copy_files'] as $cf) {
+        $this->data['file_inputs'] .= '<input type="hidden" name="file[]" value="' . $this->cfmh->enc($cf) . '">' . PHP_EOL;
+      }
+
+      // Set paths
+      $this->data['action_link'] = get_site_url('admin/files/bulk-copy/?p=' . $this->cfmh->enc($this->cfmh->currentPath()));
+      $this->data['current_path'] = $this->cfmh->currentPath();
+      $this->data['current_path_enc'] = $this->cfmh->enc($this->cfmh->currentPath());
+
+      // Set Breadcrumbs
+      $this->data['breadcrumbs'][] = array(
+        'text' => 'Bulk Copy',
+        'href' => get_site_url("admin/files/bulk-copy/?p={$this->cfmh->currentPath()}")
+      );
+
+      // Get list of folders
+      $this->getDestinationFolders();
+
+      // Load view
+      $this->load->view('files/bulkcopy', $this->data, 'admin');
       exit;
     }
   }
@@ -1283,6 +1393,88 @@ class Files extends Cornerstone\Controller
       flashMsg('admin_filemanager', '<strong>Error</strong> File not found. Please try again.', 'warning');
       redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
     }
+  }
+
+  /**
+   * Unpack archive
+   *
+   * @param mixed $params Mixed values of extra parameters
+   */
+  public function unpack(...$params)
+  {
+    // Check user is allowed to view this
+    if (!$this->role->canDo('add_files')) {
+      // Redirect user with error
+      flashMsg('admin_filemanager', '<strong>Error</strong> Sorry, you are not allowed to unpack archives. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/files/');
+      exit;
+    }
+
+    // Set params to request
+    $this->request->set_params($params);
+
+    // Get file
+    $unzip = $this->request->get['archive'];
+    $unzip = $this->cfmh->clean_path($unzip);
+    $unzip = str_replace('/', '', $unzip);
+    $isValid = false;
+
+    $path = $this->cfmh->rootPath();
+    if ($this->cfmh->currentPath() != '') {
+      $path .= '/' . $this->cfmh->currentPath();
+    }
+
+    if ($unzip != '' && is_file($path . '/' . $unzip)) {
+      $zip_path = $path . '/' . $unzip;
+      $ext = pathinfo($zip_path, PATHINFO_EXTENSION);
+      $isValid = true;
+    } else {
+      flashMsg('admin_filemanager', '<strong>Error</strong> File not found', 'danger');
+    }
+
+
+    if (($ext == "zip" && !class_exists('ZipArchive')) || ($ext == "tar" && !class_exists('PharData'))) {
+      flashMsg('admin_filemanager', '<strong>Error</strong> Operations with archives are not available', 'danger');
+      redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+    }
+
+    if ($isValid) {
+      //to folder
+      $tofolder = '';
+      if (isset($this->request->get['tofolder'])) {
+        $tofolder = pathinfo($zip_path, PATHINFO_FILENAME);
+        if ($this->cfmh->mkdir($path . '/' . $tofolder, true)) {
+          $path .= '/' . $tofolder;
+        }
+      }
+
+      if ($ext == "zip") {
+        $zipper = new Cornerstone\CS_Zipper();
+        $res = $zipper->unzip($zip_path, $path);
+      } elseif ($ext == "tar") {
+        try {
+          $gzipper = new PharData($zip_path);
+          if (@$gzipper->extractTo($path, null, true)) {
+            $res = true;
+          } else {
+            $res = false;
+          }
+        } catch (Exception $e) {
+          //TODO:: need to handle the error
+          $res = true;
+        }
+      }
+
+      if ($res) {
+        flashMsg('admin_filemanager', '<strong>Success</strong> Archive unpacked', 'success');
+      } else {
+        flashMsg('admin_filemanager', '<strong>Error</strong> Archive not unpacked', 'warning');
+      }
+    } else {
+      flashMsg('admin_filemanager', '<strong>Error</strong> File not found', 'warning');
+    }
+    redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
+    exit;
   }
 
   /**
