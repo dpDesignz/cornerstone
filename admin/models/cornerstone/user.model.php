@@ -10,6 +10,7 @@ use function ezsql\functions\{
   selecting,
   inserting,
   updating,
+  deleting,
   leftJoin,
   where,
   grouping,
@@ -464,5 +465,198 @@ class User extends Cornerstone\ModelBase
 
     // Return FALSE
     return false;
+  }
+
+  ###########################
+  ####    PERMISSIONS    ####
+  ###########################
+
+  /**
+   * Get list of user permissions
+   *
+   * @param int $userID ID of the user to retrieve
+   *
+   * @return object Return object with list of role permissions
+   */
+  public function listUserPermissions(int $userID)
+  {
+    // Check if data is valid
+    if (!empty($userID) && is_numeric($userID)) {
+      // Data is valid
+
+      // Set permissions for output
+      $rolePermissionsArr = array();
+      $userPermissionsArr = array();
+
+      // Get the role
+      $this->conn->dbh->tableSetup('users', DB_PREFIX);
+      $userRoleResults = selecting(
+        "user_role_id",
+        where(
+          eq('user_id', $userID)
+        )
+      );
+
+      // Check if role results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userRoleResults)) {
+
+        // Set users role
+        $usersRoleID = $userRoleResults[0]->user_role_id;
+
+        // Check if data is valid
+        if (!empty($usersRoleID) && is_numeric($usersRoleID)) {
+          // Data is valid
+
+          $this->conn->dbh->tableSetup('role_perms', DB_PREFIX);
+          $rolePermsResults = selecting(
+            "rpl_rp_id",
+            where(
+              eq('rpl_role_id', $usersRoleID)
+            )
+          );
+
+          // Check if results
+          if ($this->conn->dbh->getNum_Rows() > 0 && !empty($rolePermsResults)) {
+
+            // Set permissions
+            foreach ($rolePermsResults as $permissionData) {
+              $rolePermissionsArr[$permissionData->rpl_rp_id] = true;
+            }
+          } // No results.
+        } // Data is invalid.
+      } // No results.
+
+      // Get user permissions
+      $this->conn->dbh->tableSetup('user_perms', DB_PREFIX);
+      $userPermsResults = selecting(
+        "upl_rp_id,
+        upl_access",
+        where(
+          eq('upl_user_id', $userID)
+        )
+      );
+
+      // Check if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userPermsResults)) {
+
+        // Set permissions
+        foreach ($userPermsResults as $permissionData) {
+          // Add to array.
+          $userPermissionsArr[$permissionData->upl_rp_id] = (int) $permissionData->upl_access;
+        }
+      } // No results.
+    } // Data is invalid.
+
+    // Return array
+    return (object) array('role_permissions' => $rolePermissionsArr, 'user_permissions' => $userPermissionsArr);
+  }
+
+  /**
+   * Add User/Permission Link
+   *
+   * @param int $userID ID of the user
+   * @param int $permissionID ID of the permission
+   * @param int $accessType `[optional]` The type of access allowed. Defaults to "0" (Default)
+   *z`
+   * @return bool|int Will return FALSE if failed or true if successful.
+   */
+  public function addOPLink(int $userID, int $permissionID, int $accessType = 0)
+  {
+
+    // Make sure the data is valid
+    if (!empty($userID) && is_numeric($userID) && !empty($permissionID) && is_numeric($permissionID) && is_numeric($accessType)) {
+
+      // Add link
+      $this->conn->dbh->tableSetup('user_perms', DB_PREFIX);
+      inserting(
+        array(
+          'upl_user_id' => $userID,
+          'upl_rp_id' => $permissionID,
+          'upl_access ' => $accessType
+        )
+      );
+
+      // Check if added successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return TRUE
+        return TRUE;
+      } // Unable to add. Return FALSE
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Update User/Permission Link
+   *
+   * @param int $userID ID of the user
+   * @param int $permissionID ID of the permission
+   * @param int $accessType `[optional]` The type of access allowed. Defaults to "0" (Default)
+   *z`
+   * @return bool|int Will return FALSE if failed or true if successful.
+   */
+  public function updateOPLink(int $userID, int $permissionID, int $accessType = 0)
+  {
+
+    // Make sure the data is valid
+    if (!empty($userID) && is_numeric($userID) && !empty($permissionID) && is_numeric($permissionID) && is_numeric($accessType)) {
+
+      // Add link
+      $this->conn->dbh->tableSetup('user_perms', DB_PREFIX);
+      updating(
+        array(
+          'upl_access ' => $accessType
+        ),
+        eq('upl_user_id', $userID),
+        eq('upl_rp_id', $permissionID)
+      );
+
+      // Check if added successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return TRUE
+        return TRUE;
+      } // Unable to add. Return FALSE
+    } // Data invalid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  /**
+   * Delete User/Permission Link
+   *
+   * @param int $userID ID of the user
+   * @param int $permissionID ID of the permission
+   *
+   * @return bool Will return FALSE if failed or TRUE if successful.
+   */
+  public function deleteOPLink(int $userID, int $permissionID)
+  {
+
+    // Make sure the data is valid
+    if (!empty($userID) && is_numeric($userID) && !empty($permissionID) && is_numeric($permissionID)) {
+
+      // Run query to delete
+      $this->conn->dbh->tableSetup('user_perms', DB_PREFIX);
+      deleting(
+        where(
+          eq("upl_user_id", $userID),
+          eq("upl_rp_id", $permissionID)
+        )
+      );
+
+      // Check if any rows affected
+      if ($this->conn->dbh->affectedRows() > 0) {
+        // Return TRUE
+        return TRUE;
+      } // No rows affected. Return FALSE.
+
+    } // Data isn't valid. Return FALSE
+
+    // Return FALSE
+    return FALSE;
   }
 }

@@ -401,11 +401,11 @@ class Roles extends Cornerstone\Controller
     }
 
     // Set fallbacks
-    $this->data['viewOptions'] = (!empty($this->data['viewOptions'])) ? $this->data['viewOptions'] : '<p class="cs-caption">No view options available</p>';
-    $this->data['addOptions'] = (!empty($this->data['addOptions'])) ? $this->data['addOptions'] : '<p class="cs-caption">No add options available</p>';
-    $this->data['editOptions'] = (!empty($this->data['editOptions'])) ? $this->data['editOptions'] : '<p class="cs-caption">No edit options available</p>';
-    $this->data['deleteOptions'] = (!empty($this->data['deleteOptions'])) ? $this->data['deleteOptions'] : '<p class="cs-caption">No delete options available</p>';
-    $this->data['otherOptions'] = (!empty($this->data['otherOptions'])) ? $this->data['otherOptions'] : '<p class="cs-caption">No other options available</p>';
+    $this->data['viewOptions'] = (!empty($this->data['viewOptions'])) ? $this->data['viewOptions'] : '<p class="cs-caption">No view permissions available</p>';
+    $this->data['addOptions'] = (!empty($this->data['addOptions'])) ? $this->data['addOptions'] : '<p class="cs-caption">No add permissions available</p>';
+    $this->data['editOptions'] = (!empty($this->data['editOptions'])) ? $this->data['editOptions'] : '<p class="cs-caption">No edit permissions available</p>';
+    $this->data['deleteOptions'] = (!empty($this->data['deleteOptions'])) ? $this->data['deleteOptions'] : '<p class="cs-caption">No delete permissions available</p>';
+    $this->data['otherOptions'] = (!empty($this->data['otherOptions'])) ? $this->data['otherOptions'] : '<p class="cs-caption">No other permissions available</p>';
   }
 
   /**
@@ -550,7 +550,7 @@ class Roles extends Cornerstone\Controller
 
         // Set Error
         flashMsg('admin_roles', '<strong>Error</strong> There was an error saving the role. Please try again', 'warning');
-        redirectTo('admin/roles');
+        redirectTo('admin/roles/');
         exit;
       }
     } else { // Page wasn't posted. Load view.

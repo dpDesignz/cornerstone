@@ -15,17 +15,10 @@ $pageMetaType = "website";
 
 // Set any page injected values
 $loadScripts = array(
-  'validate',
-  'chosen'
+  'validate'
 );
 $pageHeadExtras = '';
-$pageFooterExtras = '<script>
-  $("#permissions").chosen({
-    no_results_text: "Oops, no permissions matched",
-    width: "100%",
-    search_contains: "true"
-  });
-  </script>';
+$pageFooterExtras = '';
 $currentNav = 'users';
 $currentSubNav = $currentNav . '/roles';
 
@@ -61,7 +54,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
 <div class="csc-wrapper csc-row csc-container">
   <section class="csc-col csc-col12 csc-col--md8">
     <?php flashMsg('roles_role'); ?>
-    <form action="<?php echo $data->action_url; ?>" method="POST" id="role-form" class="csc-form cs-p-3 me-form">
+    <form action="<?php echo $data->action_url; ?>" method="POST" id="role-form" class="csc-form cs-p-3">
       <?php
       // Output ID if set
       if (!empty($data->id)) { ?>

@@ -147,7 +147,7 @@ class Users extends Cornerstone\Controller
   }
 
   /**
-   * Set Add Page Data
+   * Set Add / Edit Page Data
    *
    * @param int $setRoleID `[optional]` Assigned role. Defaults to "0" (Guest)
    */
@@ -606,9 +606,272 @@ class Users extends Cornerstone\Controller
           // Load view
           $this->load->view('users/user', $this->data, 'admin');
           exit;
-        } // Error getting the brand. Redirect to brands list.
+        } // Error getting the data. Redirect to index list.
 
-      } // No ID present. Redirect to brands list.
+      } // No ID present. Redirect to index list.
+
+      // Redirect user
+      redirectTo('admin/brands');
+      exit;
+    }
+  }
+
+  /**
+   * Set Permissions Page Data
+   */
+  protected function createPermsElements()
+  {
+    // Page Type
+    $this->data['page_type'] = 'edit';
+    // Action URL
+    $this->data['action_url'] = get_site_url('admin/users/permissions/' . $this->data['id']);
+    // H1
+    $this->data['page_title'] = 'Edit ' . ucfirst($this->data['login']) . ' Permissions';
+    // Set Breadcrumbs
+    $this->data['breadcrumbs'][] = array(
+      'text' => ucfirst($this->data['login']),
+      'href' => get_site_url('admin/users/edit/' . $this->data['id'])
+    );
+    $this->data['breadcrumbs'][] = array(
+      'text' => 'Edit Permissions',
+      'href' => $this->data['action_url']
+    );
+    // Instructions
+    $this->data['instructions'] = 'Select the permissions to allow / deny for ' . ucfirst($this->data['login']) . ' to update them over their assigned role.';
+
+    #################################
+    ####    USER PERMISSIONS    ####
+    ################################
+    // Get list of users permissions
+    $permissionsList = $this->userModel->listUserPermissions((int) $this->data['id']);
+
+    ###########################
+    ####    PERMISSIONS    ####
+    ###########################
+
+    // Load the role model
+    $this->roleModel = $this->load->model('cornerstone/userrole', 'admin');
+
+    // Init permission options
+    $this->data['viewOptions'] = '';
+    $this->data['addOptions'] = '';
+    $this->data['editOptions'] = '';
+    $this->data['deleteOptions'] = '';
+    $this->data['otherOptions'] = '';
+    $this->data['permissionsAllowedList'] = '<option></option>';
+    $this->data['permissionsDisallowedList'] = '<option></option>';
+    // Get list of permissions for assigning
+    if ($permissionsData = $this->roleModel->listPermissions()) {
+
+      // Loop through data and create options
+      foreach ($permissionsData as $permission) {
+
+        // Check if allowed
+        $allowedSelected = (isset($permissionsList->user_permissions[$permission->rp_id]) && $permissionsList->user_permissions[$permission->rp_id] === 1) ? ' selected' : '';
+        $disallowedSelected = (isset($permissionsList->user_permissions[$permission->rp_id]) && $permissionsList->user_permissions[$permission->rp_id] === 2) ? ' selected' : '';
+
+        // Add to lists
+        $this->data['permissionsAllowedList'] .= '<option value="' . $permission->rp_id . '"' . $allowedSelected . '>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . ' (' . $permission->rp_key . ')</option>';
+        $this->data['permissionsDisallowedList'] .=
+          '<option value="' . $permission->rp_id . '"' . $disallowedSelected . '>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . ' (' . $permission->rp_key . ')</option>';
+
+        // Check if in role permissions
+        if (isset($permissionsList->role_permissions[$permission->rp_id])) {
+          // Get type
+          $permissionType = explode('_', $permission->rp_key);
+          // Check which option to add to
+          switch ($permissionType[0]) {
+            case 'view':
+              $this->data['viewOptions'] .= '<p>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</p>';
+              break;
+            case 'add':
+              $this->data['addOptions'] .= '<p>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</p>';
+              break;
+            case 'edit':
+              $this->data['editOptions'] .= '<p>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</p>';
+              break;
+            case 'delete':
+            case 'archive':
+              $this->data['deleteOptions'] .= '<p>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</p>';
+              break;
+
+            default:
+              $this->data['otherOptions'] .= '<p>' . ucwords(str_replace('_', ' ', $permission->rp_key)) . '</p>';
+              break;
+          }
+        }
+      }
+    } else {
+      // Set blank options
+      $this->data['no_perm_options'] = '<p class="cs-body2">There are currently no permissions available to assign to this user.</p>';
+    }
+
+    // Set fallbacks
+    $this->data['viewOptions'] = (!empty($this->data['viewOptions'])) ? $this->data['viewOptions'] : '<p class="cs-caption">No view permissions set</p>';
+    $this->data['addOptions'] = (!empty($this->data['addOptions'])) ? $this->data['addOptions'] : '<p class="cs-caption">No add permissions set</p>';
+    $this->data['editOptions'] = (!empty($this->data['editOptions'])) ? $this->data['editOptions'] : '<p class="cs-caption">No edit permissions set</p>';
+    $this->data['deleteOptions'] = (!empty($this->data['deleteOptions'])) ? $this->data['deleteOptions'] : '<p class="cs-caption">No delete permissions set</p>';
+    $this->data['otherOptions'] = (!empty($this->data['otherOptions'])) ? $this->data['otherOptions'] : '<p class="cs-caption">No other permissions set</p>';
+  }
+
+  /**
+   * Permissions Page
+   */
+  public function permissions(...$params)
+  {
+
+    // Check user is allowed to view this
+    if (!$this->role->canDo('edit_user')) {
+      // Redirect user with error
+      flashMsg('admin_users', '<strong>Error</strong> Sorry, you are not allowed to edit users. Please contact your site administrator for access to this.', 'warning');
+      redirectTo('admin/users/');
+      exit;
+    }
+
+    // Process "edit"
+
+    //Check if page posted and process form if it is
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "save") {
+
+      // Sanitize POST data
+      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+      // Check ID
+      if (!empty($params) && is_numeric($params[0]) && $params[0] == $_POST['id']) {
+
+        // Get information submitted and validate
+        if (isset($_POST['id'])) {
+
+          // Try validating
+          try {
+
+            // Get ID
+            $this->data['id'] = htmlspecialchars(stripslashes(trim($_POST['id'])));
+
+            // Get allowed data
+            $this->data['allowed'] = (isset($_POST['allowed'])) ? $_POST['allowed'] : array();
+
+            // Get disallowed data
+            $this->data['disallowed'] = (isset($_POST['disallowed'])) ? $_POST['disallowed'] : array();
+          } catch (Exception $e) {
+
+            // Log error if any and set flash message
+            error_log($e->getMessage(), 0);
+            flashMsg('users_permissions', '<strong>Error</strong> There was an error editing the users permissions. Please try again', 'warning');
+          }
+        } else { // Required data not set. Set Errors.
+
+          $this->data['err']['id'] = 'ID is missing';
+        }
+
+        // If valid, add new
+        if (empty($this->data['err'])) {
+          // Validated
+
+          // Get existing role permissions
+          $existingData = array();
+          if ($userPermissionsList = $this->userModel->listUserPermissions((int) $this->data['id'])->user_permissions) {
+            // Loop through already assigned permissions
+            foreach ($userPermissionsList as $permID => $permStatus) {
+              // Check if permission exists in posted data
+              if (!in_array($permID, $this->data['allowed']) && !in_array($permID, $this->data['disallowed'])) {
+                // Permission doesn't exist. Delete link
+                $this->userModel->deleteOPLink((int) $this->data['id'], (int) $permID);
+              } else {
+                // Add to existing data array
+                $existingData[$permID] = (int) $permStatus;
+              }
+            }
+          }
+
+          // Loop through submitted data
+          foreach ($this->data['allowed'] as $allowedPermID) {
+            // Check if already assigned
+            if (empty($existingData) || !array_key_exists($allowedPermID, $existingData)) {
+              // Permissions isn't already allowed. Allow it
+              $this->userModel->addOPLink(
+                (int) $this->data['id'],
+                (int) $allowedPermID,
+                1
+              );
+            } else if (!empty($existingData) && array_key_exists($allowedPermID, $existingData) && (int) $existingData[$allowedPermID] !== 1) {
+              // Permissions already exists. Update it
+              $this->userModel->updateOPLink(
+                (int) $this->data['id'],
+                (int) $allowedPermID,
+                1
+              );
+            }
+          }
+          foreach ($this->data['disallowed'] as $disallowedPermID) {
+            // Check if already assigned
+            if (
+              empty($existingData) || !array_key_exists($disallowedPermID, $existingData)
+            ) {
+              // Permissions isn't already disallowed. Disallow it
+              $this->userModel->addOPLink(
+                (int) $this->data['id'],
+                (int) $disallowedPermID,
+                2
+              );
+            } else if (!empty($existingData) && array_key_exists($disallowedPermID, $existingData) && (int) $existingData[$disallowedPermID] !== 2) {
+              // Permissions already exists. Update it
+              $this->userModel->updateOPLink(
+                (int) $this->data['id'],
+                (int) $disallowedPermID,
+                2
+              );
+            }
+          }
+
+          // Set success message
+          flashMsg('admin_users', '<strong>Success</strong>The user permissions were saved successfully.');
+
+          // Redirect to index
+          redirectTo('admin/users/');
+          exit;
+        }
+
+        // Set error message
+        flashMsg('users_permissions', '<strong>Error</strong> There was an error updating the user permissions. Please try again.', 'warning');
+
+        // If it's made it this far there were errors. Load view with submitted data
+
+        // Set Permissions Data
+        $this->createPermsElements();
+
+        // Load view
+        $this->load->view('users/permissions', $this->data, 'admin');
+        exit;
+      } else { // Error with the ID. Redirect to list view with error.
+
+        // Set Error
+        flashMsg('admin_users', '<strong>Error</strong> There was an error saving the user permissions. Please try again', 'warning');
+        redirectTo('admin/users/');
+        exit;
+      }
+    } else { // Page wasn't posted. Load view.
+
+      // Check ID
+      if (!empty($params) && is_numeric($params[0])) {
+
+        // Get Information
+        if ($userData = $this->userModel->getUser($params[0])) {
+
+          // Set data
+          foreach ($userData as $key => $data) {
+            $this->data[str_replace(array('user_'), '', $key)] = $data;
+          }
+
+          // Set Permissions Data
+          $this->createPermsElements();
+
+          // Load view
+          $this->load->view('users/permissions', $this->data, 'admin');
+          exit;
+        } // Error getting the data. Redirect to index list.
+
+      } // No ID present. Redirect to index list.
 
       // Redirect user
       redirectTo('admin/brands');

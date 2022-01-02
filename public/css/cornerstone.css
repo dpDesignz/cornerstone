@@ -7172,6 +7172,7 @@ body.cs-component__form .csc-form {
   /* Style Placeholders */
   /* Style Fieldset */
   /* Style Form Actions */
+  /* Style Form Details */
   /* Text inputs */
   /* Validation Sass Placeholders */
   /* Search Field */
@@ -7182,7 +7183,6 @@ body.cs-component__form .csc-form {
   ========================================================================== */
   /* Remove default checkbox */
   /* Indeterminate checkbox */
-  /* Style Form Details */
   /* Radio Buttons
   ========================================================================== */
   /* Unchecked styles */
@@ -7242,6 +7242,13 @@ body.cs-component__form .csc-form__actions > div {
 body.cs-component__form .csc-form__actions > div:last-child {
     text-align: right;
   }
+}
+body.cs-components .csc-form-details,
+body.cs-component__form .csc-form-details {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  background-color: #eceff1;
+  border-left: 1px solid #cfd8dc;
 }
 body.cs-components .csc-form input:not([type]),
 body.cs-components .csc-form input[type=text]:not(.browser-default),
@@ -9155,11 +9162,6 @@ body.cs-components .csc-form [type=checkbox].csc-filled-in:disabled:checked + sp
 body.cs-component__form .csc-form [type=checkbox].csc-filled-in:disabled:checked + span:not(.csc-lever):after {
   background-color: #949494;
   border-color: #949494;
-}
-body.cs-components .csc-form-details,
-body.cs-component__form .csc-form-details {
-  background-color: #eceff1;
-  border-left: 1px solid #cfd8dc;
 }
 body.cs-components .csc-form [type=radio]:not(:checked),
 body.cs-components .csc-form [type=radio]:checked,
@@ -11822,5 +11824,3 @@ aside {
     content: "Please see the website for the latest version of this information.";
   }
 }
-
-/*# sourceMappingURL=cornerstone.css.map */

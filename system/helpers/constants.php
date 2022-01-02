@@ -25,7 +25,7 @@ unset($row);
 /**#@+
  * Cornerstone constants
  */
-\defined('CS_VERSION') or \define('CS_VERSION', '0.6.4'); // Last updated ~ 2021-12-31
+\defined('CS_VERSION') or \define('CS_VERSION', '0.6.5'); // Last updated ~ 2022-01-02
 \defined('_DS') or \define('_DS', \DIRECTORY_SEPARATOR);
 /**#@-*/
 

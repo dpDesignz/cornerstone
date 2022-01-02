@@ -299,7 +299,7 @@ class Files extends Cornerstone\Controller
       }
 
       // Check to output permission columns
-      $op_file_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="' . get_site_url('admin/files/chmod/?p= ' . urlencode($this->data['path']) . '&amp;item=' . urlencode($f)) . '">' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
+      $op_file_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="' . get_site_url('admin/files/chmod/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;item=' . urlencode($f)) . '">' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
 
       // Check if allowed to delete
       $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete File" data-tippy-content="Delete File" class="delete-this" data-t="File" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="far fa-trash-alt"></i></button>' : '';
@@ -372,7 +372,7 @@ class Files extends Cornerstone\Controller
       }
 
       // Check to output permission columns
-      $op_folder_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="' . get_site_url('admin/files/chmod/?p= ' . urlencode($this->data['path']) . '&amp;item=' . urlencode($f)) . '">' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
+      $op_folder_cols = ($this->data['opPermissionColumns']) ? '<td><a title="Change Permissions" href="' . get_site_url('admin/files/chmod/?p=' . urlencode($this->cfmh->currentPath()) . '&amp;item=' . urlencode($f)) . '">' . $perms . '</a></td><td> ' . $owner['name'] . ':' . $group['name'] . '</td>' : '';
 
       // Check if allowed to delete
       $deleteOP = $this->role->canDo('delete_files') ? '<button type="button" title="Delete Folder" data-tippy-content="Delete Folder" class="delete-this" data-t="Folder" data-f="' . urlencode($f) . '" data-name="' . $f . '"><i class="far fa-trash-alt"></i></button>' : '';
@@ -688,7 +688,7 @@ class Files extends Cornerstone\Controller
         } else {
           if ($this->cfmh->mkdir($path . '/' . $new, false) === true) {
             flashMsg('admin_filemanager', '<strong>Success</strong> ' . sprintf('Folder "<em>%s</em>" created', $this->cfmh->enc($new)), 'success');
-          } elseif (fm_mkdir($path . '/' . $new, false) === $path . '/' . $new) {
+          } elseif ($this->cfmh->mkdir($path . '/' . $new, false) === $path . '/' . $new) {
             flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Folder "<em>%s</em>" already exists', $this->cfmh->enc($new)), 'danger');
           } else {
             flashMsg('admin_filemanager', '<strong>Error</strong> ' . sprintf('Folder "<em>%s</em>" not created. Please try again.', $this->cfmh->enc($new)), 'danger');
@@ -855,7 +855,7 @@ class Files extends Cornerstone\Controller
         $is_utf8 = $this->cfmh->is_utf8($content);
         if (function_exists('iconv')) {
           if (!$is_utf8) {
-            $content = iconv(FM_ICONV_INPUT_ENC, 'UTF-8//IGNORE', $content);
+            $content = iconv($this->cfmh->iconvInputEnc(), 'UTF-8//IGNORE', $content);
           }
         }
         $this->data['headerOP'] .= 'Charset: ' . ($is_utf8 ? 'utf-8' : '8 bit') . '<br>';
@@ -949,7 +949,7 @@ class Files extends Cornerstone\Controller
       if ($file->isDir()) {
         $selected = ($checkPath === $file->getRealpath()) ? ' selected' : '';
         $valueOP = ($relative) ? $this->cfmh->get_relative_path_folder($file->getRealpath()) : $file->getRealpath();
-        $this->data['folder_options'] .= '<option value="' . $valueOP . '"' . $selected . '>' . str_replace($rootPath, '', $file->getLinkTarget()) . '</option>';
+        $this->data['folder_options'] .= '<option value="' . $valueOP . '"' . $selected . '>' . str_replace($rootPath, '', $file->getRealpath()) . '</option>';
       }
     }
   }
@@ -1120,7 +1120,6 @@ class Files extends Cornerstone\Controller
       if (!is_dir($copy_to_path)) {
         if (!$this->cfmh->mkdir($copy_to_path, true)) {
           flashMsg('admin_filemanager', '<strong>Error</strong> Unable to create destination folder. Please try again.', 'danger');
-          fm_set_msg('Unable to create destination folder', 'error');
           redirectTo('admin/files/?p=' . urlencode($this->cfmh->currentPath()));
         }
       }

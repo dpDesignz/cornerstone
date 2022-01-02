@@ -53,17 +53,17 @@ require(get_theme_path('layout.php', 'admin')); ?>
 </div>
 <div class="csc-wrapper csc-row cs-my-2">
   <div class="csc-col csc-col12">
-    <h1 class="cs-h2 cs-my-2"><?php echo $data->page_title; ?></h1>
+    <h1 class="cs-h2 cs-my-2"><?= $data->page_title; ?></h1>
   </div>
 </div>
 <div class="csc-wrapper csc-row csc-container">
   <section class="csc-col csc-col12 csc-col--md8">
     <?php flashMsg('users_user'); ?>
-    <form action="<?php echo $data->action_url; ?>" method="POST" id="user-form" class="csc-form cs-p-3">
+    <form action="<?= $data->action_url; ?>" method="POST" id="user-form" class="csc-form cs-p-3">
       <?php
       // Output ID if set
       if (!empty($data->id)) { ?>
-        <input type="hidden" name="id" value="<?php echo $data->id; ?>">
+        <input type="hidden" name="id" value="<?= $data->id; ?>">
       <?php } ?>
       <fieldset>
         <legend>User</legend>
@@ -99,11 +99,16 @@ require(get_theme_path('layout.php', 'admin')); ?>
         <div class="csc-row csc-row--no-pad">
           <div class="csc-col csc-col12 csc-input-field">
             <select name="role_id" id="role_id" data-placeholder="Choose the assigned role" tabindex="6" data-lpignore="true" required>
-              <?php echo $data->role_options; ?>
+              <?= $data->role_options; ?>
             </select>
             <label>Assigned Role*</label>
           </div>
         </div>
+        <?php
+        // Only show permissions link if editing
+        if ($data->page_type == "edit") { ?>
+          <p><a class="csc-btn--flat csc-btn--info csc-btn--text-normal" href="<?= get_site_url('admin/users/permissions/' . $data->id); ?>">Set individual permissions</a></p>
+        <?php } ?>
         <div class="csc-row csc-row--no-pad">
           <div class="csc-col csc-col12 csc-input-field cs-my-0">
             <p class="cs-text-center">
@@ -134,7 +139,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
         <?php } ?>
       </fieldset>
       <div class="csc-row csc-row--no-gap">
-        <div class="csc-col csc-col12 csc-col--md6 cs-my-1 cs-mb-3"><a href="<?php echo $data->cancel_btn; ?>" class="csc-btn--flat"><span>Cancel</span></a></div>
+        <div class="csc-col csc-col12 csc-col--md6 cs-my-1 cs-mb-3"><a href="<?= $data->cancel_btn; ?>" class="csc-btn--flat"><span>Cancel</span></a></div>
         <div class="csc-col csc-col12 cs-text-right csc-col--md6 cs-my-1 cs-mb-3">
           <button type="submit" name="action" tabindex="10" value="save" class="csc-btn csc-btn--success">Save <i class="fas fa-save csc-bi-right"></i></button>
         </div>
@@ -148,7 +153,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
   </section>
   <section class="csc-col csc-col12 csc-col--md4 cs-hide-md-down csc-form-details">
     <h4 class="cs-h4">Form Details</h4>
-    <p class="cs-body1"><?php echo $data->instructions; ?></p>
+    <p class="cs-body1"><?= $data->instructions; ?></p>
     <h5 class="cs-h5">Form Fields</h5>
     <p class="cs-body1 cs-mb-0"><strong>Customer</strong></p>
     <p class="cs-body2"><strong>Login (username)*: </strong> The username used for logging in to the admin end of the website.</p>
