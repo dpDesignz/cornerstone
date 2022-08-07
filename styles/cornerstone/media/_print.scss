@@ -1,0 +1,133 @@
+// media/_print.scss
+
+@media print,
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 1.25dppx),
+       (min-resolution: 120dpi) {
+    /* Style adjustments for high resolution devices */
+}
+
+
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid the additional HTTP request:
+   https://www.phpied.com/delay-loading-your-print-css/
+   ========================================================================== */
+
+   @media print {
+    *,
+    *:before,
+    *:after {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster */
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links that are fragment identifiers,
+     * or use the `javascript:` pseudo protocol
+     */
+
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after {
+        content: "";
+    }
+
+    pre {
+        white-space: pre-wrap !important;
+    }
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    /*
+     * Printing Tables:
+     * http://css-discuss.incutio.com/wiki/Printing_Tables
+     */
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img,
+    ul { // Added 'ul'
+        page-break-inside: avoid;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h1, // Added H1
+    h2,
+    h3 {
+        page-break-after: avoid;
+        display: block !important; // Added to over-ride any "Grid"
+    }
+
+    // Custom CSS
+    body,
+    body > main,
+    .container-content-inner {
+        display: block !important;
+    }
+    body > header,
+    body > main > header,
+    body > main > footer,
+    body > footer,
+    script,
+    .reveal-overlay {
+        display: none !important;
+    }
+    body,
+    article {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    nav,
+    aside {
+        display: none !important;
+     }
+     @page {
+        margin: 2cm;
+     }
+     img {
+        max-width: 100% !important;
+     }
+     a {
+        font-weight: bolder;
+        text-decoration: none;
+        &[href^=http]:after {
+            content:" <" attr(href) "> ";
+        }
+        &[href^="#"]:after {
+            content: "";
+        }
+     }
+     .wrapper::after {
+        content: "Please see the website for the latest version of this information.";
+      }
+}

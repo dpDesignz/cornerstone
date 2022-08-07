@@ -1,0 +1,154 @@
+// components/_select2.scss
+
+/*!
+ * Select2 Extended
+ * https://select2.org/appearance#themes */
+body.cs-components,
+body.cs-component__select2 {
+  .select2 {
+    width: 100%;
+
+    // Container
+    &-container {
+      width: 100%;
+
+      // Open container
+      &--open {
+        .select2-selection {
+          border-bottom-color: $default-color;
+          box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);
+        }
+      }
+    }
+
+    // Selection
+    &-selection {
+      box-sizing: content-box;
+      display: grid;
+      grid-template-columns: 1fr 20px;
+      align-items: center;
+      margin: 0; padding: 0;
+      width: 100%; height: 3rem;
+      border: none; border-bottom: 1px solid #9e9e9e; border-radius: 0; outline: none;
+      background: none; background-color: transparent;
+      font-size: 16px;
+      box-shadow: none;
+      transition: box-shadow 0.3s, border 0.3s;
+
+      &__rendered {
+        margin-right: 0;
+        margin-left: 0.75rem;
+        padding-left: 0 !important;
+      }
+
+      &__arrow {
+        position: static !important;
+        width: auto !important; height: auto !important;
+
+        b {
+          position: static !important;
+          display: block;
+        }
+      }
+
+      // Multiselect choice
+      &__choice {
+        float: none;
+        display: inline-grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        overflow: hidden;
+        height: 32px;
+        padding: 7px 12px !important;
+        margin: 8px 5px 3px 0 !important;
+        color: rgba(0,0,0,.87); font-size: .875rem; line-height: 1rem; font-weight: 400; letter-spacing: .0178571429em;
+        border: none !important; outline: none; border-radius: 16px !important;
+        background-image: none; background-color: #e0e0e0 !important;
+      }
+
+      // Selection Multiple
+      &--multiple {
+        grid-template-columns: 1fr;
+        padding: 0 5px;
+        border: 1px solid #aaa !important;
+
+        .select2-search__field {
+          margin-bottom: 0 !important;
+          border-bottom: none !important;
+        }
+      }
+    }
+
+    // Dropdown
+    &-dropdown {
+      border: none;
+      box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);
+    }
+
+    // Search
+    &-search {
+
+      // Search field
+      &__field {
+        height: 3rem;
+        margin: 0 0 8px 0;
+        padding: 0;
+        padding-left: 0.75em;
+        font-size: 16px;
+        border: none !important;
+        border-bottom: 1px solid $default-color !important;
+        box-shadow: 0 1px 0 0 $default-color;
+        background: url('/img/cornerstone/search.png') no-repeat 100% 50%;
+        background-size: 25px 25px;
+      }
+    }
+
+    // Results
+    &-results {
+
+      // Group
+      &__group {
+        padding: 14px 16px !important;
+        min-height: 50px;
+        font-size: 16px;
+        text-align: left;
+        line-height: 1.5rem;
+        border-top: 1px solid #eee;
+        color: rgba(0,0,0,0.3) !important;
+        background-color: transparent;
+      }
+
+      // Options
+      &__option {
+        display: list-item;
+        padding: 14px 16px;
+        width: 100%; min-height: 50px;
+        font-size: 16px; text-align: left; line-height: 1.5rem; color: rgba(0,0,0,0.87);
+        cursor: pointer;
+
+        &s {
+          padding: 0;
+
+          // Nested
+          &--nested {
+            .select2-results__option {
+              padding-left: 25px !important;
+            }
+          }
+        }
+
+        &[aria-selected="true"] {
+            color: color('deep-purple', 'darken-4') !important;
+            background-color: color('deep-purple', 'lighten-3') !important;
+        }
+      }
+    }
+
+    // Style Label
+    + label {
+      transform: translateY(-22px) translateX(-8px) scale(.8) !important;
+      transform-origin: 0 0 !important;
+      font-weight: bolder;
+    }
+  }
+}

@@ -1,0 +1,47 @@
+// components/_uppy.scss
+
+/*!
+ * Trumbowyg Extended
+ * https://alex-d.github.io/Trumbowyg/ */
+body.cs-components,
+body.cs-component__uppy {
+  .uppy {
+    &-FileInput-btn {
+      border: 0;
+      border-radius: 2px;
+      background-color: transparent;
+      border: 1px solid $button-color;
+      color: $button-color;
+      text-transform: uppercase;
+      transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+        -webkit-box-shadow 0.15s ease-in-out;
+
+      &:hover,
+      &:focus {
+        background-color: rgba($button-color, .04);
+      }
+    }
+
+    &-Dashboard-inner {
+      min-height: unset;
+    }
+
+    &-DashboardItem {
+      justify-content: center;
+    }
+
+    &-Dashboard:not(.uppy-size--md) .uppy-DashboardItem-preview {
+      width: 120px;
+      height: 120px;
+    }
+
+    &-DashboardItem-fileInfoAndButtons {
+      display: none;
+    }
+
+    &-DragDrop-inner {
+      padding: 20px;
+    }
+  }
+}

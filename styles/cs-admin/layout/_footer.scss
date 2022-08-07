@@ -1,0 +1,26 @@
+// layout/_footer.scss
+
+/*------------------------------------*\
+  #FOOTER
+\*------------------------------------*/
+body.cs-admin > div#main__content > footer {
+    grid-area: cs--main__footer;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 25px;
+    font-size: 0.65rem; text-align: center;
+    border-top: 1px solid #e7e7e7;
+
+    p{
+
+      &#footer__copyright {
+        text-align: left;
+      }
+
+      &#footer__thankyou {
+        text-align: right;
+      }
+
+    }
+
+}

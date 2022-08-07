@@ -1,0 +1,21 @@
+// layout/_main.scss
+
+/*------------------------------------*\
+  #MAIN CONTENT
+\*------------------------------------*/
+body.cs-admin > div#main__content {
+    grid-area: cs--body__main;
+    display: grid;
+    grid-template-columns: 1fr; grid-gap: 25px;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      "cs--main__main"
+      "cs--main__footer";
+    background-color: #f2f2f2;
+    box-shadow: inset 7px 0 9px -7px rgba(0,0,0,0.56);
+
+    > main {
+      grid-area: cs--main__main;
+      padding: 0 25px;
+    }
+}

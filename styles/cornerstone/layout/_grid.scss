@@ -1,0 +1,359 @@
+// layout/_grid.scss
+
+/*------------------------------------*\
+  #GRID SYSTEM
+\*------------------------------------*/
+body.cs-page,
+body.cs-grid {
+
+  // Create a row
+  .csc-row {
+    display: grid;
+    grid-template-columns: repeat(#{$num-cols}, minmax(0, 1fr));
+    grid-gap: #{$gutter-width};
+    width: 100%;
+
+    &--no-gap {
+        grid-gap: 0;
+    }
+
+    &--no-pad > .csc-col {
+        padding: 0 !important;
+    }
+
+    // Generate the default column sizes
+    @for $i from 1 through $num-cols {
+      &#{$i} {
+        grid-row: span #{$i};
+      }
+    }
+
+    // Generate the column sizes for small+ screens
+    @include media("screen", ">=sm") {
+      &--sm {
+        @for $i from 1 through $num-cols {
+          &#{$i} {
+            grid-row: span #{$i};
+          }
+        }
+      }
+    }
+
+    // Generate the column sizes for medium+ screens
+    @include media("screen", ">=md") {
+      &--md {
+        @for $i from 1 through $num-cols {
+          &#{$i} {
+            grid-row: span #{$i};
+          }
+        }
+      }
+    }
+
+    // Generate the column sizes for large+ screens
+    @include media("screen", ">=lg") {
+      &--lg {
+        @for $i from 1 through $num-cols {
+          &#{$i} {
+            grid-row: span #{$i};
+          }
+        }
+      }
+    }
+
+    // Generate the column sizes for extra large+ screens
+    @include media("screen", ">=xl") {
+      &--xl {
+        @for $i from 1 through $num-cols {
+          &#{$i} {
+            grid-row: span #{$i};
+          }
+        }
+      }
+    }
+
+  }
+
+  // Create a column
+  .csc-col {
+    // display: grid;
+    // align-content: start; justify-items: start;
+    padding: 0 .75rem;
+    min-height: 1px;
+
+    // Generate the default column sizes
+    @for $i from 1 through $num-cols {
+      &#{$i} {
+        grid-column: span #{$i};
+      }
+    }
+
+    // Generate the column sizes for small+ screens
+    @include media("screen", ">=sm") {
+      &--sm {
+        @for $i from 1 through $num-cols {
+          &#{$i} {
+            grid-column: span #{$i};
+          }
+        }
+      }
+    }
+
+    // Generate the column sizes for medium+ screens
+    @include media("screen", ">=md") {
+      &--md {
+        @for $i from 1 through $num-cols {
+          &#{$i} {
+            grid-column: span #{$i};
+          }
+        }
+      }
+    }
+
+    // Generate the column sizes for large+ screens
+    @include media("screen", ">=lg") {
+      &--lg {
+        @for $i from 1 through $num-cols {
+          &#{$i} {
+            grid-column: span #{$i};
+          }
+        }
+      }
+    }
+
+    // Generate the column sizes for extra large+ screens
+    @include media("screen", ">=xl") {
+      &--xl {
+        @for $i from 1 through $num-cols {
+          &#{$i} {
+            grid-column: span #{$i};
+          }
+        }
+      }
+    }
+
+    // Default Grid Align & Default Align
+    &--ga,
+    &--align {
+      display: grid;
+
+      // Grid Align Top
+      &-top {
+        @extend .csc-col--ga;
+        align-content: start;
+      }
+
+      // Grid Align Right
+      &-right {
+        @extend .csc-col--ga;
+        justify-items: end;
+      }
+
+      // Grid Align Bottom
+      &-btm {
+        @extend .csc-col--ga;
+        align-content: end;
+      }
+
+      // Grid Align Left
+      &-left {
+        @extend .csc-col--ga;
+        justify-items: start;
+      }
+
+      // Grid Align Middle
+      &-middle {
+        @extend .csc-col--ga;
+        align-content: center;
+      }
+
+      // Grid Align Center
+      &-center {
+        @extend .csc-col--ga;
+        justify-items: center;
+      }
+    }
+
+    // Grid Align & Align for small+ screens
+    @include media("screen", ">=sm") {
+      &--ga-sm,
+      &--align-sm {
+        display: grid;
+
+        // Grid Align Top
+        &-top {
+          @extend .csc-col--ga-sm;
+          align-content: start;
+        }
+
+        // Grid Align Right
+        &-right {
+          @extend .csc-col--ga-sm;
+          justify-items: end;
+        }
+
+        // Grid Align Bottom
+        &-btm {
+          @extend .csc-col--ga-sm;
+          align-content: end;
+        }
+
+        // Grid Align Left
+        &-left {
+          @extend .csc-col--ga-sm;
+          justify-items: start;
+        }
+
+        // Grid Align Middle
+        &-middle {
+          @extend .csc-col--ga-sm;
+          align-content: center;
+        }
+
+        // Grid Align Center
+        &-center {
+          @extend .csc-col--ga-sm;
+          justify-items: center;
+        }
+      }
+    }
+
+    // Grid Align & Align for medium+ screens
+    @include media("screen", ">=md") {
+      &--ga-md,
+      &--align-md {
+        display: grid;
+
+        // Grid Align Top
+        &-top {
+          @extend .csc-col--ga-md;
+          align-content: start;
+        }
+
+        // Grid Align Right
+        &-right {
+          @extend .csc-col--ga-md;
+          justify-items: end;
+        }
+
+        // Grid Align Bottom
+        &-btm {
+          @extend .csc-col--ga-md;
+          align-content: end;
+        }
+
+        // Grid Align Left
+        &-left {
+          @extend .csc-col--ga-md;
+          justify-items: start;
+        }
+
+        // Grid Align Middle
+        &-middle {
+          @extend .csc-col--ga-md;
+          align-content: center;
+        }
+
+        // Grid Align Center
+        &-center {
+          @extend .csc-col--ga-md;
+          justify-items: center;
+        }
+      }
+    }
+
+    // Grid Align & Align for large+ screens
+    @include media("screen", ">=lg") {
+      &--ga-lg,
+      &--align-lg {
+        display: grid;
+
+        // Grid Align Top
+        &-top {
+          @extend .csc-col--ga-lg;
+          align-content: start;
+        }
+
+        // Grid Align Right
+        &-right {
+          @extend .csc-col--ga-lg;
+          justify-items: end;
+        }
+
+        // Grid Align Bottom
+        &-btm {
+          @extend .csc-col--ga-lg;
+          align-content: end;
+        }
+
+        // Grid Align Left
+        &-left {
+          @extend .csc-col--ga-lg;
+          justify-items: start;
+        }
+
+        // Grid Align Middle
+        &-middle {
+          @extend .csc-col--ga-lg;
+          align-content: center;
+        }
+
+        // Grid Align Center
+        &-center {
+          @extend .csc-col--ga-lg;
+          justify-items: center;
+        }
+      }
+    }
+
+    // Grid Align & Align for extra large+ screens
+    @include media("screen", ">=xl") {
+      &--ga-xl,
+      &--align-xl {
+        display: grid;
+
+        // Grid Align Top
+        &-top {
+          @extend .csc-col--ga-xl;
+          align-content: start;
+        }
+
+        // Grid Align Right
+        &-right {
+          @extend .csc-col--ga-xl;
+          justify-items: end;
+        }
+
+        // Grid Align Bottom
+        &-btm {
+          @extend .csc-col--ga-xl;
+          align-content: end;
+        }
+
+        // Grid Align Left
+        &-left {
+          @extend .csc-col--ga-xl;
+          justify-items: start;
+        }
+
+        // Grid Align Middle
+        &-middle {
+          @extend .csc-col--ga-xl;
+          align-content: center;
+        }
+
+        // Grid Align Center
+        &-center {
+          @extend .csc-col--ga-xl;
+          justify-items: center;
+        }
+      }
+    }
+
+  }
+
+  // Fix 'p' element if assigned `csc-col` class
+  p.csc-col {
+    display: block;
+  }
+}

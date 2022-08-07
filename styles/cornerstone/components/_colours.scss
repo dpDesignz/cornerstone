@@ -1,0 +1,35 @@
+// components/_colours.scss
+
+body.cs-components,
+body.cs-component__colours {
+  @each $color_name, $color in $colors {
+    @each $color_type, $color_value in $color {
+      @if $color_type == "base" {
+        .csc-#{$color_name} {
+          background-color: $color_value !important;
+        }
+        .csc-text-#{$color_name} {
+          color: $color_value !important;
+        }
+      }
+      @else if $color_name != "shades" {
+        .csc-#{$color_name}.#{$color_type} {
+          background-color: $color_value !important;
+        }
+        .csc-text-#{$color_name}.text-#{$color_type} {
+          color: $color_value !important;
+        }
+      }
+    }
+  }
+
+  // Shade classes
+  @each $color, $color_value in $shades {
+    .csc-#{$color} {
+      background-color: $color_value !important;
+    }
+    .csc-text-#{$color} {
+      color: $color_value !important;
+    }
+  }
+}

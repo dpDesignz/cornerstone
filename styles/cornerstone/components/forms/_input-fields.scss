@@ -1,0 +1,468 @@
+// components/forms/_input-fields.scss
+
+/* Text inputs */
+input:not([type]),
+input[type=text]:not(.browser-default),
+input[type=password]:not(.browser-default),
+input[type=email]:not(.browser-default),
+input[type=url]:not(.browser-default),
+input[type=time]:not(.browser-default),
+input[type=date]:not(.browser-default),
+input[type=datetime]:not(.browser-default),
+input[type=datetime-local]:not(.browser-default),
+input[type=tel]:not(.browser-default),
+input[type=number]:not(.browser-default),
+input[type=search]:not(.browser-default),
+textarea.csc-textarea {
+
+  // General Styles
+  background-color: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  border-bottom: $input-border;
+  border-radius: 0;
+  outline: none;
+  height: $input-height;
+  width: 100%;
+  font-size: $input-font-size;
+  margin: $input-margin;
+  padding: $input-padding;
+  padding-left: 0.75em;
+  box-shadow: none;
+  transition: box-shadow .3s, border .3s;
+
+  // Disabled input style
+  &:disabled,
+  &[readonly="readonly"] {
+    color: $input-disabled-color;
+    border-bottom: $input-disabled-border;
+  }
+
+  // Disabled label style
+  &:disabled+label,
+  &[readonly="readonly"]+label {
+    color: $input-disabled-color;
+  }
+
+  // Focused input style
+  &:focus:not([readonly]) {
+    border-bottom: 1px solid $input-focus-color;
+    box-shadow: 0 1px 0 0 $input-focus-color;
+  }
+
+  // Focused label style
+  &:focus:not([readonly])+label {
+    color: $input-focus-color;
+  }
+
+  // Hide helper text on data message
+  &.valid ~ .csc-helper-text[data-success],
+  &:focus.valid ~ .csc-helper-text[data-success],
+  &.invalid ~ .csc-helper-text[data-error],
+  &:focus.invalid ~ .csc-helper-text[data-error] {
+    @extend %hidden-text;
+  }
+
+  // Valid Input Style
+  &.valid,
+  &:focus.valid {
+    @extend %valid-input-style;
+  }
+
+  // Custom Success Message
+  &.valid ~ .csc-helper-text:after,
+  &:focus.valid ~ .csc-helper-text:after {
+    @extend %custom-success-message;
+  }
+  &.valid ~ .csc-helper-text,
+  &:focus.valid ~ .csc-helper-text,
+  &:focus.valid ~ label {
+    color: $input-success-color;
+  }
+
+  // Invalid Input Style
+  &.invalid,
+  &:focus.invalid {
+    @extend %invalid-input-style;
+  }
+
+  // Custom Error message
+  &.invalid ~ .csc-helper-text:after,
+  &:focus.invalid ~ .csc-helper-text:after {
+    @extend %custom-error-message;
+  }
+  &.invalid ~ .csc-helper-text,
+  &:focus.invalid ~ .csc-helper-text,
+  &:focus.invalid ~ label {
+    color: $input-error-color;
+  }
+
+  // Full width label when using validate for error messages
+  &.validate + label {
+    width: 100%;
+  }
+
+  // Form Message Shared Styles
+  & + label:after {
+    @extend %input-after-style;
+  }
+}
+
+
+/* Validation Sass Placeholders */
+%valid-input-style {
+  border-color: $input-success-color;
+  box-shadow: 0 1px 0 0 $input-success-color;
+}
+%invalid-input-style {
+  border-color: $input-error-color;
+  box-shadow: 0 1px 0 0 $input-error-color;
+}
+%hidden-text {
+  color: transparent;
+  user-select: none;
+  pointer-events: none;
+}
+%custom-success-message {
+  content: attr(data-success);
+  color: $input-success-color;
+}
+%custom-error-message {
+  content: attr(data-error);
+  color: $input-error-color;
+}
+%input-after-style {
+  display: block;
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  opacity: 0;
+  transition: .2s opacity ease-out, .2s color ease-out;
+}
+
+
+// Styling for input field wrapper
+.csc-input-field {
+  position: relative;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  // Hint icon
+  .csc-hint {
+    position: absolute;
+    top: 14px;
+    right: 20px;
+    color: color("blue", "base");
+    font-size: 20px;
+  }
+
+  // Infield Top Aligned
+  &.csc-ifta {
+    &:focus-within label {
+      color: color("light-blue", "base") !important;
+    }
+
+    // IFTA Label
+    label {
+      position: relative;
+      z-index: 1;
+      top: unset;
+      left: unset !important;
+      display: block;
+      margin-bottom: -30px;
+      padding: 0px 10px 0px 20px;
+      color: var(--font-color);
+      font-size: 0.8em;
+      font-weight: 400;
+      pointer-events: none;
+      transform: none;
+
+      &.active {
+        transform: none !important;
+        font-weight: 400 !important;
+      }
+    }
+
+    // IFTA Field
+    input {
+      &::placeholder {
+        color: color("grey", "base");
+      }
+
+      &:focus::placeholder {
+        color: transparent;
+      }
+    }
+    .csc-ifta {
+      &__field {
+        width: 100%;
+        height: unset;
+        margin: 0 0 20px;
+        padding: 35px 20px 15px;
+        border: 0;
+        border-radius: 6px;
+        box-shadow: inset 0 0 0 1px #ccc;
+
+        &.valid {
+          border: none;
+          box-shadow: inset 0 0 0 2px $input-success-color;
+        }
+
+        &.invalid {
+          border: none;
+          box-shadow: inset 0 0 0 2px $input-error-color;
+        }
+
+        &:focus {
+          outline: none;
+          border: none !important;
+          box-shadow: inset 0 0 0 2px color("light-blue", "base") !important;
+        }
+      }
+    }
+
+    // IFTA Helper Text
+    .csc-helper-text {
+      margin-top: -18px;
+      padding: 10px;
+      width: 96.7%;
+
+      &.invalid {
+        color: color("red", "darken-4");
+        background-color: color("red", "lighten-5");
+      }
+    }
+  }
+
+  // Inline styles
+  &.csc-inline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+
+    input,
+    .csc-select-dropdown {
+      margin-bottom: 1rem;
+    }
+
+  }
+
+  // Gutter spacing
+  &.csc-col {
+
+    label {
+      left: $gutter-width / 2;
+
+      &:not(.csc-label-icon).active {
+        transform: translateY(-20px) translateX(-14px) scale(.8);
+      }
+
+    }
+
+    .csc-prefix ~ label,
+    .csc-prefix ~ .csc-validate ~ label {
+      width: calc(100% - 3rem - #{$gutter-width});
+    }
+
+  }
+
+  & > label {
+    color: $input-border-color;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 1rem;
+    cursor: text;
+    transition: transform .2s ease-out, color .2s ease-out;
+    transform-origin: 0% 100%;
+    text-align: initial;
+    transform: translateY(12px);
+
+    &:not(.csc-label-icon).active {
+      transform: translateY(-20px) scale(.8);
+      transform-origin: 0 0;
+      font-weight: bolder;
+    }
+
+    &.active span.label-hide {
+      display: none;
+    }
+
+    &.active.tooltipstered,
+    &.active[data-tippy-content] {
+      cursor: help;
+      border-bottom: 1px dotted $link-color;
+    }
+
+  }
+
+  // Autofill + date + time inputs
+  & > input[type]:-webkit-autofill:not(.browser-default):not([type="search"]) + label,
+  & > input[type=date]:not(.browser-default) + label,
+  & > input[type=time]:not(.browser-default) + label {
+    transform: translateY(-14px) scale(.8);
+    transform-origin: 0 0;
+  }
+
+  .csc-helper-text {
+    position: absolute;
+    z-index: 250;
+    margin-top: -7px;
+    padding: 5px;
+    width: 100%;
+    min-height: 18px;
+    display: block;
+    font-size: 12px;
+    color: rgba(0,0,0,.54);
+    text-align: left;
+    background-color: navajowhite;
+
+    &::after {
+      opacity: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+  }
+
+  // Prefix Icons
+  .csc-prefix {
+    position: absolute;
+    width: $input-height;
+    font-size: $input-icon-size;
+    transition: color .2s;
+    top: ($input-height - $input-icon-size) / 2;
+
+    &.csc-active {
+      color: $input-focus-color;
+    }
+
+  }
+
+  .csc-prefix ~ input,
+  .csc-prefix ~ textarea,
+  .csc-prefix ~ label,
+  .csc-prefix ~ .csc-validate ~ label,
+  .csc-prefix ~ .csc-helper-text,
+  .csc-prefix ~ .csc-autocomplete-content {
+    margin-left: 3rem;
+    width: 92%;
+    width: calc(100% - 3rem);
+  }
+
+  .csc-prefix ~ label {
+    margin-left: 3rem;
+  }
+
+  .csc-prefix ~ input {
+    @include media("screen", "<md") {
+      width: 80%;
+      width: calc(100% - 3rem);
+    }
+
+    @include media("screen", "<lg") {
+      width: 86%;
+      width: calc(100% - 3rem);
+    }
+  }
+}
+
+
+/* Search Field */
+.csc-input-field input[type=search] {
+  display: block;
+  line-height: inherit;
+  transition: .3s background-color;
+
+  .csc-nav-wrapper & {
+    height: inherit;
+    padding-left: 4rem;
+    width: calc(100% - 4rem);
+    border: 0;
+    box-shadow: none;
+  }
+
+  &:focus:not(.browser-default) {
+    background-color: $input-background;
+    border: 0;
+    box-shadow: none;
+    color: #444;
+
+    & + label i,
+    & ~ .mdi-navigation-close,
+    & ~ .material-icons {
+      color: #444;
+    }
+  }
+
+  & + .csc-label-icon {
+    transform: none;
+    left: 1rem;
+  }
+
+  & ~ .mdi-navigation-close,
+  & ~ .material-icons {
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    color: transparent;
+    cursor: pointer;
+    font-size: $input-icon-size;
+    transition: .3s color;
+  }
+}
+
+
+/* Textarea */
+
+// Default textarea
+textarea {
+  width: 100%;
+  height: $input-height;
+  background-color: transparent;
+
+  &.csc-textarea {
+    line-height: normal;
+    overflow-y: hidden; /* prevents scroll bar flash */
+    padding-top: 0.8rem; /* prevents text jump on Enter keypress */
+    padding-bottom: 0.8rem;
+    resize: none;
+    min-height: $input-height;
+    box-sizing: border-box;
+  }
+}
+
+// For textarea autoresize
+.csc-hiddendiv {
+  visibility: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word; /* future version of deprecated 'word-wrap' */
+  padding-top: 1.2rem; /* prevents text jump on Enter keypress */
+
+  // Reduces repaints
+  position: absolute;
+  top: 0;
+  z-index: -1;
+}
+
+
+/* Autocomplete */
+.csc-autocomplete-content {
+  li {
+    .csc-highlight { color: #444; }
+
+    img {
+      height: $dropdown-item-height - 10;
+      width: $dropdown-item-height - 10;
+      margin: 5px 15px;
+    }
+  }
+}
+
+/* Character Counter */
+.csc-character-counter {
+  min-height: 18px;
+}

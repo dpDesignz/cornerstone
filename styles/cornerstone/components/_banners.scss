@@ -1,0 +1,126 @@
+// components/_banners.scss
+
+body.cs-components,
+body.cs-component__banner {
+  #csc-banner {
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    position: absolute;
+    top: -130px;
+    width: 100%;
+    min-width: 100vw;
+    min-height: 54px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    transition: top 0.5s;
+
+    &__container {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: 12px;
+      grid-template-areas:
+        "csc--banner_text"
+        "csc--banner_buttons";
+      width: 100vw;
+      max-width: 360px;
+      padding: 10px 8px 8px 16px;
+
+      @include media("screen", ">=md") {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "csc--banner_text csc--banner_buttons";
+        grid-gap: 90px;
+        max-width: 720px;
+        padding: 8px 8px 8px 24px;
+      }
+
+      &-with-icon {
+        grid-template-columns: 40px 1fr;
+        grid-template-areas:
+          "csc--banner_icon csc--banner_text"
+          "csc--banner_buttons csc--banner_buttons";
+
+        @include media("screen", ">=md") {
+          grid-template-columns: 40px 1fr auto;
+          grid-template-areas:
+            "csc--banner_icon csc--banner_text csc--banner_buttons";
+          grid-gap: 24px;
+          padding: 16px 8px 8px 16px;
+        }
+
+      }
+
+    }
+
+    &__text {
+      grid-area: csc--banner_text;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: center;
+
+      @include media("screen", ">=md") {
+        margin-right: 66px;
+      }
+
+      > p {
+        margin: 0;
+        color: $primary-color;
+      }
+
+    }
+
+    &__buttons {
+      grid-area: csc--banner_buttons;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+
+      > .csc-btn + .csc-btn {
+        margin-left: 8px;
+      }
+
+    }
+
+    &__icon {
+      grid-area: csc--banner_icon;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      margin-right: 4px;
+      padding: 10px;
+      background-color: $button-color;
+      border-radius: 50%;
+
+      > i {
+        font-size: 20px;
+        color: #FFFFFF;
+      }
+
+      &-green {
+        background-color: #009688 !important;
+      }
+
+      &-red {
+        background-color: #F44336 !important;
+      }
+
+      &-blue {
+        background-color: #2196F3 !important;
+      }
+
+      &-yellow {
+        background-color: #FFC107 !important;
+      }
+
+    }
+
+    // Make the content animate in
+    &.visible {
+      top: 0px;
+    }
+
+  }
+}

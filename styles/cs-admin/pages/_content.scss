@@ -1,0 +1,268 @@
+// pages/_content.scss
+#index {
+  &-filters {
+    &__container {
+      display: flex;
+      align-items: stretch;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      min-height: initial;
+    }
+
+    &--search {
+      flex-grow: 1;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+    }
+
+    &--actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 16px;
+      background: #e2e2e2;
+
+      @media #{$medium-and-up} {
+        border-left: 1px solid rgba(160, 160, 160, .25);
+      }
+
+      nav {
+        ol {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+
+          li {
+            display: inline-block;
+          }
+        }
+      }
+    }
+
+    &__sort-by,
+    &__per-page {
+      &__container {
+        font-size: 13px;
+
+        select {
+          font-size: 14px;
+          background-color: transparent;
+          border: 0;
+
+          >option {
+            font-size: 13px;
+          }
+        }
+      }
+    }
+  }
+
+  &-search {
+    padding: 8px 0;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid transparent;
+    transition: border 0.6s linear;
+
+    &:focus {
+      border-bottom-color: #9e9e9e;
+    }
+
+    &-results {
+      display: none;
+    }
+  }
+
+  &-footer {
+    &-filters {
+      &__container {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+        min-height: initial;
+      }
+
+      &--count {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      &--pagination {
+        ol {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+
+          li {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+}
+
+.index {
+  &-pagination {
+    &-btn {
+      &:disabled {
+        border-color: transparent !important;
+      }
+    }
+  }
+}
+
+section#sections-list {
+
+  table {
+
+    tr {
+
+      th {
+
+        &:nth-last-child(2) {
+          width: 210px;
+        }
+
+        &:last-child {
+          width: 120px;
+          text-align: left;
+        }
+
+      }
+
+      td {
+
+        &:first-child {
+          .item {
+            &--title {
+              display: block;
+              font-size: 1.1em;
+            }
+          }
+        }
+
+        &:last-child {
+          text-align: left;
+        }
+
+      }
+
+      &:hover td:first-child i {
+        opacity: 0.75;
+      }
+
+    }
+
+  }
+
+}
+
+section#pages-list {
+
+  table {
+
+    tr {
+
+      th {
+
+        &:nth-child(2),
+        &:nth-last-child(2) {
+          width: 210px;
+        }
+
+        &:last-child {
+          width: 120px;
+          text-align: left;
+        }
+
+      }
+
+      td {
+
+        &:first-child {
+          .item {
+            &--title {
+              display: block;
+              font-size: 1.1em;
+            }
+          }
+        }
+
+        &:last-child {
+          text-align: left;
+        }
+
+      }
+
+      &:hover td:first-child i {
+        opacity: 0.75;
+      }
+
+    }
+
+  }
+
+}
+
+form#page-form {
+  .csc-wrapper {
+    max-width: 90%;
+  }
+
+  .trumbowyg-box,
+  .trumbowyg-editor {
+    min-height: 50vh;
+  }
+}
+
+form#faq-form {
+  .csc-wrapper {
+    max-width: 90%;
+  }
+
+  .trumbowyg-box,
+  .trumbowyg-editor {
+    min-height: 450px;
+  }
+}
+
+form#menu-form {
+  #menu-items {
+
+    .fa-file,
+    .fas.fa-question-circle {
+      font-size: 0.75em;
+      cursor: help;
+    }
+
+    .fa-file {
+      color: color("deep-orange", "darken-4");
+    }
+
+    .fas.fa-question-circle {
+      color: color("indigo", "darken-4");
+    }
+
+    .fa-trash-alt {
+      cursor: pointer;
+    }
+  }
+}
+
+form#faq-form {
+  #faq-items {
+    .fa-trash-alt {
+      cursor: pointer;
+    }
+  }
+}

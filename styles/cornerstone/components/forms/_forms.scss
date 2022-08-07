@@ -1,0 +1,72 @@
+// components/forms/_forms.scss
+
+body.cs-components,
+body.cs-component__form {
+
+  .csc-form {
+
+    /* Style Placeholders */
+    ::placeholder {
+      color: lighten(color("grey", "base"), 20%);
+    }
+
+    /* Style Fieldset */
+
+    fieldset {
+      margin: 0;
+      padding: 0;
+      border: 0;
+
+      legend {
+        display: block;
+        width: 100%;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        font-size: 1.25rem;
+        font-weight: bolder;
+        border-bottom: 1px dotted color("grey", "lighten-1");
+      }
+
+    }
+
+    /* Style Form Actions */
+    &__actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+
+      @include media("screen", ">=md") {
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+
+      >div {
+        text-align: center;
+
+        @include media("screen", ">=md") {
+          text-align: left;
+        }
+
+        &:last-child {
+          @include media("screen", ">=md") {
+            text-align: right;
+          }
+        }
+      }
+    }
+
+    /* Style Form Details */
+    &-details {
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.75rem !important;
+      background-color: color("blue-grey", "lighten-5");
+      border-left: 1px solid color("blue-grey", "lighten-4");
+    }
+
+    @import 'input-fields';
+    @import 'checkboxes';
+    @import 'radio-buttons';
+    @import 'switches';
+
+  }
+}

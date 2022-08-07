@@ -1,0 +1,68 @@
+// components/_badges.scss
+
+body.cs-components,
+body.cs-component__badge {
+
+  .csc-badge {
+    float: right;
+    min-width: 3rem; height: 22px;
+    margin-left: 14px; padding: 0 6px;
+    text-align: center; font-size: 1rem; line-height: 22px; color: #757575;
+    box-sizing: border-box;
+
+    &.inline {
+      display: inline-block;
+    }
+
+    &[data-badge-caption]::after {
+      content: " " attr(data-badge-caption);
+    }
+
+    // Framed Badges
+    &--framed {
+      font-weight: 300; font-size: 0.8rem; color: #fff;
+      background-color: #757575;
+      border-radius: 2px;
+
+      &-green {
+        background-color: #009688 !important;
+      }
+
+      &-red {
+        background-color: #F44336 !important;
+      }
+
+      &-blue {
+        background-color: #2196F3 !important;
+      }
+
+      &-orange {
+        background-color: #FF9800 !important;
+      }
+
+      &-new {
+
+        &::after {
+          content: " new";
+        }
+
+      }
+
+    }
+
+  }
+
+  // Badges in navbar
+  nav .csc-badge {
+    float: none;
+    display: inline-block;
+    margin-left: 4px;
+    height: 22px;
+    line-height: 22px; -webkit-font-smoothing: auto;
+  }
+
+  // Badges in collapsible
+  .collapsible .csc-badge {
+    margin-left: auto;
+  }
+}

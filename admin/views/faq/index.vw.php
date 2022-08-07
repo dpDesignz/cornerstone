@@ -27,18 +27,8 @@ require(get_theme_path('head.php', 'admin'));
 // Load html layout
 require(get_theme_path('layout.php', 'admin')); ?>
 
-<div class="csc-row cs-mt-3">
-  <section class="csc-col csc-col12">
-    <nav class="csc-breadcrumbs">
-      <?php
-      // Check for and output breadcrumbs
-      if (!empty($data->breadcrumbs)) {
-        // Output breadcrumbs
-        echo outputBreadcrumbs((object) $data->breadcrumbs);
-      } ?>
-    </nav>
-  </section>
-</div>
+<?= (!empty($data->breadcrumbs)) ? outputBreadcrumbs((object) $data->breadcrumbs) : ''; // Output breadcrumbs
+?>
 <?php if (!empty($data->noData) && $data->noData) { ?>
   <div id="no-index-data" class="csc-row">
     <div class="csc-col csc-col12">
@@ -56,7 +46,8 @@ require(get_theme_path('layout.php', 'admin')); ?>
         <span id="filter__status">
           <a <?php echo (empty($data->filterStatus)) ? 'class="active" ' : ''; ?> href="<?php echo get_site_url('admin/faq'); ?>">All</a<> | <a <?php echo (!empty($data->filterStatus) && strtolower($data->filterStatus) === 'published') ? 'class="active" ' : ''; ?>href="<?php echo get_site_url('admin/faq/status/published'); ?>">Published</a> | <a <?php echo (!empty($data->filterStatus) && strtolower($data->filterStatus) === 'draft') ? 'class="active" ' : ''; ?>href="<?php echo get_site_url('admin/faq/status/draft'); ?>">Draft</a>
         </span>
-        <?php if ($data->showFilter) { ?> | Filtered Results: <?php echo (!empty($data->filterData)) ? $data->filterData : ''; ?><?php } ?></p>
+        <?php if ($data->showFilter) { ?> | Filtered Results: <?php echo (!empty($data->filterData)) ? $data->filterData : ''; ?><?php } ?>
+      </p>
     </section>
     <section class="csc-col csc-col12 csc-col--md6 cs-text-center cs-text-right-md csc-col--ga-middle">
       <p class="cs-mt-0 cs-mt-md-3">

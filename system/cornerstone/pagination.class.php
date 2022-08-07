@@ -137,7 +137,7 @@ class Pagination
     $PAGESURI = $request_uri;
 
     // Start pages output
-    $returnOutput .= '<ul>';
+    $returnOutput .= '<ul role="navigation" aria-label="pagination">';
 
     // Check if the current page is set
     if (array_search('page', $PAGESURI) === FALSE) {

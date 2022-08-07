@@ -1,0 +1,395 @@
+// layout/_header.scss
+
+/*------------------------------------*\
+  #HEADER
+\*------------------------------------*/
+body.cs-page > #cs-header {
+    grid-area: cs--body__header;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "header_mobilenav header_logo header_accmenu"
+      "header_nav header_nav header_nav";
+    min-height: 50px;
+    border-bottom: 1px solid $primary-color;
+
+    @include media("screen", ">=md") {
+      grid-template-areas:
+        "header_logo header_nav header_accmenu";
+    }
+
+    #header {
+      &__logo {
+        grid-area: header_logo;
+        text-align: center;
+        a {
+          display: inline-block;
+          svg {
+            height: 65px;
+          }
+          svg,
+          svg .st0 {
+            fill: $secondary-color;
+          }
+        }
+      }
+
+      &__mobile-nav,
+      &__account-menu {
+        display: flex;
+        align-items: center;
+      }
+
+      &__mobile-nav {
+        grid-area: header_mobilenav;
+        justify-content: start;
+        padding-left: 14px;
+
+        @include media("screen", ">=lg") {
+          display: none;
+        }
+
+        // Based on https://codepen.io/JeromeRenders/pen/GqjxVL
+        &__btn {
+          position: relative;
+          width: 60px;
+          height: 60px;
+          background: transparent;
+          font-size: 24px;
+          color: hsl(215, 13%, 35%);
+          border: none;
+          cursor: pointer;
+
+          span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 4px;
+            background: hsl(215, 13%, 35%); // New
+            border-radius: 2px;
+            overflow: hidden;
+            transition: all 0.3s linear;
+
+            &::before {
+              content: ' ';
+              position: absolute;
+              top: 0;
+              right: 0;
+              width: 0;
+              height: 100%;
+              background: hsl(215, 13%, 35%);
+              transition: all 0.3s linear;
+            }
+
+            &:nth-child(1) {
+              animation: span-first-off 0.5s ease-in-out;
+              animation-fill-mode: forwards;
+            }
+
+            &:nth-child(2) {
+              animation: span-second-off 0.5s ease-in-out;
+              animation-fill-mode: forwards;
+            }
+
+            &:nth-child(3) {
+              animation: span-third-off 0.5s ease-in-out;
+              animation-fill-mode: forwards;
+            }
+          }
+
+          &.on {
+            &:hover span::before {
+              width: 100%;
+              transition: all 0.3s linear;
+            }
+
+            span {
+              &:nth-child(1) {
+                animation: span-first-on 0.5s ease-in-out;
+                animation-fill-mode: forwards;
+              }
+              &:nth-child(2) {
+                animation: span-second-on 0.5s ease-in-out;
+                animation-fill-mode: forwards;
+              }
+              &:nth-child(3) {
+                animation: span-third-on 0.5s ease-in-out;
+                animation-fill-mode: forwards;
+              }
+            }
+          }
+        }
+      }
+
+      &__account-menu {
+        grid-area: header_accmenu;
+        justify-content: flex-end;
+        padding-right: 24px;
+
+        .am-btn {
+          display: inline-block;
+          margin-left: 16px;
+          width: 35px;
+          font-size: 24px;
+          color: hsl(215, 13%, 35%);
+          text-align: center;
+          cursor: pointer;
+          @include media("screen", ">=md") {
+            margin-left: 24px;
+          }
+
+          &:first-child {
+            margin-left: 10px;
+          }
+        }
+      }
+
+      &__nav {
+        grid-area: header_nav;
+        display: none;
+        position: relative;
+        padding: 16px;
+        background-color: hsl(0, 0%, 100%);
+
+        @include media("screen", ">=lg") {
+          display: block;
+          padding: 8px 0;
+          text-align: center;
+          background-color: transparent;
+        }
+
+        &.nav--open {
+          position: absolute;
+          top: 66px;
+          left: 0;
+          z-index: 999;
+          display: block;
+          width: 100vw;
+          height: calc(100vh - 174px);
+          overflow-x: scroll;
+        }
+
+        nav {
+
+          ul,
+          ol {
+            margin: 0;
+            padding: 0;
+            color: hsl(0, 0%, 0%);
+            text-transform: uppercase;
+            list-style: none;
+          }
+
+          > ol {
+            padding: 16px 0;
+
+            @include media("screen", ">=lg") {
+              padding: 0;
+            }
+
+            &:first-child {
+              padding-top: 0px;
+            }
+
+            &:last-child {
+              padding-bottom: 0px;
+              border-bottom: none;
+            }
+
+            &.nav__secondary,
+            &.nav__secondary ol {
+              text-transform: none;
+            }
+
+            li {
+
+              @include media("screen", ">=lg") {
+                display: inline-block;
+              }
+
+              a {
+                display: block;
+                padding: 10px 0;
+                color: hsl(0, 0%, 0%);
+                font-weight: bolder;
+
+                @include media("screen", ">=lg") {
+                  display: inline-block;
+                  padding: 10px 20px;
+                  border-bottom: 2px solid transparent;
+                }
+
+                i {
+                  color: hsl(39, 32%, 54%);
+                  transform: rotate(-90deg);
+
+                  @include media("screen", ">=lg") {
+                    margin-left: 6px;
+                    transform: rotate(0deg);
+                  }
+                }
+
+                &:hover,
+                &:focus {
+                  color: var(--secondary-color);
+                  border-bottom-color: var(--secondary-color);
+                }
+
+                &.nav-active {
+                  text-decoration: underline;
+                  color: var(--secondary-color) !important;
+                  border-bottom-color: var(--secondary-color);
+
+                  @include media("screen", ">=lg") {
+                    text-decoration: none;
+                  }
+                }
+              }
+
+              > ol {
+                padding: 0 10px;
+                background-color: hsl(0, 0%, 100%);
+                color: hsl(0, 0%, 0%);
+                font-size: 0.95em;
+                transition: all .2s ease-in;
+
+                @include media("screen", ">=lg") {
+                  display: none;
+                  position: absolute;
+                  left: 0;
+                  justify-content: center;
+                  width: 100%;
+                  padding: 10px;
+                  padding-bottom: 25px;
+                  box-shadow: 0 10px 9px rgba(0,0,0,.1);
+                }
+
+                li {
+                  a {
+                    color: hsl(0, 0%, 0%) !important;
+                    border-bottom: none;
+
+                    i.fa-chevron-down {
+                      @include media("screen", ">=lg") {
+                        display: none;
+                      }
+                    }
+
+                    &:hover,
+                    &:focus,
+                    &.nav-active {
+                      text-decoration: underline;
+                    }
+                  }
+
+                  > ol {
+                    display: block !important;
+                    text-align: left;
+                    box-shadow: none;
+                    @include media("screen", ">=lg") {
+                      position: unset;
+                      justify-content: flex-start;
+                      padding: 0 10px;
+                    }
+                    li {
+                      display: block;
+                      a {
+                        @include media("screen", ">=lg") {
+                          padding: 5px 10px;
+                          font-weight: normal;
+                          text-transform: none;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              @include media("screen", ">=lg") {
+                &:hover ol {
+                  display: flex;
+                }
+              }
+
+            }
+          }
+        }
+      }
+    }
+}
+
+@keyframes span-first-on {
+  0% {
+    transform: translate(-50%, -300%);
+  }
+  30% {
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+}
+@keyframes span-first-off {
+  0% {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+  30% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -300%);
+  }
+}
+
+@keyframes span-second-on {
+  0% {
+    transform: translate(-50%, -50%);
+  }
+  25% {
+    background: hsl(215, 13%, 35%);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    transform: translate(-150%, -50%) scale(0);
+  }
+}
+@keyframes span-second-off {
+  0% {
+    transform: translate(-150%, -50%) scale(0);
+  }
+  25% {
+    background: hsl(215, 13%, 35%);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes span-third-on {
+  0% {
+    transform: translate(-50%, 200%);
+  }
+  30% {
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+}
+@keyframes span-third-off {
+  0% {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  30% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, 200%);
+  }
+}

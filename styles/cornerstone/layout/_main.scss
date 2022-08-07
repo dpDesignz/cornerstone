@@ -1,0 +1,11 @@
+// layout/_main.scss
+
+/*------------------------------------*\
+  #MAIN CONTENT
+\*------------------------------------*/
+body.cs-page > #cs-main {
+    grid-area: cs--body__main;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 20px;
+}

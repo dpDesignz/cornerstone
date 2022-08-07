@@ -172,13 +172,25 @@ function getClosest(int $search, array $arr)
  */
 function outputBreadcrumbs(object $breadcrumbs)
 {
+  // Get the current user role permissions
+  $userRoles = '';
+  if (isLoggedInUser()) {
+    global $role;
+    $userRoles = $role;
+    $userRoles->setUserPermissions((int) $_SESSION['_cs']['user']['uid']);
+  }
+
   // Init output
-  $returnOutput = '';
+  $returnOutput = '<nav class="csc-breadcrumbs" aria-label="breadcrumbs">';
+  $itemsFound = false;
 
   // Output breadcrumbs
   foreach ($breadcrumbs as $breadcrumb) {
+    $itemsFound = true;
     // Check for href
     $href = (!empty($breadcrumb->href)) ? ' href="' . $breadcrumb->href . '"' : '';
+    // Check for permission
+    $href = (empty($breadcrumb->permission) || (!empty($userRoles) && $userRoles->canDo($breadcrumb->permission))) ? $href : '';
     // Check for title
     $title = (!empty($breadcrumb->title)) ? $breadcrumb->title : $breadcrumb->text;
     // Check for last item
@@ -186,8 +198,10 @@ function outputBreadcrumbs(object $breadcrumbs)
     $returnOutput .= '<a' . $href . ' class="csc-breadcrumb" title="' . $title . '"' . $ariaCurrent . '>' . $breadcrumb->text . '</a>';
   }
 
+  $returnOutput .= (!$itemsFound) ? '<a class="csc-breadcrumb" title="No breadcrumb available">n/a</a>' : '';
+
   // Return output
-  return (!empty($returnOutput)) ? $returnOutput : '<a class="csc-breadcrumb" title="No breadcrumb available">n/a</a>';
+  return $returnOutput  . '</nav>';
 }
 
 /**
@@ -204,6 +218,8 @@ function returnParentAdminMenuItem(object $item, $userRoles, string $currentNav 
 {
 
   // Init output
+  $returnParentOutput = '';
+  $returnChildrenWrapper = '';
   $returnOutput = '';
 
   // Check if currently active item
@@ -219,23 +235,24 @@ function returnParentAdminMenuItem(object $item, $userRoles, string $currentNav 
   $fallbackIcon = (!empty($item->icon)) ? $item->icon : 'fas fa-bars';
 
   // Add to return output
-  $returnOutput .= '<li class="has-subnav' . $activeNav . '"><a data-toggle="collapse" data-tippy-content="' . $fallbackTitle . '" aria-expanded="' . $ariaExpanded . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span><b class="caret"></b></a>';
+  $returnParentOutput .= '<li class="has-subnav' . $activeNav . '"><a data-toggle="collapse" data-tippy-content="' . $fallbackTitle . '" aria-expanded="' . $ariaExpanded . '"><i class="' . $fallbackIcon . '"></i> <span>' . $item->text . '</span><b class="caret"></b></a>';
 
   // Check children isn't empty
   if (!empty($item->children)) {
     // Children isn't empty
-
-    // Add to return output
-    $returnOutput .= '<ol class="sidebar__sub-nav" aria-hidden="' . $ariaHidden . '">';
 
     // Loop through children
     foreach ($item->children as $childItem) {
 
       // Make sure the child item is an object
       $childItem = (object) $childItem;
+      $hasChildren = FALSE;
 
       // Check if a user permission is required
       if (empty($childItem->permission) || (!empty($userRoles) && $userRoles->canDo($childItem->permission))) {
+
+        // Set has children
+        $hasChildren = TRUE;
 
         // Check if currently active child item
         $isActiveChild = (!empty($currentSubNav) && strtolower($currentSubNav) == strtolower($item->identifier . '/' . $childItem->identifier)) ? 'class="active"' : '';
@@ -252,14 +269,16 @@ function returnParentAdminMenuItem(object $item, $userRoles, string $currentNav 
     }
 
     // Add to return output
-    $returnOutput .= '</ol>';
+    if ($hasChildren) {
+      $returnChildrenWrapper = '<ol class="sidebar__sub-nav" aria-hidden="' . $ariaHidden . '">' . $returnOutput . '</ol>';
+    }
   }
 
   // Add to return output
-  $returnOutput .= '</li>';
+  $returnParentOutput .= $returnChildrenWrapper . '</li>';
 
   // Return output
-  return (!empty($returnOutput)) ? $returnOutput : '';
+  return (!empty($returnChildrenWrapper)) ? $returnParentOutput : '';
 }
 
 /**
@@ -427,6 +446,78 @@ function base_outputMenu(object $menuItems, string $pathMatch = null)
 
   // Return output
   return (!empty($returnOutput)) ? $returnOutput : '<li><a>No menu items available</a></li>';
+}
+
+/**
+ * Output Admin Index Filters
+ *
+ * @param array $menuItems An array of the menu items to output
+ * @param string $currentNav `[optional]` The current navigation identifier. Defaults to empty
+ * @param string $currentSubNav `[optional]` The current sub-navigation identifier. Defaults to empty
+ *
+ * @return string Will return the menu as a string
+ */
+function outputAdminIndexFilters($search = '', $placeholder = '', $sortBy = [], $perPage = [])
+{
+  // Check for any extra sorting
+  $sortByOP = '';
+  if (!empty($sortBy) && is_array($sortBy)) {
+    foreach ($sortBy as $value => $label) {
+      $sortByOP .= '<option value="' . $value . '">' . $label . '</option>';
+    }
+  }
+  // Check for over-riding per page
+  $perPageOP = '';
+  if (!empty($perPage) && is_array($perPage)) {
+    foreach ($perPage as $value => $isSelected) {
+      $selected = ($isSelected) ? ' selected' : '';
+      $perPageOP .= '<option value="' . $value . '"' . $selected . '>' . $value . ' per page</option>';
+    }
+  } else {
+    $perPageOP = '<option value="10">10 per page</option>
+      <option value="25" selected="">25 per page</option>
+      <option value="50">50 per page</option>
+      <option value="100">100 per page</option>
+      <option value="150">150 per page</option>
+      <option value="200">200 per page</option>';
+  }
+  // Set search placeholder
+  $searchPlaceholder = (!empty($placeholder)) ? $placeholder : 'Search data...';
+  // Check for search value
+  $searchOP = (!empty($search)) ? ' value="' . $search . '"' : '';
+  // Return output
+  return '<section id="index-filters__container" class="csc-container">
+    <div id="index-filters--search">
+      <label for="index-search"><i class="fa-solid fa-search"></i></label>
+      <input type="text" name="search" id="index-search" tabindex="1"' . $searchOP . ' placeholder="' . $searchPlaceholder . '">
+    </div>
+    <div id="index-filters--actions">
+      <div id="index-filters__sort-by__container">
+        <strong>Sort by:</strong>
+        <select id="index-filters--sort-by">
+          <option value="az" selected="">A - Z</option>
+          <option value="za">Z - A</option>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          ' . $sortByOP . '
+        </select>
+      </div>
+      <nav>
+        <ol>
+          <li><button type="button" class="csc-btn--tiny csc-btn--outlined index-pagination-btn" data-btn-type="first" data-page-num="1" data-tippy-content="First Page"><i class="fa-solid fa-backward-fast"></i></button></li>
+          <li><button type="button" class="csc-btn--tiny csc-btn--outlined index-pagination-btn" data-btn-type="prev" data-page-num="" data-tippy-content="Previous Page"><i class="fa-solid fa-backward-step"></i></button></li>
+          <li><button type="button" class="csc-btn--tiny csc-btn--outlined index-pagination-btn" data-btn-type="next" data-page-num="" data-tippy-content="Next Page"><i class="fa-solid fa-forward-step"></i></button></li>
+          <li><button type="button" class="csc-btn--tiny csc-btn--outlined index-pagination-btn" data-btn-type="last" data-page-num="" data-tippy-content="Last Page"><i class="fa-solid fa-forward-fast"></i></button></li>
+        </ol>
+      </nav>
+      <div id="index-filters__per-page__container">
+        <strong>View:</strong>
+        <select id="index-filters--pagination-per-page">
+          ' . $perPageOP . '
+        </select>
+      </div>
+    </div>
+  </section>';
 }
 
 /**

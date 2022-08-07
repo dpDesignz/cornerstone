@@ -75,12 +75,25 @@ class Common extends Cornerstone\Controller
    */
   private function createSettingsElements()
   {
-
     // Set Breadcrumbs
     $this->data['breadcrumbs'][] = array(
       'text' => 'Settings',
       'href' => get_site_url('account/settings')
     );
+
+    // Load files required.
+    require_once(DIR_HELPERS . 'fn.timezone.php'); // Load the timezone helper
+
+    // TODO Detect user timezone automatically and suggest
+
+    // Timezones
+    $this->data['timezone_options'] = "";
+    $timezones = timezones_list();
+    foreach ($timezones as $zone) {
+      // Check if selected
+      $selectedTZ = (!empty($this->data['timezone']) && timezones_filter($this->data['timezone']) === $zone[1]) ? ' selected' : '';
+      $this->data['timezone_options'] .= '<option value="' . htmlspecialchars($zone[1]) . '"' . $selectedTZ . '>' . htmlspecialchars($zone[0]) . '</option>';
+    }
   }
 
   /**
@@ -100,50 +113,63 @@ class Common extends Cornerstone\Controller
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "update") {
 
-      // Sanitize POST data
-      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
-      // Get information submitted and try validate
+      // Get information submitted and validate
       try {
 
         // Get first_name data
-        $this->data['first_name'] = htmlspecialchars(trim($_POST['first_name']));
+        $this->data['first_name'] = trim($_POST['first_name']);
         if (empty($this->data['first_name'])) {
           // Data is not set. Return error.
           $this->data['err']['first_name'] = 'Please enter your first name';
-        } else if (!empty($this->data['first_name']) && strlen($this->data['first_name']) < 3) {
-          // Data is less than 3 characters. Return error.
-          $this->data['err']['first_name'] = 'Please enter at least 3 characters';
+          throw new Exception("Your first name is missing. Please enter your first name.");
+        } else if (!empty($this->data['first_name']) && strlen($this->data['first_name']) < 2) {
+          // Data is less than 2 characters. Return error.
+          $this->data['err']['first_name'] = 'Please enter at least 2 characters';
+          throw new Exception("Your first name is less than 2 characters. Please enter at least 2 characters.");
         }
 
         // Get last_name data
-        $this->data['last_name'] = htmlspecialchars(trim($_POST['last_name']));
+        $this->data['last_name'] = trim($_POST['last_name']);
         if (empty($this->data['last_name'])) {
           // Data is not set. Return error.
           $this->data['err']['last_name'] = 'Please enter your last name';
+          throw new Exception("Your last name is missing. Please enter your last name.");
         } else if (!empty($this->data['last_name']) && strlen($this->data['last_name']) < 3) {
           // Data is less than 3 characters. Return error.
           $this->data['err']['last_name'] = 'Please enter at least 3 characters';
+          throw new Exception("Your last name is less than 2 characters. Please enter at least 2 characters.");
         }
 
         // Get display_name data
-        $this->data['display_name'] = htmlspecialchars(trim($_POST['display_name']));
+        $this->data['display_name'] = trim($_POST['display_name']);
         if (empty($this->data['display_name'])) {
           // Data is not set. Return error.
           $this->data['err']['display_name'] = 'Please enter your display name';
+          throw new Exception("Your display name is missing. Please enter your display name.");
         } else if (!empty($this->data['display_name']) && strlen($this->data['display_name']) < 3) {
           // Data is less than 3 characters. Return error.
           $this->data['err']['display_name'] = 'Please enter at least 3 characters';
+          throw new Exception("Your display name is less than 2 characters. Please enter at least 2 characters.");
+        }
+
+        // Get timezone data
+        $this->data['timezone'] = trim($_POST['timezone']);
+        if (empty($this->data['timezone'])) {
+          // Data is not set. Return error.
+          $this->data['err']['timezone'] = 'Please select a timezone.';
+          throw new Exception("Your timezone is missing. Please select a timezone.");
         }
 
         // Get email data
-        $this->data['email'] = htmlspecialchars(trim($_POST['email']));
+        $this->data['email'] = trim($_POST['email']);
         if (empty($this->data['email'])) {
           // Data is not set. Return error.
           $this->data['err']['email'] = 'Please enter your email address';
+          throw new Exception("Your email address is missing. Please enter your email address.");
         } else if (!empty($this->data['email']) && !filter_var($this->data['email'], FILTER_VALIDATE_EMAIL)) {
           // Data isn't a valid email address. Return error.
           $this->data['err']['email'] = 'Please enter a valid email address';
+          throw new Exception("Your email address failed validation. Please enter a valid email address.");
         }
 
         // Get password data
@@ -156,9 +182,9 @@ class Common extends Cornerstone\Controller
 
         // Check validation is all ok
         if (!empty($this->data['password']) && (!$uppercase || !$lowercase || !$number || strlen($this->data['password']) < 6 || strlen($this->data['password']) > 128)) {
-
           // If password not set or doesn't match the requirements, return error
           $this->data['err']['password'] = 'Your password must be at least six characters long and contain at least one upper case letter and one number.';
+          throw new Exception("Your password must be at least six characters long and contain at least one upper case letter and one number. Please enter a valid password.");
         }
 
         // Get confirm_password data
@@ -166,15 +192,16 @@ class Common extends Cornerstone\Controller
         if (!empty($this->data['password']) && empty($this->data['confirm_password'])) {
           // Data is not set. Return error.
           $this->data['err']['password'] = 'Please confirm your password';
+          throw new Exception("Your password confirmation was missing. Please enter your password confirmation.");
         } else if (!empty($this->data['password']) && $this->data['password'] !== $this->data['confirm_password']) {
           // Data is not set. Return error.
           $this->data['err']['password'] = 'Your passwords must match';
+          throw new Exception("Your password confirmation didn't match. Please enter your password confirmation.");
         }
       } catch (Exception $e) {
-
         // Log error if any and set flash message
         error_log($e->getMessage(), 0);
-        flashMsg('account_settings', '<strong>Error</strong> There was an error updating your settings. Please try again', 'warning');
+        flashMsg('account_settings', '<strong>Error</strong> There was an error updating your settings - ' . $e->getMessage() . '. Please try again', 'warning');
       }
 
       // If valid, add new address
@@ -186,8 +213,21 @@ class Common extends Cornerstone\Controller
           $this->data['first_name'],
           $this->data['last_name'],
           $this->data['display_name'],
-          $this->data['email']
+          $this->data['email'],
+          $this->data['timezone']
         )) { // Settings updated successfully.
+
+          // Update session preferences
+          // Set user email address
+          $_SESSION['_cs']['user']['email'] = $this->data['email'];
+          // Set user display name
+          $_SESSION['_cs']['user']['name'] = ucwords($this->data['display_name']);
+          // Set user language
+          // $_SESSION['_cs']['user']['lang'] = $this->data['language'];
+          // Set user timezone
+          $_SESSION['_cs']['user']['timezone'] = new \DateTimeZone($this->data['timezone']);
+          // Set user date format
+          // $_SESSION['_cs']['user']['date_format'] = $this->data['date_format'];
 
           // Init password message
           $passwordMsg = '';
@@ -558,6 +598,12 @@ class Common extends Cornerstone\Controller
    */
   public function login()
   {
+    // Check if logged in
+    if (isLoggedInUser()) {
+      // Logged in. Redirect to account page
+      redirectTo('account/');
+      exit;
+    }
 
     // Check for admin source
     $isAdminSource = (!empty($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], get_site_url() . 'admin/') !== FALSE) ? TRUE : FALSE;

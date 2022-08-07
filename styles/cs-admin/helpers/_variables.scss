@@ -1,0 +1,45 @@
+// helpers/_variables.scss
+
+// Colors
+// ==========================================================================
+
+// Primary Colour
+$primary-color: #233344 !default;
+$primary-color-light: lighten($primary-color, 15%) !default;
+$primary-color-dark: darken($primary-color, 15%) !default;
+
+// Seconday Colour
+$secondary-color: color("deep-orange", "base") !default;
+
+// Tertiary Colour
+$tertiary-color: color("blue", "base") !default;
+
+$default-color:  color("purple", "base") !default;
+$disabled-color: rgba(0, 0, 0, .12);
+$success-color: color("green", "base") !default;
+$error-color: color("red", "base") !default;
+$link-color: color("light-blue", "darken-1") !default;
+
+// Media Queries
+// ==========================================================================
+
+// Media Query Ranges
+$small-screen-up: 576px !default;
+$medium-screen-up: 768px !default;
+$large-screen-up: 992px !default;
+$xlarge-screen-up: 1200px !default;
+$small-screen-max: 767px !default;
+$medium-screen-max: 991px !default;
+$large-screen-max: 1199px !default;
+
+$small-and-up: "only screen and (min-width : #{$small-screen-up})" !default;
+$medium-and-up: "only screen and (min-width : #{$medium-screen-up})" !default;
+$large-and-up: "only screen and (min-width : #{$large-screen-up})" !default;
+$extra-large-and-up: "only screen and (min-width : #{$xlarge-screen-up})" !default;
+$small-and-down: "only screen and (max-width : #{$small-screen-max})" !default;
+$small-only: "only screen and (min-width : #{$small-screen-up}) and (max-width : #{$small-screen-max})" !default;
+$medium-and-down: "only screen and (max-width : #{$medium-screen-max})" !default;
+$medium-only: "only screen and (min-width : #{$medium-screen-up}) and (max-width : #{$medium-screen-max})" !default;
+
+// CSS Root
+// ==========================================================================

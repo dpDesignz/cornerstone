@@ -35,18 +35,8 @@ require(get_theme_path('head.php', 'admin'));
 // Load html layout
 require(get_theme_path('layout.php', 'admin')); ?>
 
-<div class="csc-row csc-row--no-pad cs-mt-3">
-  <section class="csc-col csc-col12">
-    <nav class="csc-breadcrumbs">
-      <?php
-      // Check for and output breadcrumbs
-      if (!empty($data->breadcrumbs)) {
-        // Output breadcrumbs
-        echo outputBreadcrumbs((object) $data->breadcrumbs);
-      } ?>
-    </nav>
-  </section>
-</div>
+<?= (!empty($data->breadcrumbs)) ? outputBreadcrumbs((object) $data->breadcrumbs) : ''; // Output breadcrumbs
+?>
 <style>
   body.cs-page .csc-wrapper {
     max-width: 750px;

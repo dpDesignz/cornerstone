@@ -1,0 +1,197 @@
+// components/_cards.scss
+
+body.cs-components,
+body.cs-component__cards {
+
+  .csc-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    max-width: 344px;
+    min-height: 148px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);
+
+    // Card Content
+    &__content {
+      will-change: transform,opacity;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      outline: none;
+      color: inherit;
+      text-decoration: none;
+      // cursor: pointer;
+      overflow: hidden;
+
+      &::before {
+        transition: opacity 15ms linear, background-color 15ms linear;
+        z-index: 1;
+      }
+
+      &::after,
+      &::before {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        opacity: 0;
+        background-color: #000;
+        border-radius: 50%;
+      }
+
+      &:hover::before {
+        opacity: .04;
+      }
+
+      &:first-child {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+      }
+
+      &:last-child {
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+      }
+    }
+
+    // Card Media
+    &__media {
+      position: relative;
+      margin: 0;
+      background-repeat: no-repeat;
+      background-position: 50%;
+      background-size: cover;
+
+      &::before {
+        content: "";
+        display: block;
+        margin-top: 56.25%;
+      }
+
+      &:first-child {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+      }
+
+    }
+
+    // Card Primary
+    &__primary {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: 16px;
+      padding: 16px 16px 8px;
+
+      &__title {
+        margin: 0;
+      }
+
+      &__subtitle {
+        margin: 0;
+        color: rgba(0,0,0,.54);
+      }
+
+      // Add Avatar to Primary
+      &--with-avatar {
+        grid-template-columns: 40px 1fr;
+      }
+
+      &__avatar {
+        width: 40px;
+        height: 40px;
+        margin: 8px 0 0;
+        background-repeat: no-repeat;
+        background-position: 50%; background-size: cover;
+        border-radius: 50%;
+        overflow: hidden;
+
+        &::before {
+          display: block;
+          content: "";
+          margin-top: 56.25%;
+        }
+
+      }
+
+      // OR Add Thumbnail to Primary
+      &--with-thumbnail {
+        grid-template-columns: 1fr 80px;
+      }
+
+      &__thumbnail {
+        width: 80px; height: 80px;
+        margin: 0;
+        background-repeat: no-repeat; background-position: 50%; background-size: cover;
+        overflow: hidden;
+
+        &::before {
+          content: "";
+          display: block;
+          margin-top: 56.25%;
+        }
+
+      }
+
+    }
+
+    // Card Secondary
+    &__secondary {
+      padding: 8px 16px;
+      color: rgba(0,0,0,.54);
+    }
+
+    // Card Actions
+    &__actions {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      min-height: 52px;
+
+      &__buttons,
+      &__icons {
+        display: flex;
+        align-items: center;
+      }
+
+      &__buttons {
+        .csc-btn + .csc-btn {
+          margin-left: 8px;
+        }
+      }
+
+      &__icons {
+        flex-grow: 1; justify-content: flex-end;
+        color: rgba(0,0,0,.38);
+      }
+
+      &__buttons + &__icons {
+        margin-left: 16px; margin-right: 0;
+      }
+
+    }
+
+    // Shaped Card
+    &--shaped {
+      border-radius: 24px 8px;
+    }
+
+    // Flat Card
+    &--flat {
+      box-shadow: none;
+      border: 1px solid rgba(0,0,0,.12);
+    }
+
+    // Remove Max Width
+    &--no-width {
+      max-width: 100%;
+      width: 100%;
+    }
+
+  }
+
+}

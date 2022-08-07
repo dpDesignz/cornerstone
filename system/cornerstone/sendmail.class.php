@@ -38,7 +38,7 @@ class SendMail
 
       // Load database
       $csMailOptions = new CornerstoneDBH;
-      $this->conn->dbh->tableSetup('options', DB_PREFIX);
+      $csMailOptions->dbh->tableSetup('options', DB_PREFIX);
 
       // Get the options from the database
       $optionResults = selecting(

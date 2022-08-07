@@ -75,7 +75,7 @@ class AccountAuth extends Cornerstone\ModelBase
   }
 
   /**
-   * Check for user user
+   * Check for user
    *
    * @param string $userData Username or email address to check
    * @param int $active `[optional]` Check if user is active. Defaults to "1"
@@ -235,7 +235,10 @@ class AccountAuth extends Cornerstone\ModelBase
       $userResult = selecting(
         'user_id,
         user_email,
-        user_display_name',
+        user_display_name,
+        user_lang,
+        user_timezone,
+        user_date_format',
         where(
           eq('user_id', $this->uid),
           neq('user_status', '0')
@@ -260,13 +263,18 @@ class AccountAuth extends Cornerstone\ModelBase
         $_SESSION['_cs']['user']['email'] = $result->user_email;
         // Set user display name
         $_SESSION['_cs']['user']['name'] = ucwords($result->user_display_name);
+        // Set user language
+        $_SESSION['_cs']['user']['lang'] = $result->user_lang;
+        // Set user timezone
+        $_SESSION['_cs']['user']['timezone'] = new \DateTimeZone($result->user_timezone);
+        // Set user date format
+        $_SESSION['_cs']['user']['date_format'] = $result->user_date_format;
 
         /**
          * Get the "ext.accountauth.php" file and run `setCustomAuth()` function
          * to add any custom set $_SESSION items
          */
         require_once(DIR_ROOT . 'account/models/ext.accountauth.php');
-        setCustomAuth($this->uid);
 
         // Log user login into `cs_login_log`
         $this->setLoginLog(1);

@@ -37,14 +37,8 @@ require(get_theme_path('layout.php')); ?>
   }
 </style>
 <div id="cs-main">
-  <nav class="csc-breadcrumbs" aria-label="Breadcrumb">
-    <?php
-    // Check for and output breadcrumbs
-    if (!empty($data->breadcrumbs)) {
-      // Output breadcrumbs
-      echo outputBreadcrumbs((object) $data->breadcrumbs);
-    } ?>
-  </nav>
+  <?= (!empty($data->breadcrumbs)) ? outputBreadcrumbs((object) $data->breadcrumbs) : ''; // Output breadcrumbs
+  ?>
   <div class="csc-wrapper">
     <?php flashMsg('account_register'); ?>
     <div class="csc-row cs-pb-5">

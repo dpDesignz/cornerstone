@@ -1,0 +1,49 @@
+// pages/* http://sass-guidelin.es/#pages-folder
+
+/*------------------------------------*\
+  #CUSTOM SECTION STYLES
+\*------------------------------------*/
+#no-index-data {
+  position: relative;
+  align-content: center;
+  min-height: calc(100vh - 33%);
+  z-index: 2;
+
+  h1 {
+    margin: 0;
+    color: color("blue-grey", "darken-3");
+    font-size: 5rem;
+    font-weight: lighter;
+    position: relative;
+    z-index: 2;
+  }
+
+  &__tag {
+    color: color("blue-grey", "darken-1");
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+    letter-spacing: 0.03125em;
+  }
+
+  &__btn {
+    margin-top: 35px;
+  }
+
+  &__icon {
+    position: absolute;
+    display: block;
+    right: 0;
+    bottom: 25%;
+    text-align: right;
+    font-size: 200px;
+
+    i.fad {
+      --fa-primary-color: #90a4ae;
+      --fa-secondary-color: #b0bec5;
+    }
+  }
+}
+
+@import "content";
+@import 'filemanager';
+@import "users";

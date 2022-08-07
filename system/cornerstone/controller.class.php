@@ -91,6 +91,9 @@ abstract class Controller
     // Set default method fallback
     $defaultMethod = (!empty($defaultMethod)) ? $defaultMethod : 'index';
 
+    // Set method to the default method
+    $setMethod = (!empty($setMethod)) ? $setMethod : $defaultMethod;
+
     // Set $rootDir to defined directory
     $rootDir = DIR_ROOT . trim($setDirectory) . _DS;
 
@@ -104,14 +107,16 @@ abstract class Controller
     $setController = new $setController($this->registry, ...$params);
 
     // Check to see if set method exists in controller
-    if (!empty($setMethod) && method_exists($setController, $setMethod)) {
-      // Unset the method param if found
-      if (array_search($setMethod, $params) !== FALSE) {
-        array_splice($params, array_search($setMethod, $params), 1);
+    if (!empty($setMethod)) {
+      $checkMethod = trim(preg_replace('/\s+/', '', str_replace('-', '', $setMethod)));
+      if (method_exists($setController, $checkMethod)) {
+        // Unset the method param if found
+        if (array_search($setMethod, $params) !== FALSE) {
+          array_splice($params, array_search($setMethod, $params), 1);
+        }
+        // Set method
+        $setMethod = $checkMethod;
       }
-    } else {
-      // Set method to the default method
-      $setMethod = $defaultMethod;
     }
 
     // Call a callback with array of params
@@ -177,6 +182,39 @@ abstract class Controller
 
     // Set no filter results message
     $this->data['no_filter_results_msg'] = '<p class="csc-body1">Sorry, there were no results that matched your filter.</p>';
+  }
+
+  /**
+   * Init the re-used values for a live list page
+   *
+   * @param string $pageURI The URI of the current page
+   * @param array $params Mixed params that may or may not be passed
+   *
+   * @return array Will set the initial values for a list page.
+   */
+  protected function init_live_list_page(string $pageURI, ...$params)
+  {
+    // Check for search and rebuild URL
+    if (isset($this->request->get['search'])) {
+      redirectTo(rtrim($pageURI, '/') . '/search/' . urlencode($this->request->get['search']));
+      exit;
+    }
+
+    // Set parameters
+    $this->request->set_params($params);
+
+    // Check for a search term
+    if (isset($this->request->params['search']) && !empty($this->request->params['search'])) {
+      $this->params['search'] = $this->request->params['search'];
+      $this->data['search'] = $this->params['search'];
+      if (empty($this->data['breadcrumbs']) || !is_array($this->data['breadcrumbs'])) {
+        $this->data['breadcrumbs'] = array();
+      }
+      $this->data['breadcrumbs'][] = array(
+        'text' => 'Search: ' . $this->params['search'],
+        'href' => get_site_url(rtrim($pageURI, '/') . '/search/' . urlencode($this->params['search']))
+      );
+    }
   }
 
   /**

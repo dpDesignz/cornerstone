@@ -1,0 +1,14 @@
+// media/_medium.scss
+// Medium devices (tablets, 768px and up) ~ Container widths: 720px
+@media #{$medium-and-up} {
+  body.cs-admin {
+  }
+}
+@media #{$medium-only} {
+  body.cs-admin {
+  }
+}
+@media #{$medium-and-down} {
+  body.cs-admin {
+  }
+}

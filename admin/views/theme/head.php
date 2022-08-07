@@ -38,7 +38,7 @@
   <?php
   $fontAwesomeURL = $option->get('font_awesome_kit_url');
   if (!empty($fontAwesomeURL)) { ?>
-    <script src="<?php echo $fontAwesomeURL; ?>"></script>
+    <script src="<?= $fontAwesomeURL; ?>" crossorigin="anonymous"></script>
   <?php } ?>
   <!-- Toastify ~ https://apvarun.github.io/toastify-js/ -->
   <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">

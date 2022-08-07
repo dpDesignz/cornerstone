@@ -4,7 +4,6 @@
  * The main account index template file
  *
  * @package Cornerstone
- * @subpackage Mission Equine
  */
 
 // Set the meta/og information for the page
@@ -26,14 +25,8 @@ require(get_theme_path('layout.php')); ?>
 
 <!-- End Header ~#~ Start Content -->
 <div id="cs-main">
-  <nav class="csc-breadcrumbs" aria-label="Breadcrumb">
-    <?php
-    // Check for and output breadcrumbs
-    if (!empty($data->breadcrumbs)) {
-      // Output breadcrumbs
-      echo outputBreadcrumbs((object) $data->breadcrumbs);
-    } ?>
-  </nav>
+  <?= (!empty($data->breadcrumbs)) ? outputBreadcrumbs((object) $data->breadcrumbs) : ''; // Output breadcrumbs
+  ?>
   <div class="csc-wrapper">
     <?php flashMsg('account_index'); ?>
     <header id="account__header">
@@ -41,7 +34,7 @@ require(get_theme_path('layout.php')); ?>
         <h1>My Account</h1>
       </section>
       <section>
-        <a class="csc-btn csc-btn--outlined csc-btn--danger" href="<?php echo get_site_url('account/logout'); ?>">Sign out <i class="fas fa-sign-out-alt csc-bi-right"></i></a>
+        <a class="csc-btn csc-btn--outlined csc-btn--danger" href="<?= get_site_url('account/logout'); ?>">Sign out <i class="fas fa-sign-out-alt csc-bi-right"></i></a>
       </section>
     </header>
     <main>
@@ -55,16 +48,16 @@ require(get_theme_path('layout.php')); ?>
               <i class="fas fa-user-tie"></i>
             </div>
             <div>
-              <h3><?php echo (!empty($_SESSION['_cs']['user']['name'])) ? $_SESSION['_cs']['user']['name'] : '<em>Name not set</em>'; ?></h3>
-              <p><?php echo (!empty($_SESSION['_cs']['user']['email'])) ? $_SESSION['_cs']['user']['email'] : '<em>Email not set</em>'; ?></p>
+              <h3><?= (!empty($_SESSION['_cs']['user']['name'])) ? $_SESSION['_cs']['user']['name'] : '<em>Name not set</em>'; ?></h3>
+              <p><?= (!empty($_SESSION['_cs']['user']['email'])) ? $_SESSION['_cs']['user']['email'] : '<em>Email not set</em>'; ?></p>
               <?php
               // Check if user can access the admin dashboard
               if ($data->isAdmin) { ?>
-                <p><a class="csc-btn" href="<?php echo get_site_url('admin'); ?>" target="_blank"><i class="material-icons csc-bi-left">dashboard</i> View Admin Dashboard</a></p>
+                <p><a class="csc-btn" href="<?= get_site_url('admin'); ?>" target="_blank"><i class="material-icons csc-bi-left">dashboard</i> View Admin Dashboard</a></p>
               <?php } ?>
             </div>
             <div>
-              <a href="<?php echo get_site_url('account/settings'); ?>" data-tippy-content="Edit your account"><i class="fas fa-cog"></i></a>
+              <a href="<?= get_site_url('account/settings'); ?>" data-tippy-content="Edit your account"><i class="fas fa-cog"></i></a>
             </div>
           </header>
         </section>

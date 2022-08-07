@@ -28,8 +28,7 @@ $redirectURL = '';
 if (!empty($_GET['redirect'])) {
   // If in url, set to this
   $redirectURL = filter_var($_GET['redirect'], FILTER_SANITIZE_URL);
-} else if ($_SERVER['REQUEST_URI'] != "/" . get_site_subfolder() . "/account/login") { // Else, see if request URI is set
-
+} else if (strpos($_SERVER['REQUEST_URI'], "/account/login") === FALSE) { // Else, see if request URI is set
   // Set to request URI
   $redirectURL = htmlspecialchars(filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL));
 }
@@ -55,14 +54,8 @@ require(get_theme_path('layout.php')); ?>
   }
 </style>
 <div id="cs-main">
-  <nav class="csc-breadcrumbs" aria-label="Breadcrumb">
-    <?php
-    // Check for and output breadcrumbs
-    if (!empty($data->breadcrumbs)) {
-      // Output breadcrumbs
-      echo outputBreadcrumbs((object) $data->breadcrumbs);
-    } ?>
-  </nav>
+  <?= (!empty($data->breadcrumbs)) ? outputBreadcrumbs((object) $data->breadcrumbs) : ''; // Output breadcrumbs
+  ?>
   <div class="csc-wrapper">
     <?php flashMsg('account_login'); ?>
     <div class="csc-row">

@@ -2,8 +2,8 @@
     <!-- End Main ~#~ Start Footer -->
     <?php if (!isset($hideThemeFooter) || !$hideThemeFooter) : ?>
       <footer>
-        <p id="footer__copyright">&copy; <?php echo date('Y') . ' ' . $data->site_name; ?></p>
-        <p id="footer__thankyou">Thank you for building with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework GitHub">Cornerstone</a> v<?php echo CS_VERSION; ?></p>
+        <p id="footer__copyright">&copy; <?= date('Y') . ' ' . $data->site_name; ?> | <span data-tippy-content="Your times are UTC<?= (new \Cornerstone\DateTime($_SESSION['_cs']['user']))->getTimeDifference(); ?>"><strong>Current Time:</strong> <?= (new \Cornerstone\DateTime($_SESSION['_cs']['user']))->format('d-M-y, h:i A'); ?></span></p>
+        <p id=" footer__thankyou">Thank you for building with <a href="https://github.com/dpDesignz/cornerstone" target="_blank" title="Cornerstone PHP Framework GitHub">Cornerstone</a> v<?= CS_VERSION; ?></p>
       </footer>
       <!-- End Footer -->
     <?php endif; ?>
@@ -12,7 +12,7 @@
     <!-- Waves ~ http://fian.my.id/Waves/ -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/node-waves/0.7.6/waves.min.js" integrity="sha256-R//ABCk0LbG1/TvQQ4+sbwjzmPxJn9SF5f7FJ2AwJ4o=" crossorigin="anonymous"></script>
     <!-- JavaScript Cookie ~ https://github.com/js-cookie/js-cookie -->
-    <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
     <!-- Tippy ~ https://atomiks.github.io/tippyjs/ -->
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>

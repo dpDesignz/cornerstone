@@ -39,23 +39,42 @@ class CornerstoneCore extends Cornerstone\ModelBase
    * Get SEO data
    *
    * @param string $keyword Keyword of the URL
+   * @param int $type Type of the URL
    *
    * @return object|bool Return object with results or FALSE if no results
    */
-  public function getSEOData(string $keyword)
+  public function getSEOData(string $keyword, int $type = null)
   {
 
     // Check keyword
     if (!empty($keyword) && is_string($keyword)) {
 
-      // Run query to get results
+      // Setup the table
       $this->conn->dbh->tableSetup('seo_url', DB_PREFIX);
-      $results = selecting(
-        "*",
-        where(
-          eq('seo_keyword', $keyword)
-        )
-      );
+
+      // Check if type set
+      if ($type === null) {
+        // Run query to get results
+        $this->conn->dbh->tableSetup('seo_url', DB_PREFIX);
+        $results = selecting(
+          "*",
+          where(
+            eq('seo_keyword', $keyword)
+          ),
+          limit(1, 0)
+        );
+      } else {
+        // Run query to get results
+        $this->conn->dbh->tableSetup('seo_url', DB_PREFIX);
+        $results = selecting(
+          "*",
+          where(
+            eq('seo_keyword', $keyword),
+            eq('seo_type', $type)
+          ),
+          limit(1, 0)
+        );
+      }
 
       // Return if results
       if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
@@ -72,13 +91,52 @@ class CornerstoneCore extends Cornerstone\ModelBase
   }
 
   /**
+   * Get SEO Keyword
+   *
+   * @param int $type Type of item
+   * @param int $typeID ID of the type of item
+   *
+   * @return mixed string|int Return string if found or original ID if no results
+   */
+  public function getSEOKeyword(int $type, int $typeID)
+  {
+
+    // Check type data
+    if (is_numeric($type) && !empty($typeID) && is_numeric($typeID)) {
+
+      // Run query to get results
+      $this->conn->dbh->tableSetup('seo_url', DB_PREFIX);
+      $results = selecting(
+        "seo_keyword",
+        where(
+          eq('seo_type', $type),
+          eq('seo_type_id', $typeID),
+          eq('seo_primary', 1)
+        )
+      );
+
+      // Return if results
+      if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
+
+        // Return results
+        return $results[0]->seo_keyword;
+        exit;
+      } // No results. Return original ID.
+
+    } // Data invalid. Return original ID.
+
+    // Return original ID
+    return (int) $typeID;
+  }
+
+  /**
    * Check SEO URL
    *
    * @param int $type Type of item
    * @param int $typeID ID of the type of item
    * @param string $url SEO friendly URL
    *
-   * @return object|bool Return object with zone or FALSE if no results
+   * @return string|bool Return string with value or FALSE if no results
    */
   public function checkSEOURL(int $type, int $typeID, string $url)
   {
@@ -107,10 +165,10 @@ class CornerstoneCore extends Cornerstone\ModelBase
 
       // Check if any results
       if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
-        // Match found. Return TRUE
+        // Match found. Return URL
 
-        // Return TRUE
-        return TRUE;
+        // Return URL
+        return $url;
         exit;
       } else { // Doesn't exist. Add it
 
@@ -129,26 +187,30 @@ class CornerstoneCore extends Cornerstone\ModelBase
 
         // Check if any results
         if ($this->conn->dbh->getNum_Rows() > 0 && !empty($results)) {
-          // Match found. Return TRUE
+          // Match found. Return URL
 
-          // Return TRUE
-          return TRUE;
+          // Return URL
+          return $newURL;
           exit;
         } else { // Doesn't exist. Add it
+          // Set fallbacks
+          $primary = (!empty($primary)) ? $primary : 0;
+
           // Add data into `cs_seo_url`
           inserting(
             array(
               'seo_type' => $type,
               'seo_type_id' => $typeID,
-              'seo_keyword' => $newURL
+              'seo_keyword' => $newURL,
+              'seo_primary' => $primary
             )
           );
 
           // Check if added successfully
           if ($this->conn->dbh->affectedRows() > 0) {
 
-            // Return TRUE
-            return TRUE;
+            // Return URL
+            return $newURL;
           } // Unable to add. Return FALSE.
         }
       }

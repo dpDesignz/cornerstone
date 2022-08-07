@@ -1,0 +1,40 @@
+@charset "utf-8";
+/*! HTML5 Boilerplate v6.1.0 | MIT License | https://html5boilerplate.com/ */
+// Based on sass-boilerplate ~ https://github.com/HugoGiraudel/sass-boilerplate
+/*########################################
+
+	Project:	Cornerstone Framework Core CSS
+	Script:		Cornerstone Framework
+	Version:	0.2.8
+	Last Change:	15/11/2019
+	Developed:	dpDesignz - www.dpdesignz.co.nz
+
+#########################################*/
+
+.Fear {display:none;}
+/* CSS Naming based on CSS Guidelines ~ https://cssguidelin.es/#naming-conventions */
+
+// 1. Configuration and helpers ~ https://sass-guidelin.es/#abstracts-folder
+@import 'helpers/all';
+
+// 2. Vendors ~ http://sass-guidelin.es/#vendors-folder
+@import 'vendor/all';
+@import 'vendor-extensions/all';
+
+// 3. Base stuff ~ http://sass-guidelin.es/#base-folder
+@import 'base/all';
+
+// 5. Components ~ http://sass-guidelin.es/#components-folder
+@import 'components/all';
+@import 'components-extensions/all';
+
+// 4. Layout-related sections ~ https://sass-guidelin.es/#layout-folder
+@import 'layout/all';
+
+// 6. Page-specific styles ~ http://sass-guidelin.es/#themes-folder
+@import 'pages/all';
+
+// Media ~ Reponsive and Print files
+@import 'media/all';
+
+// 7. Themes ~ http://sass-guidelin.es/#themes-folder

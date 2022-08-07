@@ -1,0 +1,185 @@
+// base/_helper.scss
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+/*
+ * Hide visually and from screen readers
+ */
+
+ .hidden {
+  display: none !important;
+}
+
+/*
+* Hide only visually, but have it available for screen readers:
+* https://snook.ca/archives/html_and_css/hiding-content-for-accessibility
+*
+* 1. For long content, line feeds are not interpreted as spaces and small width
+*    causes content to wrap 1 word per line:
+*    https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe
+*/
+
+.visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  white-space: nowrap; /* 1 */
+  /*
+  * Extends the .visuallyhidden class to allow the element
+  * to be focusable when navigated to via the keyboard:
+  * https://www.drupal.org/node/897638
+  */
+  .focusable:active,
+  .focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+    white-space: inherit;
+  }
+}
+
+/*
+* Hide visually and from screen readers, but maintain layout
+*/
+
+.invisible {
+  visibility: hidden;
+}
+
+/*
+* Clearfix: contain floats
+*
+* For modern browsers
+* 1. The space content is one way to avoid an Opera bug when the
+*    `contenteditable` attribute is included anywhere else in the document.
+*    Otherwise it causes space to appear at the top and bottom of elements
+*    that receive the `clearfix` class.
+* 2. The use of `table` rather than `block` is only necessary if using
+*    `:before` to contain the top-margins of child elements.
+*/
+
+.clearfix:before,
+.clearfix:after {
+  content: " "; /* 1 */
+  display: table; /* 2 */
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+/**
+ * Hide text while making it readable for screen readers
+ * 1. Needed in WebKit-based browsers because of an implementation bug;
+ *    See: https://code.google.com/p/chromium/issues/detail?id=457146
+ */
+ .hide-text {
+  overflow: hidden;
+  padding: 0; /* 1 */
+  text-indent: 101%;
+  white-space: nowrap;
+}
+
+/**
+ * Vertical Align
+ */
+ .valign-wrapper {
+  display: grid;
+  align-items: center;
+}
+
+/**
+ * Text Align
+ */
+ .left-align {
+  text-align: left;
+}
+ .right-align {
+  text-align: right;
+}
+ .center,
+ .center-align {
+  text-align: center;
+}
+
+/**
+ * Quick Floats
+ */
+ .cs-left {
+  float: left !important;
+}
+ .cs-right {
+  float: right !important;
+}
+
+/**
+ * Hiding/Showing Content
+ */
+ .hide {
+  display: none !important;
+}
+
+/**
+ * Unstyled List
+ */
+ .cs-unstyled-list,
+ .cs-unstyled-list li,
+ .cs-unstyled-list ol {
+  padding-left: 0;
+  list-style: none;
+}
+
+/**
+ * Truncate text
+ */
+ .truncate {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/**
+ * Hoverable box-shadow animations
+ */
+ .hoverable {
+  transition: box-shadow .25s;
+  &:hover {
+    box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  }
+}
+
+/**
+ * Content wrapped in a circle
+ */
+ .csc-circle {
+  border-radius: 50%;
+}
+
+/**
+ * Show item on hover
+ */
+ .has-hover-item {
+  .hover-item {
+    opacity: 0;
+  }
+
+  &:hover {
+    .hover-item {
+      opacity: 1;
+    }
+  }
+}
+h1.has-hover-item .hover-item {
+  font-size: 0.6em;
+}

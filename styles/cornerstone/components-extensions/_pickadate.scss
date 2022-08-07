@@ -1,0 +1,46 @@
+// components/_picakadate.scss
+
+/*!
+ * Pickadate Extended
+ * https://amsul.ca/pickadate.js/ */
+body.cs-components,
+body.cs-component__pickadate {
+
+  .picker {
+
+    // Style the month and year selects
+    &__select {
+      &--month,
+      &--year {
+        width: initial;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin-left: 0;
+        margin-right: 0;
+        border: none;
+
+        &:hover {
+          border-radius: 3px;
+          background-color: color('grey', 'lighten-3');
+        }
+
+        option {
+          background-color: white;
+        }
+      }
+
+      &--month {
+        font-weight: bold;
+      }
+
+      &--year {
+        color: color('grey', 'base');
+        font-size: .8em;
+        font-style: italic;
+        font-weight: bold;
+      }
+    }
+  }
+
+}

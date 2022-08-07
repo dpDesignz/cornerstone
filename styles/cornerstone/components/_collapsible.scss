@@ -1,0 +1,69 @@
+// components/_collapsible.scss
+
+body.cs-components,
+body.cs-component__collapsible {
+
+  .csc-collapsible {
+    border: 1px solid #ddd;
+    border-bottom: none;
+    margin: $element-top-margin 0 $element-bottom-margin 0;
+
+    article,
+    dl {
+
+      .csc-collapsible {
+
+        &__header {
+          &:focus {
+            outline: 0
+          }
+
+          display: flex;
+          padding: 1rem;
+          line-height: 1.5;
+          cursor: pointer;
+          -webkit-tap-highlight-color: transparent;
+          background-color: #fff;
+          border-bottom: 1px solid #ddd;
+
+          i {
+            display: inline-block;
+            margin-right: 1rem;
+            width: 2rem;
+            font-size: 1.6rem;
+            text-align: center;
+            transition: transform 500ms ease-in-out;
+          }
+        }
+
+        &__body {
+          display: none;
+          height: 0;
+          padding: 2rem;
+          border-bottom: 1px solid #ddd;
+          opacity: 0;
+          overflow: hidden;
+          transition: height 350ms ease-in-out, opacity 750ms ease-in-out;
+
+          &.show {
+            display: block;
+            height: auto;
+            opacity: 1;
+          }
+        }
+      }
+
+      &.open {
+        .csc-collapsible {
+
+          &__header {
+            .fa-caret-right {
+              transform: rotate(90deg);
+            }
+          }
+        }
+      }
+    }
+  }
+
+}

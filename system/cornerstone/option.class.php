@@ -145,6 +145,89 @@ class Option
   /**
    *
    *
+   * @param int $userID ID of the user to get for
+   * @param	string|array	$key Name of option(s) to retrieve from the database, either a string or array (not case sensitive)
+   * @param null|string $default `[optional]` Default value to return if the option does not exist. Defaults to "null"
+   *
+   * @return	mixed
+   */
+  public function getUser(
+    $userID,
+    $key,
+    $default = null
+  ) {
+    // Set table setup
+    $this->conn->dbh->tableSetup('user_meta', DB_PREFIX);
+
+    // Check if only 1 item
+    if (is_string($key)) {
+
+      // Lower $key
+      $key = strtolower($key);
+
+      // Check if the key is not empty
+      if (!empty(trim($key))) {
+        // Check for value in the database
+        $metaResults = selecting(
+          array('umeta_value'),
+          eq('umeta_key', $key),
+          eq('umeta_user_id', $userID)
+        );
+        if ($this->conn->dbh->getNum_Rows() > 0 && !empty($metaResults)) {
+          // Return data
+          return $metaResults[0]->umeta_value;
+          exit;
+        } // Value can't be found. Return $default value
+      } // key is empty. Return $default value
+
+      // Return $default value
+      return $default;
+      exit;
+    } else if (is_array($key)) { // Check if array of items
+      // Check if the key array is not empty
+      if (count($key) > 0) {
+
+        // Create array to return
+        $returnArray = array();
+
+        // Get the items from the database
+        foreach ($key as $metaName) {
+
+          // Lower $metaName
+          $metaName = strtolower($metaName);
+
+          // Check for value in the database
+          $metaResults = selecting(
+            array('umeta_value'),
+            eq('umeta_key', $key),
+            eq('umeta_user_id', $userID)
+          );
+          if ($this->conn->dbh->getNum_Rows() > 0 && !empty($metaResults)) {
+
+            // If option is empty, return $default value, else return $key=>$value from table
+            $returnArray[$metaName] = (empty(trim($metaResults[0]->umeta_value))) ? $default : $metaResults[0]->umeta_value;
+          } else { // Value can't be found. Return $default value
+            $returnArray[$metaName] = $default;
+          }
+        }
+        // Return object of data
+        return (object) $returnArray;
+        exit;
+      } // Array is empty. Return $default value
+
+      // Return $default value
+      return $default;
+      exit;
+    }
+
+    // Return null
+    return null;
+    exit;
+  }
+
+  /**
+   *
+   *
    * @param	string	$key
    * @param	string	$value
    */

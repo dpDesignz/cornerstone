@@ -123,7 +123,7 @@ class CornerstoneSessionHandler implements \SessionHandlerInterface
     $access_dtm = new \DateTime();
 
     // Get user ID
-    $userID = (!empty($_SESSION['_cs']['user']['uid'])) ? $_SESSION['_cs']['user']['uid'] : '';
+    $userID = (!empty($_SESSION['_cs']['user']['uid'])) ? $_SESSION['_cs']['user']['uid'] : null;
 
     // Replace the data
     $this->conn->dbh->tableSetup('session', DB_PREFIX);

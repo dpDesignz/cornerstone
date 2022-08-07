@@ -1,0 +1,87 @@
+// components/_pagination.scss
+
+body.cs-components,
+body.cs-component__pagination {
+
+  .cs-pagination {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 16px;
+    padding: 0 16px;
+
+    @include media("screen", ">=md") {
+      display: inline;
+      padding: 0;
+    }
+
+    ul {
+      display: inline-block;
+      margin: 0;
+      padding-left: 0;
+      list-style-type: none;
+      grid-column: span 2;
+
+      @include media("screen", ">=md") {
+        margin-left: 2em;
+      }
+
+      > li {
+        display: inline-flex;
+        padding: 0 0.15em;
+        height: 1.5em;
+        list-style-type: none;
+        text-align: center;
+        border-radius: 2px;
+
+        > a {
+          padding: 0 0.5em;
+          color: inherit;
+        }
+
+        &:hover > a {
+          border-bottom: 1px solid $link-color;
+        }
+      }
+    }
+  }
+
+  .cs-pagitem {
+    &--items,
+    &--info,
+    &--info + li {
+      @include media("screen", ">=md") {
+        margin-left: 2em !important;
+      }
+    }
+    &s {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      margin-left: 0.5em;
+      border: 0;
+      border-bottom: 1px solid $font-color;
+      outline: 0;
+      font-weight: bold;
+      cursor: pointer;
+
+      > option {
+        font-weight: normal;
+      }
+    }
+    &--active {
+      > a {
+        cursor: default;
+        color: $link-color !important;
+        font-weight: bold;
+        border-bottom: none !important;
+      }
+    }
+    &--disabled {
+      color: $disabled-color;
+      > a {
+        cursor: default;
+        border-bottom: none !important;
+      }
+    }
+  }
+}

@@ -5,6 +5,15 @@
 // Enable JS debugging
 const debug: boolean = false;
 
+// Check if iOS
+// @ts-ignore
+let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+// @ts-ignore
+isIOS = (!isIOS && navigator.userAgent.match(/Mac/) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2) ? true : isIOS;
+
+// Set touch event
+const touchEvent = 'ontouchstart' in window ? 'touchstart' : 'click';
+
 // Vanilla JS ready function
 const ready = (callback: any) => {
   if (document.readyState !== 'loading') callback();
@@ -24,7 +33,6 @@ const getClosest = function (elem: HTMLElement, selector: string): HTMLElement |
       Element.prototype.msMatchesSelector ||
       // @ts-ignore
       Element.prototype.oMatchesSelector ||
-      Element.prototype.webkitMatchesSelector ||
       function (s) {
         const matches = (document || elem.ownerDocument).querySelectorAll(
           s
@@ -162,7 +170,7 @@ const siteAlerts = document.querySelectorAll<HTMLElement>('.csc-alert');
 if (siteAlerts) {
   // Loop through the alerts
   siteAlerts.forEach(alert =>
-    alert.addEventListener('click', () => { // Add click event listeners
+    alert.addEventListener(touchEvent, () => { // Add click event listeners
       // Check if closable
       if (
         !alert.hasAttribute('data-closable') ||
@@ -180,7 +188,7 @@ const siteBanner = document.querySelector('#csc-banner');
 // Check if there are any banners
 if (siteBanner) {
   // Add click event listener
-  siteBanner.addEventListener('click', (): void => {
+  siteBanner.addEventListener(touchEvent, (): void => {
     // Check if the banner has the visible class
     if (siteBanner.classList.contains('visible'))
       // Remove the visible class
@@ -193,7 +201,7 @@ const tableHeaders = document.querySelectorAll<HTMLElement>('.csc-table-header__
 // Check if there are any table headers
 if (tableHeaders) {
   // Loop through the table headers
-  tableHeaders.forEach(headerItem => headerItem.addEventListener('click', (): void => {
+  tableHeaders.forEach(headerItem => headerItem.addEventListener(touchEvent, (): void => {
     // Check if the current header is active
     if (!headerItem.classList.contains('csc-table-header__title--active')) {
       // Remove the active and descending class
@@ -292,39 +300,45 @@ function toggleFAQCollapsible(this: HTMLElement) {
 
 // Toggle Tabs
 const tabLinks = document.querySelectorAll<HTMLElement>('.csc-tab');
+let tabItemsFound = false;
 if (tabLinks.length > 0) {
   tabLinks.forEach(tabLink => {
-    tabLink.addEventListener('click', function (e: MouseEvent | TouchEvent): void {
-      // Hide all tab contents
-      const tabContents = document.querySelectorAll<HTMLElement>('.csc-tab__content');
-      tabContents.forEach(tabContent => {
-        tabContent.style.display = "none";
-      });
+    if (tabLink.dataset.ref !== undefined) {
+      tabItemsFound = true;
+      tabLink.addEventListener('click', function (e: MouseEvent | TouchEvent): void {
+        // Hide all tab contents
+        const tabContents = document.querySelectorAll<HTMLElement>('.csc-tab__content');
+        tabContents.forEach(tabContent => {
+          tabContent.style.display = "none";
+        });
 
-      // Remove the active button class
-      tabLinks.forEach(activeLink => {
-        activeLink.classList.remove("csc-tab--active");
-      });
+        // Remove the active button class
+        tabLinks.forEach(activeLink => {
+          activeLink.classList.remove("csc-tab--active");
+        });
 
-      // Show active tab
-      const activeTab: HTMLElement | null = document.querySelector(`#tab__${this.dataset.ref}`);
-      if (activeTab) {
-        activeTab.style.display = "block";
-        tabLink.classList.add("csc-tab--active");
-      }
-    });
+        // Show active tab
+        const activeTab: HTMLElement | null = document.querySelector(`#tab__${this.dataset.ref}`);
+        if (activeTab) {
+          activeTab.style.display = "block";
+          tabLink.classList.add("csc-tab--active");
+        }
+      });
+    }
   });
 
   // Load initial tab on document load
-  ready(() => {
-    // Check for tab with active class
-    const activeTab = [...tabLinks].filter(el => el.classList.contains('csc-tab--active') !== false);
-    if (activeTab && activeTab.length > 0) { // Load active tab
-      activeTab[0].click();
-    } else { // Load initial tab
-      tabLinks[0].click();
-    }
-  });
+  if (tabItemsFound) {
+    ready(() => {
+      // Check for tab with active class
+      const activeTab = [...tabLinks].filter(el => el.classList.contains('csc-tab--active') !== false);
+      if (activeTab && activeTab.length > 0) { // Load active tab
+        activeTab[0].click();
+      } else { // Load initial tab
+        tabLinks[0].click();
+      }
+    });
+  }
 }
 
 // Scroll to element from hash
@@ -572,7 +586,7 @@ if ($.modal !== undefined) {
 
 // Close loader on click
 // @ts-ignore
-$(document).on('click', '.csc-loader--full-page', function () {
+$(document).on(touchEvent, '.csc-loader--full-page', function () {
   // @ts-ignore
   $(this).fadeOut(500, function () {
     // now that the fade completed
@@ -747,8 +761,7 @@ document.querySelectorAll<HTMLInputElement>('.cs-pagitems').forEach(select =>
   })
 );
 
-// @ts-ignore
-$(document).ready(function () {
+ready(() => {
   // Show Banner
   if (siteBanner) {
     if (!siteBanner.classList.contains('visible'))

@@ -131,7 +131,10 @@ class AccountCore extends Cornerstone\ModelBase
         user_display_name,
         CONCAT(user_first_name, ' ', user_last_name) AS users_name,
         user_login,
-        user_email",
+        user_email,
+        user_lang,
+        user_timezone,
+        user_date_format",
         where(
           eq("user_id", $this->uid)
         )
@@ -156,6 +159,7 @@ class AccountCore extends Cornerstone\ModelBase
    * @param string $lastName The last name of the user
    * @param string $displayName The display name of the user
    * @param string $email The email address of the user
+   * @param string $timezone The timezone of the user
    *
    * @return int Will return FALSE if failed or TRUE if successful.
    */
@@ -163,7 +167,8 @@ class AccountCore extends Cornerstone\ModelBase
     string $firstName,
     string $lastName,
     string $displayName,
-    string $email
+    string $email,
+    string $timezone
   ) {
 
     // Check data is valid
@@ -177,6 +182,7 @@ class AccountCore extends Cornerstone\ModelBase
           'user_last_name' => $lastName,
           'user_display_name' => $displayName,
           'user_email' => $email,
+          'user_timezone' => $timezone,
           'user_edited_id' => $this->uid,
           'user_edited_dtm' => date('Y-m-d H:i:s')
         ),
@@ -195,4 +201,9 @@ class AccountCore extends Cornerstone\ModelBase
     // Return FALSE
     return FALSE;
   }
+
+
+  ####################
+  ####    META    ####
+  ####################
 }

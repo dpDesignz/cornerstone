@@ -77,6 +77,10 @@ function get_sort_url(string $sortItem, string $dir = "", string $uri = "")
   $query_string = (!empty($request_uri[1])) ? '?' . $request_uri[1] : '';
   // Set the request URI
   $request_uri = explode('/', trim($request_uri[0], '/'));
+  // Check for subfolder install
+  if (trim($request_uri[0]) == get_site_subfolder()) {
+    array_splice($request_uri, 0, 1);
+  }
 
   // Check if the sort is set
   if (array_search('sort', $request_uri) === FALSE) {

@@ -1,0 +1,27 @@
+// base/_base.scss
+
+/* ==========================================================================
+   Cornerstone Admin Styling
+   ========================================================================== */
+
+/* Body Layouts */
+
+body.cs-admin {
+    display: grid;
+    min-height: 100vh;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+        "cs--body__sidebar"
+        "cs--body__header"
+        "cs--body__main";
+    transition: all 1s;
+
+    @media #{$medium-and-up} {
+        grid-template-columns: minmax(0, 230px) minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "cs--body__sidebar cs--body__header"
+            "cs--body__sidebar cs--body__main";
+    }
+}

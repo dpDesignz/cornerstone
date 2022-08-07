@@ -1,0 +1,62 @@
+// components/_trumbowyg.scss
+
+/*!
+ * Trumbowyg Extended
+ * https://alex-d.github.io/Trumbowyg/ */
+body.cs-components,
+body.cs-component__trumbowyg {
+
+  .trumbowyg {
+
+    // Style the trumbowyg box
+    &-box {
+      border: none;
+      min-height: 225px;
+    }
+
+    // Style the trumbowyg button row
+    &-button-pane {
+      z-index: 0;
+      background: transparent;
+      border-bottom: none;
+
+      button.trumbowyg-active,
+      button:not(.trumbowyg-disable):focus,
+      button:not(.trumbowyg-disable):hover {
+        background-color: rgba(52, 52, 52, 0.7);
+        outline: 0;
+
+        svg {
+          fill: #fff;
+        }
+
+      }
+
+      &::after {
+        background: none;
+        background-color: transparent;
+      }
+
+    }
+
+    // Style the trumbowyg button groups
+    &-button-group::after {
+      background: transparent;
+    }
+
+    // Style the trumbowyg editor
+    &-editor {
+      border: 1px solid #DDD;
+      min-height: 185px;
+    }
+
+  }
+
+  // Style labels for trumbowyg textareas
+  .trumbowyg  + label {
+    transform: translateY(-14px) translateX(-8px) scale(0.8) !important;
+    transform-origin: 0 0 !important;
+    font-weight: bolder;
+  }
+
+}

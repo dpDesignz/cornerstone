@@ -3,6 +3,9 @@
 // The core JS file for running Cornerstone Framework scripts
 */
 const debug = false;
+let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+isIOS = (!isIOS && navigator.userAgent.match(/Mac/) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2) ? true : isIOS;
+const touchEvent = 'ontouchstart' in window ? 'touchstart' : 'click';
 const ready = (callback) => {
     if (document.readyState !== 'loading')
         callback();
@@ -16,7 +19,6 @@ const getClosest = function (elem, selector) {
                 Element.prototype.mozMatchesSelector ||
                 Element.prototype.msMatchesSelector ||
                 Element.prototype.oMatchesSelector ||
-                Element.prototype.webkitMatchesSelector ||
                 function (s) {
                     const matches = (document || elem.ownerDocument).querySelectorAll(s);
                     let i = matches.length;
@@ -96,7 +98,7 @@ const animateElm = function (elem, animation, speed, hide) {
 };
 const siteAlerts = document.querySelectorAll('.csc-alert');
 if (siteAlerts) {
-    siteAlerts.forEach(alert => alert.addEventListener('click', () => {
+    siteAlerts.forEach(alert => alert.addEventListener(touchEvent, () => {
         if (!alert.hasAttribute('data-closable') ||
             alert.dataset.closable === 'true') {
             alert.style.display = 'none';
@@ -105,14 +107,14 @@ if (siteAlerts) {
 }
 const siteBanner = document.querySelector('#csc-banner');
 if (siteBanner) {
-    siteBanner.addEventListener('click', () => {
+    siteBanner.addEventListener(touchEvent, () => {
         if (siteBanner.classList.contains('visible'))
             siteBanner.classList.remove('visible');
     });
 }
 const tableHeaders = document.querySelectorAll('.csc-table-header__title');
 if (tableHeaders) {
-    tableHeaders.forEach(headerItem => headerItem.addEventListener('click', () => {
+    tableHeaders.forEach(headerItem => headerItem.addEventListener(touchEvent, () => {
         if (!headerItem.classList.contains('csc-table-header__title--active')) {
             headerItem.classList.remove('csc-table-header__title--active', 'csc-table-header__title--desc');
         }
@@ -173,32 +175,38 @@ function toggleFAQCollapsible() {
     }
 }
 const tabLinks = document.querySelectorAll('.csc-tab');
+let tabItemsFound = false;
 if (tabLinks.length > 0) {
     tabLinks.forEach(tabLink => {
-        tabLink.addEventListener('click', function (e) {
-            const tabContents = document.querySelectorAll('.csc-tab__content');
-            tabContents.forEach(tabContent => {
-                tabContent.style.display = "none";
+        if (tabLink.dataset.ref !== undefined) {
+            tabItemsFound = true;
+            tabLink.addEventListener('click', function (e) {
+                const tabContents = document.querySelectorAll('.csc-tab__content');
+                tabContents.forEach(tabContent => {
+                    tabContent.style.display = "none";
+                });
+                tabLinks.forEach(activeLink => {
+                    activeLink.classList.remove("csc-tab--active");
+                });
+                const activeTab = document.querySelector(`#tab__${this.dataset.ref}`);
+                if (activeTab) {
+                    activeTab.style.display = "block";
+                    tabLink.classList.add("csc-tab--active");
+                }
             });
-            tabLinks.forEach(activeLink => {
-                activeLink.classList.remove("csc-tab--active");
-            });
-            const activeTab = document.querySelector(`#tab__${this.dataset.ref}`);
-            if (activeTab) {
-                activeTab.style.display = "block";
-                tabLink.classList.add("csc-tab--active");
+        }
+    });
+    if (tabItemsFound) {
+        ready(() => {
+            const activeTab = [...tabLinks].filter(el => el.classList.contains('csc-tab--active') !== false);
+            if (activeTab && activeTab.length > 0) {
+                activeTab[0].click();
+            }
+            else {
+                tabLinks[0].click();
             }
         });
-    });
-    ready(() => {
-        const activeTab = [...tabLinks].filter(el => el.classList.contains('csc-tab--active') !== false);
-        if (activeTab && activeTab.length > 0) {
-            activeTab[0].click();
-        }
-        else {
-            tabLinks[0].click();
-        }
-    });
+    }
 }
 ready(() => {
     const { hash } = window.location;
@@ -337,7 +345,7 @@ if ($.modal !== undefined) {
     });
     $(document).on('click.modal', 'button[rel~="modal:close"]', $.modal.close);
 }
-$(document).on('click', '.csc-loader--full-page', function () {
+$(document).on(touchEvent, '.csc-loader--full-page', function () {
     $(this).fadeOut(500, function () {
         $(this).remove();
     });
@@ -447,7 +455,7 @@ if ($.trumbowyg !== undefined) {
 document.querySelectorAll('.cs-pagitems').forEach(select => select.addEventListener('change', function () {
     window.location.href = select.value;
 }));
-$(document).ready(function () {
+ready(() => {
     if (siteBanner) {
         if (!siteBanner.classList.contains('visible'))
             siteBanner.classList.add('visible');

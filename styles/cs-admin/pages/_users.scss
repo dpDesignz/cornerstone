@@ -1,0 +1,107 @@
+// pages/_users.scss
+
+section#users-list {
+
+  table {
+
+    tr {
+
+      th {
+
+        &:nth-child(1) {
+          width: 250px;
+        }
+
+        &:nth-child(3) {
+          width: 300px;
+        }
+
+        &:nth-child(4) {
+          width: 150px;
+        }
+
+        &:last-child {
+          width: 250px;
+          text-align: left;
+        }
+
+      }
+
+      td {
+
+        &:nth-child(2) {
+          .item{
+            &--title {
+              display: block;
+              font-size: 1.1em;
+            }
+          }
+        }
+
+        &:last-child {
+          text-align: left;
+        }
+
+      }
+
+      &:hover td:first-child i {
+        opacity: 0.75;
+      }
+
+    }
+
+  }
+
+}
+
+section#roles-list {
+
+  table {
+
+    tr {
+
+      th {
+
+        &:nth-last-child(2) {
+          width: 100px;
+          text-align: center;
+        }
+
+        &:last-child {
+          width: 125px;
+        }
+
+      }
+
+      td {
+
+        &:nth-child(1) {
+          .item{
+            &--title {
+              display: block;
+              font-size: 1.1em;
+            }
+          }
+        }
+
+        &:nth-last-child(2) {
+          text-align: center;
+          padding: 4px;
+
+          span {
+            filter: invert(1);
+            mix-blend-mode: difference;
+          }
+        }
+
+      }
+
+      &:hover td:first-child i {
+        opacity: 0.75;
+      }
+
+    }
+
+  }
+
+}

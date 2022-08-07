@@ -96,7 +96,7 @@ class Users extends Cornerstone\Controller
         if (!empty($data->login_dtm)) {
 
           // Set timestamp
-          $userLastLogin = new \DateTime($data->login_dtm);
+          $userLastLogin = new \Cornerstone\DateTime($_SESSION['_cs']['user'], $data->login_dtm);
           $userLastLogin = $userLastLogin->format('D, jS M Y h:ia');
         } else { // Unable to find last login. Set default value.
 
@@ -183,9 +183,32 @@ class Users extends Cornerstone\Controller
       );
       // Instructions
       $this->data['instructions'] = 'Enter the new details for ' . ucfirst($this->data['login']) . ' to update them.';
+      // Check for user meta data
+      if ($userMetaData = $this->userModel->getUserMeta($this->data['id'])) {
+        // Set data
+        foreach ($userMetaData as $metaItem) {
+          $this->data[$metaItem->umeta_key] = $metaItem->umeta_value;
+        }
+      }
     }
     // Cancel Button
     $this->data['cancel_btn'] = get_site_url('admin/users/');
+
+    #########################
+    ####    TIMEZONES    ####
+    #########################
+
+    // Load files required.
+    require_once(DIR_HELPERS . 'fn.timezone.php'); // Load the timezone helper
+
+    // Timezone options
+    $this->data['timezone_options'] = "";
+    $timezones = timezones_list();
+    foreach ($timezones as $zone) {
+      // Check if selected
+      $selectedTZ = ((!empty($this->data['timezone']) && timezones_filter($this->data['timezone']) === $zone[1]) || !isset($this->data['timezone']) && $zone[1] === "Europe/London") ? ' selected' : '';
+      $this->data['timezone_options'] .= '<option value="' . htmlspecialchars($zone[1]) . '"' . $selectedTZ . '>' . htmlspecialchars($zone[0]) . '</option>';
+    }
 
     #####################
     ####    ROLES    ####
@@ -208,6 +231,12 @@ class Users extends Cornerstone\Controller
     } else {
       $this->data['role_options'] = '<option value="0" disabled>No roles available</option>';
     }
+
+    ####################
+    ####    META    ####
+    ####################
+    // SET ANY CUSTOMER USER META LOADING HERE
+    // THIS WILL BE RESET ON UPDATE SO MAKE SURE YOU HAVE THIS BACKED UP
   }
 
   /**
@@ -228,81 +257,94 @@ class Users extends Cornerstone\Controller
 
     //Check if page posted and process form if it is
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "save") {
-
-      // Sanitize POST data
-      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
       // Get information submitted and validate
-      if (isset($_POST['login'])) {
-
-        // Try validating
-        try {
-
-          // Get login data
-          $this->data['login'] = htmlspecialchars(trim($_POST['login']));
-          if (empty($this->data['login'])) {
-            // Data is not set. Return error.
-            $this->data['err']['login'] = 'Please enter a login (username) value';
-          } else  if (strlen($this->data['login']) < 3) {
-            // Data is less than 3 characters. Return error.
-            $this->data['err']['login'] = 'Please enter at least 3 characters';
-          }
-
-          // Get display_name data
-          $this->data['display_name'] = htmlspecialchars(trim($_POST['display_name']));
-          if (empty($this->data['display_name'])) {
-            // Data is not set. Return error.
-            $this->data['err']['display_name'] = 'Please enter a display name';
-          } else  if (strlen($this->data['display_name']) < 2) {
-            // Data is less than 3 characters. Return error.
-            $this->data['err']['display_name'] = 'Please enter at least 2 characters';
-          }
-
-          // Get first_name data
-          $this->data['first_name'] = htmlspecialchars(trim($_POST['first_name']));
-          if (empty($this->data['first_name'])) {
-            // Data is not set. Return error.
-            $this->data['err']['first_name'] = 'Please enter a first name';
-          } else  if (strlen($this->data['first_name']) < 2) {
-            // Data is less than 3 characters. Return error.
-            $this->data['err']['first_name'] = 'Please enter at least 2 characters';
-          }
-
-          // Get last_name data
-          $this->data['last_name'] = htmlspecialchars(trim($_POST['last_name']));
-          if (empty($this->data['last_name'])) {
-            // Data is not set. Return error.
-            $this->data['err']['last_name'] = 'Please enter a last name';
-          } else  if (strlen($this->data['last_name']) < 2) {
-            // Data is less than 3 characters. Return error.
-            $this->data['err']['last_name'] = 'Please enter at least 2 characters';
-          }
-
-          // Get email data
-          $this->data['email'] = htmlspecialchars(trim($_POST['email']));
-          if (!empty($this->data['email']) && !filter_var($this->data['email'], FILTER_VALIDATE_EMAIL)) {
-            // Data isn't a valid email address. Return error.
-            $this->data['err']['email'] = 'Please enter a valid email address';
-          }
-
-          // Get role_id data
-          $this->data['role_id'] = htmlspecialchars(trim($_POST['role_id']));
-          if (empty($this->data['role_id'])) {
-            // Data is not set. Return error.
-            $this->data['err']['role_id'] = 'Please select a role';
-          }
-
-          // Get send auth_rqd flag
-          $this->data['auth_rqd'] = (isset($_POST['auth_rqd']) && !empty($_POST['auth_rqd'])) ? TRUE : FALSE;
-        } catch (Exception $e) {
-
-          // Log error if any and set flash message
-          error_log($e->getMessage(), 0);
-          flashMsg('users_user', '<strong>Error</strong> There was an error adding the user. Please try again', 'warning');
+      try {
+        // Get login data
+        $this->data['login'] = trim($_POST['login']);
+        if (empty($this->data['login'])) {
+          // Data is not set. Return error.
+          $this->data['err']['login'] = 'Please enter a login (username) value';
+          throw new Exception("The login (username) is missing. Please enter a login (username).");
+        } else if (strlen($this->data['login']) < 3) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['login'] = 'Please enter at least 3 characters';
+          throw new Exception("The login (username) is less than 3 characters. Please enter at least 3 characters.");
         }
-      } else { // Required data not set. Set Errors.
 
-        $this->data['err']['login'] = 'Please enter a login (username) value';
+        // Get display_name data
+        $this->data['display_name'] = trim($_POST['display_name']);
+        if (empty($this->data['display_name'])) {
+          // Data is not set. Return error.
+          $this->data['err']['display_name'] = 'Please enter a display name';
+          throw new Exception("The display name is missing. Please enter your display name.");
+        } else  if (strlen($this->data['display_name']) < 2) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['display_name'] = 'Please enter at least 2 characters';
+          throw new Exception("The display name is less than 2 characters. Please enter at least 2 characters.");
+        }
+
+        // Get first_name data
+        $this->data['first_name'] = trim($_POST['first_name']);
+        if (empty($this->data['first_name'])) {
+          // Data is not set. Return error.
+          $this->data['err']['first_name'] = 'Please enter a first name';
+          throw new Exception("The first name is missing. Please enter a first name.");
+        } else  if (strlen($this->data['first_name']) < 2) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['first_name'] = 'Please enter at least 2 characters';
+          throw new Exception("The first name is less than 2 characters. Please enter at least 2 characters.");
+        }
+
+        // Get last_name data
+        $this->data['last_name'] = trim($_POST['last_name']);
+        if (empty($this->data['last_name'])) {
+          // Data is not set. Return error.
+          $this->data['err']['last_name'] = 'Please enter a last name';
+          throw new Exception("The last name is missing. Please enter a last name.");
+        } else  if (strlen($this->data['last_name']) < 2) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['last_name'] = 'Please enter at least 2 characters';
+          throw new Exception("The last name is less than 2 characters. Please enter at least 2 characters.");
+        }
+
+        // Get email data
+        $this->data['email'] = trim($_POST['email']);
+        if (empty($this->data['email'])) {
+          // Data is not set. Return error.
+          $this->data['err']['email'] = 'Please enter an email address';
+          throw new Exception("The email address is missing. Please enter an email address.");
+        } else if (!empty($this->data['email']) && !filter_var($this->data['email'], FILTER_VALIDATE_EMAIL)) {
+          // Data isn't a valid email address. Return error.
+          $this->data['err']['email'] = 'Please enter a valid email address';
+          throw new Exception("The email address failed validation. Please enter a valid email address.");
+        }
+
+        // Get timezone data
+        $this->data['timezone'] = trim($_POST['timezone']);
+        if (empty($this->data['timezone'])) {
+          // Data is not set. Return error.
+          $this->data['err']['timezone'] = 'Please select a timezone.';
+          throw new Exception("The timezone is missing. Please select a timezone.");
+        }
+
+        // Get role_id data
+        $this->data['role_id'] = trim($_POST['role_id']);
+        if (empty($this->data['role_id'])) {
+          // Data is not set. Return error.
+          $this->data['err']['role_id'] = 'Please select a role';
+          throw new Exception("The role is missing. Please select a role.");
+        }
+
+        // Get send auth_rqd flag
+        $this->data['auth_rqd'] = (isset($_POST['auth_rqd']) && !empty($_POST['auth_rqd'])) ? TRUE : FALSE;
+
+        // Get meta data if any set
+        $this->data['meta'] = (isset($_POST['meta']) && !empty($_POST['meta'])) ? $_POST['meta'] : null;
+      } catch (Exception $e) {
+
+        // Log error if any and set flash message
+        error_log($e->getMessage(), 0);
+        flashMsg('users_user', '<strong>Error</strong> There was an error adding the user - ' . $e->getMessage() . '. Please try again', 'warning');
       }
 
       // If valid, add new
@@ -328,9 +370,14 @@ class Users extends Cornerstone\Controller
           $this->data['first_name'],
           $this->data['last_name'],
           (int) $this->data['role_id'],
-          (int) $this->data['auth_rqd']
+          (int) $this->data['auth_rqd'],
+          $this->data['timezone']
         )) {
           // User Added
+
+          // Add user meta if any
+          if (!empty($this->data['meta']))
+            $this->addMeta((int) $userID, $this->data['meta']);
 
           // Set the user ID
           if ($this->userModel->setUserID((int) $userID)) {
@@ -427,7 +474,7 @@ class Users extends Cornerstone\Controller
           // Redirect to index
           redirectTo('admin/users/');
           exit;
-        } // Unable to add contact. Return error.
+        } // Unable to add. Return error.
 
         // Set error message
         flashMsg('users_user', '<strong>Error</strong> There was an error adding the user. Please try again.', 'warning');
@@ -449,6 +496,13 @@ class Users extends Cornerstone\Controller
   }
 
   /**
+   * Add Meta from Add page
+   */
+  private function addMeta($userID, $meta_data)
+  {
+  }
+
+  /**
    * Edit Page
    */
   public function edit(...$params)
@@ -467,86 +521,101 @@ class Users extends Cornerstone\Controller
     //Check if page posted and process form if it is
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == "save") {
 
-      // Sanitize POST data
-      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
       // Get information submitted and validate
-      if (isset($_POST['id'])) {
+      try {
 
-        // Try validating
-        try {
+        // Get ID
+        $this->data['id'] = htmlspecialchars(stripslashes(trim($_POST['id'])));
 
-          // Get ID
-          $this->data['id'] = htmlspecialchars(stripslashes(trim($_POST['id'])));
-
-          // Get login data
-          $this->data['login'] = htmlspecialchars(trim($_POST['login']));
-          if (empty($this->data['login'])) {
-            // Data is not set. Return error.
-            $this->data['err']['login'] = 'Please enter a login (username) value';
-          } else  if (strlen($this->data['login']) < 3) {
-            // Data is less than 3 characters. Return error.
-            $this->data['err']['login'] = 'Please enter at least 3 characters';
-          }
-
-          // Get display_name data
-          $this->data['display_name'] = htmlspecialchars(trim($_POST['display_name']));
-          if (empty($this->data['display_name'])) {
-            // Data is not set. Return error.
-            $this->data['err']['display_name'] = 'Please enter a display name';
-          } else  if (strlen($this->data['display_name']) < 2) {
-            // Data is less than 3 characters. Return error.
-            $this->data['err']['display_name'] = 'Please enter at least 2 characters';
-          }
-
-          // Get first_name data
-          $this->data['first_name'] = htmlspecialchars(trim($_POST['first_name']));
-          if (empty($this->data['first_name'])) {
-            // Data is not set. Return error.
-            $this->data['err']['first_name'] = 'Please enter a first name';
-          } else  if (strlen($this->data['first_name']) < 2) {
-            // Data is less than 3 characters. Return error.
-            $this->data['err']['first_name'] = 'Please enter at least 2 characters';
-          }
-
-          // Get last_name data
-          $this->data['last_name'] = htmlspecialchars(trim($_POST['last_name']));
-          if (empty($this->data['last_name'])) {
-            // Data is not set. Return error.
-            $this->data['err']['last_name'] = 'Please enter a last name';
-          } else  if (strlen($this->data['last_name']) < 2) {
-            // Data is less than 3 characters. Return error.
-            $this->data['err']['last_name'] = 'Please enter at least 2 characters';
-          }
-
-          // Get email data
-          $this->data['email'] = htmlspecialchars(trim($_POST['email']));
-          if (!empty($this->data['email']) && !filter_var($this->data['email'], FILTER_VALIDATE_EMAIL)) {
-            // Data isn't a valid email address. Return error.
-            $this->data['err']['email'] = 'Please enter a valid email address';
-          }
-
-          // Get role_id data
-          $this->data['role_id'] = htmlspecialchars(trim($_POST['role_id']));
-          if (isset($this->data['role_id']) && $this->data['role_id'] < 0) {
-            // Data is not set. Return error.
-            $this->data['err']['role_id'] = 'Please select a role';
-          }
-
-          // Get auth_rqd flag
-          $this->data['auth_rqd'] = (isset($_POST['auth_rqd']) && !empty($_POST['auth_rqd'])) ? TRUE : FALSE;
-
-          // Get status flag
-          $this->data['status'] = (isset($_POST['status']) && !empty($_POST['status'])) ? TRUE : FALSE;
-        } catch (Exception $e) {
-
-          // Log error if any and set flash message
-          error_log($e->getMessage(), 0);
-          flashMsg('users_user', '<strong>Error</strong> There was an error editing the user. Please try again', 'warning');
+        // Get login data
+        $this->data['login'] = trim($_POST['login']);
+        if (empty($this->data['login'])) {
+          // Data is not set. Return error.
+          $this->data['err']['login'] = 'Please enter a login (username) value';
+          throw new Exception("The login (username) is missing. Please enter a login (username).");
+        } else if (strlen($this->data['login']) < 3) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['login'] = 'Please enter at least 3 characters';
+          throw new Exception("The login (username) is less than 3 characters. Please enter at least 3 characters.");
         }
-      } else { // Required data not set. Set Errors.
 
-        $this->data['err']['id'] = 'ID is missing';
+        // Get display_name data
+        $this->data['display_name'] = trim($_POST['display_name']);
+        if (empty($this->data['display_name'])) {
+          // Data is not set. Return error.
+          $this->data['err']['display_name'] = 'Please enter a display name';
+          throw new Exception("The display name is missing. Please enter your display name.");
+        } else  if (strlen($this->data['display_name']) < 2) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['display_name'] = 'Please enter at least 2 characters';
+          throw new Exception("The display name is less than 2 characters. Please enter at least 2 characters.");
+        }
+
+        // Get first_name data
+        $this->data['first_name'] = trim($_POST['first_name']);
+        if (empty($this->data['first_name'])) {
+          // Data is not set. Return error.
+          $this->data['err']['first_name'] = 'Please enter a first name';
+          throw new Exception("The first name is missing. Please enter a first name.");
+        } else  if (strlen($this->data['first_name']) < 2) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['first_name'] = 'Please enter at least 2 characters';
+          throw new Exception("The first name is less than 2 characters. Please enter at least 2 characters.");
+        }
+
+        // Get last_name data
+        $this->data['last_name'] = trim($_POST['last_name']);
+        if (empty($this->data['last_name'])) {
+          // Data is not set. Return error.
+          $this->data['err']['last_name'] = 'Please enter a last name';
+          throw new Exception("The last name is missing. Please enter a last name.");
+        } else  if (strlen($this->data['last_name']) < 2) {
+          // Data is less than 3 characters. Return error.
+          $this->data['err']['last_name'] = 'Please enter at least 2 characters';
+          throw new Exception("The last name is less than 2 characters. Please enter at least 2 characters.");
+        }
+
+        // Get email data
+        $this->data['email'] = trim($_POST['email']);
+        if (empty($this->data['email'])) {
+          // Data is not set. Return error.
+          $this->data['err']['email'] = 'Please enter an email address';
+          throw new Exception("The email address is missing. Please enter an email address.");
+        } else if (!empty($this->data['email']) && !filter_var($this->data['email'], FILTER_VALIDATE_EMAIL)) {
+          // Data isn't a valid email address. Return error.
+          $this->data['err']['email'] = 'Please enter a valid email address';
+          throw new Exception("The email address failed validation. Please enter a valid email address.");
+        }
+
+        // Get timezone data
+        $this->data['timezone'] = trim($_POST['timezone']);
+        if (empty($this->data['timezone'])) {
+          // Data is not set. Return error.
+          $this->data['err']['timezone'] = 'Please select a timezone.';
+          throw new Exception("The timezone is missing. Please select a timezone.");
+        }
+
+        // Get role_id data
+        $this->data['role_id'] = trim($_POST['role_id']);
+        if (empty($this->data['role_id'])) {
+          // Data is not set. Return error.
+          $this->data['err']['role_id'] = 'Please select a role';
+          throw new Exception("The role is missing. Please select a role.");
+        }
+
+        // Get auth_rqd flag
+        $this->data['auth_rqd'] = (isset($_POST['auth_rqd']) && !empty($_POST['auth_rqd'])) ? TRUE : FALSE;
+
+        // Get status flag
+        $this->data['status'] = (isset($_POST['status']) && !empty($_POST['status'])) ? TRUE : FALSE;
+
+        // Get meta data if any set
+        $this->data['meta'] = (isset($_POST['meta']) && !empty($_POST['meta'])) ? $_POST['meta'] : null;
+      } catch (Exception $e) {
+
+        // Log error if any and set flash message
+        error_log($e->getMessage(), 0);
+        flashMsg('users_user', '<strong>Error</strong> There was an error editing the user - ' . $e->getMessage() . '. Please try again', 'warning');
       }
 
       // If valid, add new
@@ -563,9 +632,28 @@ class Users extends Cornerstone\Controller
           $this->data['last_name'],
           (int) $this->data['role_id'],
           (int) $this->data['auth_rqd'],
+          $this->data['timezone'],
           (int) $this->data['status']
         )) {
           // User updated
+
+          // Update user meta if any
+          if (!empty($this->data['meta']))
+            $this->editMeta((int) $this->data['id'], $this->data['meta']);
+
+          // Update session preferences
+          if ((int) $this->data['id'] === (int)$_SESSION['_cs']['user']['uid']) {
+            // Set user email address
+            $_SESSION['_cs']['user']['email'] = $this->data['email'];
+            // Set user display name
+            $_SESSION['_cs']['user']['name'] = ucwords($this->data['display_name']);
+            // Set user language
+            // $_SESSION['_cs']['user']['lang'] = $this->data['language'];
+            // Set user timezone
+            $_SESSION['_cs']['user']['timezone'] = new \DateTimeZone($this->data['timezone']);
+            // Set user date format
+            // $_SESSION['_cs']['user']['date_format'] = $this->data['date_format'];
+          }
 
           // Set success message
           flashMsg('admin_users', '<strong>Success</strong> ' . $this->data['display_name'] . ' was updated successfully.');
@@ -614,6 +702,14 @@ class Users extends Cornerstone\Controller
       redirectTo('admin/brands');
       exit;
     }
+  }
+
+
+  /**
+   * Edit Meta from Edit page
+   */
+  private function editMeta($userID, $meta_data)
+  {
   }
 
   /**

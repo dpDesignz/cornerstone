@@ -1,0 +1,15 @@
+// components/_tooltipster.scss
+/* Tooltipster Styling ~ http://iamceege.github.io/tooltipster/#styling */
+.tooltipster-default{
+  border-radius:5px;
+  border: none;
+  background: $primary-color;
+  color:#fff;
+  .tooltipster-content{
+    font-family: $font-stack;
+    font-size:14px;
+    line-height:16px;
+    padding:8px 10px;
+    overflow:hidden
+  }
+}

@@ -1,0 +1,45 @@
+// components/_breadcrumbs.scss
+
+body.cs-components,
+body.cs-component__breadcrumbs {
+
+  .csc-breadcrumbs {
+    margin-top: 16px;
+    padding: 0 6px 12px;
+    border-bottom: 1px solid color("grey", "lighten-2");
+  }
+
+  .csc-breadcrumb {
+    font-size: 1rem;
+    color: rgba($font-color,0.7);
+
+    &::before {
+      content: '/';
+      display: inline-block;
+      margin: 1.5px 10px 0 8px;
+      font-weight: normal !important;
+      font-style: normal;
+      -webkit-font-smoothing: antialiased;
+      color: rgba($font-color,0.7);
+    }
+
+    &:first-child::before {
+      display: none;
+    }
+
+    &[href]:hover:not(:last-child),
+    &[href]:focus:not(:last-child) {
+      text-decoration: underline;
+    }
+
+    &:last-child {
+      color: $font-color; font-weight: 700;
+    }
+
+    &:not(:last-child) {
+      color: $link-color;
+    }
+
+  }
+
+}

@@ -1,0 +1,10 @@
+// layout/_footer.scss
+
+/*------------------------------------*\
+  #FOOTER
+\*------------------------------------*/
+body.cs-page > #cs-footer {
+    grid-area: cs--body__footer;
+    display: grid;
+    grid-template-columns: 1fr;
+}

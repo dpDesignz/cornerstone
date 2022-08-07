@@ -15,6 +15,7 @@ use function ezsql\functions\{
   where,
   grouping,
   eq,
+  neq,
   like,
   orderBy,
   limit
@@ -86,6 +87,9 @@ class User extends Cornerstone\ModelBase
         user_last_name,
         user_role_id,
         user_auth_rqd,
+        user_lang,
+        user_timezone,
+        user_date_format,
         user_status",
         where(
           eq("user_id", $userID)
@@ -223,8 +227,37 @@ class User extends Cornerstone\ModelBase
    *
    * @return object Return object with list of users
    */
-  public function listUsersBasic()
+  public function listUsersBasic($params = array())
   {
+
+    // Build query
+    $this->sql = array();
+    $this->whereArray = array();
+
+    // Check for ignore role
+    if (!empty($params['ignore_role'])) {
+      // Check if array
+      if (is_array($params['ignore_role'])) {
+        // Loop through array
+        $roleIDArray = array();
+        foreach ($params['ignore_role'] as $roleID) {
+          $roleIDArray[] = neq('user_role_id', $roleID);
+        }
+        // Set to where
+        $this->whereArray[] = grouping(...$roleIDArray);
+      } else if (is_numeric($params['ignore_role'])) {
+        // Set to where
+        $this->whereArray[] = neq('user_role_id', $params['ignore_role']);
+      }
+    } else {
+      // Set to where
+      $this->whereArray[] = neq('user_id', '0');
+    }
+
+    // Combine where
+    if (!empty($this->whereArray)) {
+      $this->sql[] = where(...$this->whereArray);
+    }
 
     // Run query to find users
     $this->conn->dbh->tableSetup('users', DB_PREFIX);
@@ -234,7 +267,8 @@ class User extends Cornerstone\ModelBase
       user_first_name,
       user_last_name,
       CONCAT(user_first_name, ' ', user_last_name) AS users_name,
-      user_email"
+      user_email",
+      ...$this->sql
     );
 
     // Return if results
@@ -260,6 +294,7 @@ class User extends Cornerstone\ModelBase
    * @param string $lastName The last name of the user
    * @param int $roleID The ID of the role the user is assigned to
    * @param int $authRqd Set if the user is required to use 2FA
+   * @param string $timezone The timezone of the user
    *
    * @return bool|int Will return FALSE if failed or inserted ID if successful.
    */
@@ -272,7 +307,8 @@ class User extends Cornerstone\ModelBase
     string $firstName,
     string $lastName,
     int $roleID,
-    int $authRqd
+    int $authRqd,
+    string $timezone
   ) {
 
     // Add data
@@ -288,6 +324,7 @@ class User extends Cornerstone\ModelBase
         'user_last_name' => $lastName,
         'user_role_id' => $roleID,
         'user_auth_rqd' => $authRqd,
+        'user_timezone' => $timezone,
         'user_status' => '1',
         'user_created_dtm' => date('Y-m-d H:i:s')
       )
@@ -315,6 +352,7 @@ class User extends Cornerstone\ModelBase
    * @param string $lastName The last name of the user
    * @param int $roleID The ID of the role the user is assigned to
    * @param int $authRqd Set if the user is required to use 2FA
+   * @param string $timezone The timezone of the user
    * @param int $status The status of the user
    *
    * @return bool Will return FALSE if failed or TRUE if successful.
@@ -328,6 +366,7 @@ class User extends Cornerstone\ModelBase
     string $lastName,
     int $roleID,
     int $authRqd,
+    string $timezone,
     int $status
   ) {
 
@@ -345,6 +384,7 @@ class User extends Cornerstone\ModelBase
         'user_last_name' => $lastName,
         'user_role_id' => $roleID,
         'user_auth_rqd' => $authRqd,
+        'user_timezone' => $timezone,
         'user_status' => $status,
         'user_edited_id' => $_SESSION['_cs']['user']['uid'],
         'user_edited_dtm' => date('Y-m-d H:i:s')
@@ -358,6 +398,113 @@ class User extends Cornerstone\ModelBase
       // Return TRUE
       return TRUE;
     } // Unable to update. Return FALSE.
+
+    // Return FALSE
+    return FALSE;
+  }
+
+  ####################
+  ####    META    ####
+  ####################
+
+  /**
+   * Get user meta
+   *
+   * @param int $userID ID of the user to get meta for
+   *
+   * @return object Return object with meta for user
+   */
+  public function getUserMeta($userID)
+  {
+
+    // Setup table
+    $this->conn->dbh->tableSetup('user_meta', DB_PREFIX);
+
+    // Run query to find data
+    $userResults = selecting(
+      "umeta_key,
+      umeta_value",
+      where(
+        eq("umeta_user_id", $userID)
+      )
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userResults)) {
+
+      // Return results
+      return $userResults;
+    } // No results. Return FALSE.
+
+    // Return FALSE
+    return false;
+  }
+
+  /**
+   * Update User Meta
+   *
+   * @param int $userID The ID of the user
+   * @param string $key The key of the meta item to add/update
+   * @param string $value The value of the meta item to add/update
+   *
+   * @return bool Will return FALSE if failed or TRUE if successful.
+   */
+  public function updateUserMeta(
+    int $userID,
+    string $key,
+    string $value
+  ) {
+
+    // Setup table
+    $this->conn->dbh->tableSetup('user_meta', DB_PREFIX);
+
+    // Check if already exists
+    $userResults = selecting(
+      "umeta_id",
+      where(
+        eq("umeta_user_id", $userID),
+        eq("umeta_key", $key)
+      )
+    );
+
+    // Return if results
+    if ($this->conn->dbh->getNum_Rows() > 0 && !empty($userResults)) {
+
+      // Update data
+      updating(
+        array(
+          'umeta_value' => $value,
+          'umeta_edited_id' => $_SESSION['_cs']['user']['uid'],
+          'umeta_edited_dtm' => date('Y-m-d H:i:s')
+        ),
+        eq("umeta_user_id", $userID),
+        eq("umeta_key", $key)
+      );
+
+      // Check if updated successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return TRUE
+        return TRUE;
+      } // Unable to update. Return FALSE.
+    } else { // No results. Add meta item.
+      inserting(
+        array(
+          'umeta_user_id' => $userID,
+          'umeta_key' => $key,
+          'umeta_value' => $value,
+          'umeta_edited_id' => $_SESSION['_cs']['user']['uid'],
+          'umeta_edited_dtm' => date('Y-m-d H:i:s')
+        )
+      );
+
+      // Check if added successfully
+      if ($this->conn->dbh->affectedRows() > 0) {
+
+        // Return new ID
+        return $this->conn->dbh->getInsert_Id();
+      } // Unable to add. Return FALSE.
+    }
 
     // Return FALSE
     return FALSE;

@@ -1,0 +1,20 @@
+// media/_small.scss
+
+/* ==========================================================================
+   Media Queries for Responsive Design.
+   These templates override the primary ('mobile first') styles.
+   ========================================================================== */
+
+// Small devices (landscape phones, 576px and up) ~ Container widths: 540px
+@media #{$small-and-up} {
+  body.cs-admin {
+  }
+}
+@media #{$small-only} {
+  body.cs-admin {
+  }
+}
+@media #{$small-and-down} {
+  body.cs-admin {
+  }
+}

@@ -1,0 +1,17 @@
+// components/_tippy.scss
+/* Tippy Themes ~ https://atomiks.github.io/tippyjs/v6/themes/ */
+.tippy {
+  &-box{
+    border-radius:5px;
+    border: none;
+    background: $primary-color;
+    color:#fff;
+  }
+  &-content{
+    font-family: $font-stack;
+    font-size:14px;
+    line-height:16px;
+    padding:8px 10px;
+    overflow:hidden
+  }
+}

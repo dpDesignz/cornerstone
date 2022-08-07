@@ -1,0 +1,47 @@
+// pages/_content.scss
+
+// FAQ Section
+.csc-faq-section,
+.csc-faq-item {
+  h4 {
+    font-size: 1.5em;
+    text-align: center;
+  }
+
+  dl,
+  dd {
+    margin: 0;
+  }
+
+  .faq-item {
+    &__header {
+      font-size: 1.1em;
+
+      &.open {
+        .fa-caret-right {
+          transform: rotate(90deg);
+        }
+      }
+    }
+  }
+}
+
+// Dev Badge
+#cs__dev__site {
+  position: fixed;
+  bottom: 20px;
+  right: -50px;
+  padding: 8px;
+  width: 200px;
+  color: #FFF;
+  background-color: color("deep-orange", "darken-4");
+  transform: rotate(-45deg);
+
+  p {
+    margin: 0;
+    padding: 10px;
+    line-height: 1;
+    text-align: center;
+    border: 1px solid white;
+  }
+}

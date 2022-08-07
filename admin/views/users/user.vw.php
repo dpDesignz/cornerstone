@@ -24,7 +24,7 @@ $pageHeadExtras = '
   #submit-disabled {display: none;}
 </style>';
 $pageFooterExtras = '<script>
-  $("#role_id, #status").chosen({
+  $("#role_id, #timezone").chosen({
     disable_search_threshold: 5,
     no_results_text: "Oops, nothing found!",
     width: "100%",
@@ -39,18 +39,8 @@ require(get_theme_path('head.php', 'admin'));
 // Load html layout
 require(get_theme_path('layout.php', 'admin')); ?>
 
-<div class="csc-row csc-row--no-pad cs-mt-3">
-  <section class="csc-col csc-col12">
-    <nav class="csc-breadcrumbs" aria-label="Breadcrumb">
-      <?php
-      // Check for and output breadcrumbs
-      if (!empty($data->breadcrumbs)) {
-        // Output breadcrumbs
-        echo outputBreadcrumbs((object) $data->breadcrumbs);
-      } ?>
-    </nav>
-  </section>
-</div>
+<?= (!empty($data->breadcrumbs)) ? outputBreadcrumbs((object) $data->breadcrumbs) : ''; // Output breadcrumbs
+?>
 <div class="csc-wrapper csc-row cs-my-2">
   <div class="csc-col csc-col12">
     <h1 class="cs-h2 cs-my-2"><?= $data->page_title; ?></h1>
@@ -67,7 +57,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
       <?php } ?>
       <fieldset>
         <legend>User</legend>
-        <div class=" csc-row csc-row--no-pad csc-row--no-gap">
+        <div class=" csc-row csc-row--no-pad">
           <div class="csc-col csc-col12 csc-col--md6 csc-input-field">
             <input type="text" name="login" id="login" tabindex="1" autocapitalize="on" value="<?php if (!empty($data->login)) echo $data->login; ?>" data-lpignore="true" required>
             <label for="login">Login (username)*</label>
@@ -77,7 +67,7 @@ require(get_theme_path('layout.php', 'admin')); ?>
             <label for="display_name">Display Name*</label>
           </div>
         </div>
-        <div class="csc-row csc-row--no-pad csc-row--no-gap">
+        <div class="csc-row csc-row--no-pad">
           <div class="csc-col csc-col12 csc-col--md6 csc-input-field">
             <input type="text" name="first_name" id="first_name" tabindex="3" autocapitalize="on" value="<?php if (!empty($data->first_name)) echo $data->first_name; ?>" data-lpignore="true" required>
             <label for="first_name">First Name*</label>
@@ -95,10 +85,19 @@ require(get_theme_path('layout.php', 'admin')); ?>
         </div>
       </fieldset>
       <fieldset>
+        <legend>Preferences</legend>
+        <div class="csc-input-field">
+          <select name="timezone" id="timezone" data-placeholder="Select their local timezone" tabindex="10" required>
+            <?= $data->timezone_options; ?>
+          </select>
+          <label>Timezone*</label>
+        </div>
+      </fieldset>
+      <fieldset>
         <legend>Account Details</legend>
         <div class="csc-row csc-row--no-pad">
           <div class="csc-col csc-col12 csc-input-field">
-            <select name="role_id" id="role_id" data-placeholder="Choose the assigned role" tabindex="6" data-lpignore="true" required>
+            <select name="role_id" id="role_id" data-placeholder="Choose the assigned role" tabindex="20" data-lpignore="true" required>
               <?= $data->role_options; ?>
             </select>
             <label>Assigned Role*</label>
@@ -160,9 +159,10 @@ require(get_theme_path('layout.php', 'admin')); ?>
     <p class="cs-body2"><strong>Display Name*: </strong> The display name shown on the site when the user does something. This is generally just the first name of the user.</p>
     <p class="cs-body2"><strong>First Name*: </strong> The first name of the user.</p>
     <p class="cs-body2"><strong>Last Name*: </strong> The last name of the user.</p>
-    <p class="cs-body2"><strong>Email Address*: </strong> The email address of the user. This can also be used when logging in to the admin end of the website.</p>
+    <p class="cs-body2"><strong>Email Address*: </strong> The email address of the user. This can also be used when logging in to the website.</p>
+    <p class="cs-body2"><strong>Timezone*: </strong> The timezone of the user.</p>
     <p class="cs-body2"><strong>Assigned Role*: </strong> The assigned role of the user.</p>
-    <p class="cs-body2"><strong>Auth Required: </strong> <em>(optional)</em> Set if the user requires 2 factor authentication to log in.</p>
+    <p class="cs-body2"><strong>Auth Required: </strong> <em>(optional)</em> Set if the user requires 2 factor authentication (2FA) to log in.</p>
     <?php
     // Only show status if editing
     if ($data->page_type == "edit") {

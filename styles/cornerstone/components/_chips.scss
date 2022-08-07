@@ -1,0 +1,163 @@
+// components/_chips.scss
+
+body.cs-components,
+body.cs-component__chips {
+
+  .csc-chip {
+    will-change: transform,opacity;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 12px;
+    height: 32px;
+    outline: none;
+    background-color: #e0e0e0;
+    font-size: .875rem;
+    line-height: 1.25rem;
+    font-weight: 400;
+    letter-spacing: .0178571429em;
+    text-decoration: inherit;
+    text-transform: inherit;
+    color: rgba(0,0,0,.87);
+    cursor: pointer;
+    border-radius: 16px;
+    overflow: hidden;
+
+    &-set {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 4px;
+
+      & .csc-chip {
+        margin: 4px;
+      }
+
+      &--choice {
+        .csc-chip.csc-chip--selected {
+          color: $button-color;
+          background-color: #FFFFFF;
+
+          // Elements
+          .csc-chip__checkmark {
+            margin: -4px 4px -4px -4px;
+          }
+
+          // Actions
+          &::after,
+          &::before {
+            opacity: .08;
+            background-color: $button-color;
+          }
+
+          &:hover::before {
+            opacity: 0.12;
+          }
+
+        }
+
+      }
+
+    }
+
+    // Elements
+    &__icon {
+      vertical-align: middle;
+      text-align: center;
+      outline: none;
+      border-radius: 50%;
+
+      &--leading,
+      &--trailing {
+        color: rgba(0,0,0,.54);
+      }
+
+      &--leading {
+        display: inline-block;
+
+        &:not(.csc-chip__icon--leading-hidden) {
+          margin: -4px 4px -4px -4px;
+          min-width: 20px; height: 20px;
+          font-size: 20px;
+        }
+
+      }
+
+      &--trailing {
+        margin: 0 -4px 0 4px;
+        width: 18px; height: 18px;
+        font-size: 18px;
+
+        &:hover {
+          color: rgba(0, 0, 0, 0.62);
+        }
+
+        &:focus {
+          color: rgba(0, 0, 0, 0.87);
+        }
+
+      }
+
+    }
+
+    &__checkmark {
+      height: 20px;
+
+      &-path {
+        transition: stroke-dashoffset 150ms 50ms cubic-bezier(0.4, 0, 0.6, 1);
+        stroke-width: 2px; stroke-dashoffset: 29.7833385; stroke-dasharray: 29.7833385;
+      }
+
+    }
+
+    &__text {
+      white-space: nowrap;
+    }
+
+    // Actions
+    &::before {
+      transition: opacity 15ms linear, background-color 15ms linear;
+      z-index: 1;
+    }
+
+    &::after,
+    &::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      opacity: 0;
+      pointer-events: none;
+      background-color: rgba(0,0,0,.87);
+      border-radius: 50%;
+    }
+
+    &:hover {
+      color: rgba(0,0,0,.87);
+
+      &::before {
+        opacity: .04;
+      }
+
+    }
+
+    // Modifiers
+    &--outlined {
+      border: 1px solid #e0e0e0;
+      background-color: transparent;
+    }
+    &--shaped {
+      border-radius: 4px;
+    }
+    &--selected {
+      .csc-chip__checkmark-path {
+        stroke-dashoffset: 0;
+      }
+    }
+
+  }
+
+  // TODO: Add filter chips with and without leading icon
+}

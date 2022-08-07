@@ -34,18 +34,8 @@ require(get_theme_path('head.php', 'admin'));
 // Load html layout
 require(get_theme_path('layout.php', 'admin')); ?>
 
-<div class="csc-row cs-mt-3">
-  <section class="csc-col csc-col12">
-    <nav class="csc-breadcrumbs">
-      <?php
-      // Check for and output breadcrumbs
-      if (!empty($data->breadcrumbs)) {
-        // Output breadcrumbs
-        echo outputBreadcrumbs((object) $data->breadcrumbs);
-      } ?>
-    </nav>
-  </section>
-</div>
+<?= (!empty($data->breadcrumbs)) ? outputBreadcrumbs((object) $data->breadcrumbs) : ''; // Output breadcrumbs
+?>
 <div class="csc-row">
   <section class="csc-col csc-col12 csc-col--md6 cs-mb-md-3">
     <h1 class="cs-mb-0">File Manager</h1>
